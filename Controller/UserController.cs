@@ -26,6 +26,18 @@ namespace Bachelor_backend.Controller
             return Ok(uuid);
             
         }
+        //Get text based on session value, discuss later
+        [HttpGet]
+        public async Task<ActionResult> GetText()
+        {
+            throw new NotImplementedException();
+        }
 
+        //Login a good name? discuss later
+        [HttpPost]
+        public async Task<ActionResult>Login()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
