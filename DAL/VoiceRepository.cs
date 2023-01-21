@@ -36,5 +36,15 @@ public class VoiceRepository : IVoiceRepository
             return null;
         }
     }
+
+    public async Task<bool> DeleteFile(string uuid)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<IFormFile> GetAudioRecording(int textId)
+    {
+        throw new NotImplementedException();
+    }
     
 }

@@ -26,6 +26,11 @@ namespace Bachelor_backend.Controller
             return Ok(uuid);
             
         }
+        
+        public async Task<ActionResult<bool>> DeleteFile(string uuid)
+        {
+            throw new NotImplementedException();
+        }
         //Get text based on session value, discuss later
         [HttpGet]
         public async Task<ActionResult> GetText()
