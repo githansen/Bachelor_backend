@@ -1,9 +1,18 @@
-﻿namespace Bachelor_backend.DAL;
+﻿// https://learn.microsoft.com/en-us/dotnet/api/system.guid.newguid?view=net-6.0
+
+namespace Bachelor_backend.DAL;
 
 public class VoiceRepository : IVoiceRepository
 {
+
+    private readonly DatabaseContext _db;
+
+    public VoiceRepository(DatabaseContext db)
+    {
+        _db = db;
+    }
     
-    // https://learn.microsoft.com/en-us/dotnet/api/system.guid.newguid?view=net-6.0
+
     public async Task<string> SaveFile(IFormFile recording)
     {
         try
@@ -20,8 +29,14 @@ public class VoiceRepository : IVoiceRepository
             
             string newFileName = uuid + extension;
             string uploadPath = Path.Combine($@"{Directory.GetCurrentDirectory()}\recordings", newFileName);
-            
+
             //TODO: Insert uuid and file path in db
+            var user = new Users()
+            {
+                UUID = uuid
+            };
+            await _db.Users.AddAsync(user);
+            await _db.SaveChangesAsync();
             
             //Using stream to copy the content of the recording file to disk
             using (var stream = new FileStream(uploadPath, FileMode.Create))
