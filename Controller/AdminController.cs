@@ -21,5 +21,9 @@ namespace Bachelor_backend.Controller
         {
             throw new NotImplementedException();
         }
+        public async Task<ActionResult> GetTexts()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
