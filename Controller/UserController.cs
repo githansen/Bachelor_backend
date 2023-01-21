@@ -28,9 +28,9 @@ namespace Bachelor_backend.Controller
         }
         //Get text based on session value, discuss later
         [HttpGet]
-        public async Task<ActionResult> GetText()
+        public string GetText()
         {
-            throw new NotImplementedException();
+            return "hei";
         }
 
         //Login a good name? discuss later
