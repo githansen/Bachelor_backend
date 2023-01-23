@@ -1,4 +1,5 @@
 ﻿using Bachelor_backend.DAL;
+using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,12 +9,12 @@ namespace Bachelor_backend.Controller
     public class UserController : ControllerBase
     {
 
-        private readonly IVoiceRepository _db;
+        private readonly IVoiceRepository _voiceRep;
         private readonly DatabaseContext t;
 
-        public UserController(IVoiceRepository db, DatabaseContext t)
+        public UserController(IVoiceRepository voiceRep, DatabaseContext t)
         {
-            _db = db;
+            _voiceRep = voiceRep;
             t = t;
         }
         [HttpGet]
@@ -26,7 +27,7 @@ namespace Bachelor_backend.Controller
         public async Task<ActionResult<string>> SaveFile(IFormFile recording)
         {
 
-            string uuid = await _db.SaveFile(recording);
+            string uuid = await _voiceRep.SaveFile(recording);
             if (uuid.Equals(null))
             {
                 return BadRequest("Voice recording is not saved");
