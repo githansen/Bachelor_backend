@@ -2,6 +2,7 @@
 using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Bachelor_backend.Controller
 {
@@ -28,7 +29,7 @@ namespace Bachelor_backend.Controller
         {
 
             string uuid = await _voiceRep.SaveFile(recording);
-            if (uuid.Equals(null))
+            if (uuid.IsNullOrEmpty())
             {
                 return BadRequest("Voice recording is not saved");
             }
