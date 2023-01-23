@@ -13,7 +13,7 @@ namespace Bachelor_backend.DAL
 
     public class DatabaseContext : DbContext
     {
-        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { Database.EnsureCreated(); }
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
 
         public DbSet<Users> Users { get; set; }
     }
