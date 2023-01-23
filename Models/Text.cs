@@ -2,5 +2,6 @@
 {
     public class Text
     {
+        public int TextId { get; set; }
     }
 }

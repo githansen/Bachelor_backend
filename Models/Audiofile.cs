@@ -2,5 +2,6 @@
 {
     public class Audiofile
     {
+        public int AudiofileId { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿// https://learn.microsoft.com/en-us/dotnet/api/system.guid.newguid?view=net-6.0
 
+using Bachelor_backend.Models;
+
 namespace Bachelor_backend.DAL;
 
 public class VoiceRepository : IVoiceRepository
@@ -31,7 +33,7 @@ public class VoiceRepository : IVoiceRepository
             string uploadPath = Path.Combine($@"{Directory.GetCurrentDirectory()}\recordings", newFileName);
 
             //TODO: Insert uuid and file path in db
-            var user = new Users()
+            var user = new User()
             {
                 UUID = uuid
             };
