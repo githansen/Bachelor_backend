@@ -1,4 +1,5 @@
 ﻿using Bachelor_backend.DAL;
+using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bachelor_backend.Controller
@@ -8,12 +9,19 @@ namespace Bachelor_backend.Controller
     {
 
         private readonly IVoiceRepository _db;
+        private readonly DatabaseContext t;
 
-        public UserController(IVoiceRepository db)
+        public UserController(IVoiceRepository db, DatabaseContext t)
         {
             _db = db;
+            t = t;
         }
-
+        [HttpGet]
+        public List<Text> test()
+        {
+            List<Text> liste = t.Texts.ToList();
+            return liste;
+        }
         [HttpPost]
         public async Task<ActionResult<string>> SaveFile(IFormFile recording)
         {
