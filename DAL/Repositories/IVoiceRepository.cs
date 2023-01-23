@@ -1,4 +1,4 @@
-﻿namespace Bachelor_backend.DAL;
+﻿namespace Bachelor_backend.DAL.Repositories;
 
 public interface IVoiceRepository
 {
