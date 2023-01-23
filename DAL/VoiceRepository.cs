@@ -35,7 +35,7 @@ public class VoiceRepository : IVoiceRepository
             //TODO: Insert uuid and file path in db
             var user = new User()
             {
-                UUID = uuid
+               // UUID = uuid
             };
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
