@@ -4,13 +4,19 @@ namespace Bachelor_backend.DAL.Repositories
 {
     public class TextRepository
     {
+        private readonly DatabaseContext _db;
+        public TextRepository(DatabaseContext db) {
+            _db = db;
+        }
         public async Task<List<Text>> GetTexts()
         {
-            throw new NotImplementedException();
+            var liste = _db.Texts.ToList();
+            return liste;
         }
         public async Task<List<Tag>> GetTags()
         {
-            throw new NotImplementedException();
+            var liste = _db.Tags.ToList();
+            return liste;
         }
         public async Task<bool> CreateText()
         {
