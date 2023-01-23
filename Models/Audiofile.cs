@@ -8,9 +8,9 @@ namespace Bachelor_backend.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid UUID { get; set; }
-        public string path { get; set; }
-        public DateTime DateCreated = DateTime.Now;
-        public User user { get; set; }
+        public string? Path { get; set; }
+        public DateTime? DateCreated = DateTime.Now;
+        public User? user { get; set; }
 
     }
 }

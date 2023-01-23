@@ -6,9 +6,9 @@ namespace Bachelor_backend.Models
     {
         [Key]
         public int UserId { get; set; }
-        public string NativeLanguage { get; set; }
-        public string AgeGroup { get; set; }
-        public string Dialect { get; set; }
+        public string? NativeLanguage { get; set; }
+        public string? AgeGroup { get; set; }
+        public string? Dialect { get; set; }
 
     }
 }

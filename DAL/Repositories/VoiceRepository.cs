@@ -24,20 +24,23 @@ public class VoiceRepository : IVoiceRepository
             {
                 Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\recordings");
             }
-
-            // Creates a new file name with a uuid name
-            string uuid = Guid.NewGuid().ToString();
+            
+            
             string extension = Path.GetExtension(recording.FileName);
 
+            var audioFile = new Audiofile();
+            
+            await _db.Audiofiles.AddAsync(audioFile);
+            
+            var uuid = audioFile.UUID.ToString();
+            
             string newFileName = uuid + extension;
             string uploadPath = Path.Combine($@"{Directory.GetCurrentDirectory()}\recordings", newFileName);
 
             //TODO: Insert uuid and file path in db
-            var user = new User()
-            {
-                // UUID = uuid
-            };
-            await _db.Users.AddAsync(user);
+            
+            
+            
             await _db.SaveChangesAsync();
 
             //Using stream to copy the content of the recording file to disk
