@@ -12,11 +12,13 @@ namespace Bachelor_backend.Controller
 
         private readonly IVoiceRepository _voiceRep;
         private readonly DatabaseContext t;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(IVoiceRepository voiceRep, DatabaseContext t)
+        public UserController(IVoiceRepository voiceRep, DatabaseContext t, ILogger<UserController> logger)
         {
             _voiceRep = voiceRep;
             t = t;
+            _logger = logger
         }
         [HttpGet]
         public List<Text> test()
