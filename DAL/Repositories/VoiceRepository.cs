@@ -1,6 +1,8 @@
 ﻿// https://learn.microsoft.com/en-us/dotnet/api/system.guid.newguid?view=net-6.0
 
-namespace Bachelor_backend.DAL;
+using Bachelor_backend.Models;
+
+namespace Bachelor_backend.DAL.Repositories;
 
 public class VoiceRepository : IVoiceRepository
 {
@@ -11,7 +13,7 @@ public class VoiceRepository : IVoiceRepository
     {
         _db = db;
     }
-    
+
 
     public async Task<string> SaveFile(IFormFile recording)
     {
@@ -23,21 +25,24 @@ public class VoiceRepository : IVoiceRepository
                 Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\recordings");
             }
             
-            // Creates a new file name with a uuid name
-            string uuid = Guid.NewGuid().ToString();
+            
             string extension = Path.GetExtension(recording.FileName);
+
+            var audioFile = new Audiofile();
+            
+            await _db.Audiofiles.AddAsync(audioFile);
+            
+            var uuid = audioFile.UUID.ToString();
             
             string newFileName = uuid + extension;
             string uploadPath = Path.Combine($@"{Directory.GetCurrentDirectory()}\recordings", newFileName);
 
             //TODO: Insert uuid and file path in db
-            var user = new Users()
-            {
-                UUID = uuid
-            };
-            await _db.Users.AddAsync(user);
-            await _db.SaveChangesAsync();
             
+            
+            
+            await _db.SaveChangesAsync();
+
             //Using stream to copy the content of the recording file to disk
             using (var stream = new FileStream(uploadPath, FileMode.Create))
             {
@@ -45,7 +50,7 @@ public class VoiceRepository : IVoiceRepository
             }
             return uuid;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Console.WriteLine(e.Message);
             return null;
@@ -61,5 +66,5 @@ public class VoiceRepository : IVoiceRepository
     {
         throw new NotImplementedException();
     }
-    
+
 }
