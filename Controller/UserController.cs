@@ -18,8 +18,9 @@ namespace Bachelor_backend.Controller
         {
             _voiceRep = voiceRep;
             t = t;
-            _logger = logger
+            _logger = logger;
         }
+
         [HttpGet]
         public List<Text> test()
         {
