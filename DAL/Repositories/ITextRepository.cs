@@ -4,11 +4,11 @@ namespace Bachelor_backend.DAL.Repositories
 {
     public interface ITextRepository
     {
-        Task<bool> CreateTag();
-        Task<bool> CreateText();
+        Task<bool> CreateTag(string text);
+        Task<bool> CreateText(string text);
         Task<List<Text>> GetAllTexts();
         Task<Text> GetText();
         Task<List<Tag>> GetAllTags();
-
+        Task<bool> login();
     }
 }
