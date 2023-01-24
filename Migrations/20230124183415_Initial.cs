@@ -43,9 +43,9 @@ namespace Bachelorbackend.Migrations
                 {
                     UserId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NativeLanguage = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AgeGroup = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Dialect = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    NativeLanguage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgeGroup = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Dialect = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -81,8 +81,8 @@ namespace Bachelorbackend.Migrations
                 columns: table => new
                 {
                     UUID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    path = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -91,8 +91,7 @@ namespace Bachelorbackend.Migrations
                         name: "FK_Audiofiles_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateIndex(
