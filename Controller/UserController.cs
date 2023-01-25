@@ -9,8 +9,8 @@ namespace Bachelor_backend.Controller
     [Route("[controller]/[action]")]
     public class UserController : ControllerBase
     {
-
         private readonly IVoiceRepository _voiceRep;
+
         private readonly DatabaseContext t;
         private readonly ILogger<UserController> _logger;
 
@@ -26,6 +26,7 @@ namespace Bachelor_backend.Controller
         {
             List<Text> liste = t.Texts.ToList();
             return liste;
+
         }
         [HttpPost]
         public async Task<ActionResult<string>> SaveFile(IFormFile recording)
