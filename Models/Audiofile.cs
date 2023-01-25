@@ -11,6 +11,7 @@ namespace Bachelor_backend.Models
         public string? Path { get; set; }
         public DateTime? DateCreated = DateTime.Now;
         public User? user { get; set; }
+        public Text text { get; set; }
 
     }
 }

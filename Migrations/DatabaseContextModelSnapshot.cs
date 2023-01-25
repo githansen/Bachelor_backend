@@ -46,10 +46,15 @@ namespace Bachelorbackend.Migrations
                     b.Property<string>("Path")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TextId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("UUID");
+
+                    b.HasIndex("TextId");
 
                     b.HasIndex("UserId");
 
@@ -133,9 +138,17 @@ namespace Bachelorbackend.Migrations
 
             modelBuilder.Entity("Bachelor_backend.Models.Audiofile", b =>
                 {
+                    b.HasOne("Bachelor_backend.Models.Text", "text")
+                        .WithMany()
+                        .HasForeignKey("TextId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Bachelor_backend.Models.User", "user")
                         .WithMany()
                         .HasForeignKey("UserId");
+
+                    b.Navigation("text");
 
                     b.Navigation("user");
                 });
