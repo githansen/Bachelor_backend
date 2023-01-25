@@ -11,7 +11,6 @@ namespace Bachelor_backend.Controller
     {
         private readonly IVoiceRepository _voiceRep;
 
-        private readonly DatabaseContext t;
         private readonly ILogger<UserController> _logger;
 
         public UserController(IVoiceRepository voiceRep, ILogger<UserController> logger)
