@@ -1,11 +1,9 @@
 ﻿using Bachelor_backend.Models;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bachelor_backend.DAL
 {
-  
+
 
     public class DatabaseContext : DbContext
     {
@@ -36,8 +34,8 @@ namespace Bachelor_backend.DAL
                 .WithMany(b => b.texts)
                 .HasForeignKey(bc => bc.TagId);
 
-                
-                
+
+
         }
     }
 }

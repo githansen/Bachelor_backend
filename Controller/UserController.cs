@@ -24,12 +24,13 @@ namespace Bachelor_backend.Controller
                 return BadRequest("Voice recording is not saved");
             }
             return Ok(uuid);
-            
+
         }
-        
+
         public async Task<ActionResult<bool>> DeleteFile(string uuid)
         {
-            throw new NotImplementedException();
+            bool deleted = await _voiceRep.DeleteFile(uuid);
+            return Ok(deleted);
         }
         //Get text based on session value, discuss later
         [HttpGet]
@@ -40,7 +41,7 @@ namespace Bachelor_backend.Controller
 
         //Login a good name? 
         [HttpPost]
-        public async Task<ActionResult>Login()
+        public async Task<ActionResult> Login()
         {
             throw new NotImplementedException();
         }

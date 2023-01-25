@@ -1,8 +1,8 @@
 
 //https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-6.0 accessed 18.01.2023. Used to set up CORS
-using Microsoft.EntityFrameworkCore;
 using Bachelor_backend.DAL;
 using Bachelor_backend.DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
