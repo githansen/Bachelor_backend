@@ -34,6 +34,7 @@ namespace Bachelor_backend.Controller
             string uuid = await _voiceRep.SaveFile(recording);
             if (uuid.IsNullOrEmpty())
             {
+                _logger.LogInformation("Fault in saving voice recording");
                 return BadRequest("Voice recording is not saved");
             }
             return Ok(uuid);
