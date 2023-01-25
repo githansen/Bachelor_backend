@@ -10,12 +10,24 @@ namespace Bachelor_backend.Controller
     public class UserController : ControllerBase
     {
         private readonly IVoiceRepository _voiceRep;
-        public UserController(IVoiceRepository voiceRep)
+
+        private readonly DatabaseContext t;
+        private readonly ILogger<UserController> _logger;
+
+        public UserController(IVoiceRepository voiceRep, DatabaseContext t, ILogger<UserController> logger)
         {
             _voiceRep = voiceRep;
+            t = t;
+            _logger = logger;
+        }
+
+        [HttpGet]
+        public List<Text> test()
+        {
+            List<Text> liste = t.Texts.ToList();
+            return liste;
 
         }
-   
         [HttpPost]
         public async Task<ActionResult<string>> SaveFile(IFormFile recording)
         {
