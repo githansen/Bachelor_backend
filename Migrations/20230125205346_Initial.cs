@@ -82,17 +82,29 @@ namespace Bachelorbackend.Migrations
                 {
                     UUID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    TextId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Audiofiles", x => x.UUID);
+                    table.ForeignKey(
+                        name: "FK_Audiofiles_Texts_TextId",
+                        column: x => x.TextId,
+                        principalTable: "Texts",
+                        principalColumn: "TextId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Audiofiles_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Audiofiles_TextId",
+                table: "Audiofiles",
+                column: "TextId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Audiofiles_UserId",
