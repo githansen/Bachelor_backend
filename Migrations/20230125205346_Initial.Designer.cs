@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bachelorbackend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230123094615_Initial")]
+    [Migration("20230125205346_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -46,14 +46,18 @@ namespace Bachelorbackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("path")
-                        .IsRequired()
+                    b.Property<string>("Path")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TextId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("UUID");
+
+                    b.HasIndex("TextId");
 
                     b.HasIndex("UserId");
 
@@ -103,15 +107,12 @@ namespace Bachelorbackend.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("AgeGroup")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Dialect")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NativeLanguage")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId");
@@ -140,11 +141,17 @@ namespace Bachelorbackend.Migrations
 
             modelBuilder.Entity("Bachelor_backend.Models.Audiofile", b =>
                 {
-                    b.HasOne("Bachelor_backend.Models.User", "user")
+                    b.HasOne("Bachelor_backend.Models.Text", "text")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("TextId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Bachelor_backend.Models.User", "user")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("text");
 
                     b.Navigation("user");
                 });

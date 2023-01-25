@@ -4,6 +4,7 @@ using Bachelor_backend.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bachelorbackend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20230124112251_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,15 +49,10 @@ namespace Bachelorbackend.Migrations
                     b.Property<string>("Path")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TextId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("UUID");
-
-                    b.HasIndex("TextId");
 
                     b.HasIndex("UserId");
 
@@ -138,17 +136,9 @@ namespace Bachelorbackend.Migrations
 
             modelBuilder.Entity("Bachelor_backend.Models.Audiofile", b =>
                 {
-                    b.HasOne("Bachelor_backend.Models.Text", "text")
-                        .WithMany()
-                        .HasForeignKey("TextId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Bachelor_backend.Models.User", "user")
                         .WithMany()
                         .HasForeignKey("UserId");
-
-                    b.Navigation("text");
 
                     b.Navigation("user");
                 });

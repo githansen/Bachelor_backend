@@ -6,7 +6,7 @@ namespace Bachelor_backend.Models
     {
         public int TextId { get; set; }
         public string TextText { get; set; }
-        public ICollection<TagForText> Tags { get; set; }
+        public virtual List<TagForText> Tags { get; set; }
 
 
     }

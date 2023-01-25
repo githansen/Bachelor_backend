@@ -1,29 +1,46 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Bachelor_backend.DAL.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Bachelor_backend.Controller
 {
     [Route("[controller]/[action]")]
     public class AdminController : ControllerBase
     {
+        private readonly ITextRepository _textRep;
+        public AdminController(ITextRepository textrep) {
+        _textRep= textrep;
+        }
         public async Task<ActionResult> LogIn()
         {
+            bool success = await _textRep.login();
             throw new NotImplementedException();
         }
-        public async Task<ActionResult> CreateTag()
+        public async Task<ActionResult> CreateTag(string text)
         {
-            throw new NotImplementedException();
+            bool success = await _textRep.CreateTag(text);
+            if (success)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest(false);
+            }
         }
         public async Task<ActionResult> GetTags()
         {
-            throw new NotImplementedException();
+            var list = await _textRep.GetAllTags();
+            return Ok(list);
         }
-        public async Task<ActionResult> CreateText()
+        public async Task<ActionResult> CreateText(string text)
         {
-            throw new NotImplementedException();
+            bool success = await _textRep.CreateText(text);
+            return Ok(success);
         }
         public async Task<ActionResult> GetTexts()
         {
-            throw new NotImplementedException();
+            var list = await _textRep.GetAllTexts();
+            return Ok(list);
         }
     }
 }

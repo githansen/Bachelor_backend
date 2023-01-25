@@ -9,12 +9,11 @@ namespace Bachelor_backend.Controller
     [Route("[controller]/[action]")]
     public class UserController : ControllerBase
     {
-
         private readonly IVoiceRepository _voiceRep;
-
         public UserController(IVoiceRepository voiceRep)
         {
             _voiceRep = voiceRep;
+
         }
    
         [HttpPost]
@@ -24,15 +23,17 @@ namespace Bachelor_backend.Controller
             string uuid = await _voiceRep.SaveFile(recording);
             if (uuid.IsNullOrEmpty())
             {
+                _logger.LogInformation("Fault in saving voice recording");
                 return BadRequest("Voice recording is not saved");
             }
             return Ok(uuid);
-            
+
         }
-        
+
         public async Task<ActionResult<bool>> DeleteFile(string uuid)
         {
-            throw new NotImplementedException();
+            bool deleted = await _voiceRep.DeleteFile(uuid);
+            return Ok(deleted);
         }
         //Get text based on session value, discuss later
         [HttpGet]
@@ -43,7 +44,7 @@ namespace Bachelor_backend.Controller
 
         //Login a good name? 
         [HttpPost]
-        public async Task<ActionResult>Login()
+        public async Task<ActionResult> Login()
         {
             throw new NotImplementedException();
         }

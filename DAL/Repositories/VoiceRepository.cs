@@ -8,10 +8,12 @@ public class VoiceRepository : IVoiceRepository
 {
 
     private readonly DatabaseContext _db;
+    private readonly ILogger<VoiceRepository> _logger;
 
-    public VoiceRepository(DatabaseContext db)
+    public VoiceRepository(DatabaseContext db, ILogger<VoiceRepository> logger)
     {
         _db = db;
+        _logger = logger;
     }
 
 
@@ -24,23 +26,23 @@ public class VoiceRepository : IVoiceRepository
             {
                 Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\recordings");
             }
-            
-            
+
+
             string extension = Path.GetExtension(recording.FileName);
 
             var audioFile = new Audiofile();
-            
+
             await _db.Audiofiles.AddAsync(audioFile);
-            
+
             var uuid = audioFile.UUID.ToString();
-            
+
             string newFileName = uuid + extension;
             string uploadPath = Path.Combine($@"{Directory.GetCurrentDirectory()}\recordings", newFileName);
 
             //TODO: Insert uuid and file path in db
-            
-            
-            
+            audioFile.Path = uploadPath;
+
+
             await _db.SaveChangesAsync();
 
             //Using stream to copy the content of the recording file to disk
@@ -52,14 +54,31 @@ public class VoiceRepository : IVoiceRepository
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            _logger.LogInformation(e.Message);
             return null;
         }
     }
 
     public async Task<bool> DeleteFile(string uuid)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var audiofile = await _db.Audiofiles.FindAsync(Guid.Parse(uuid));
+            if (audiofile == null)
+            {
+                return false;
+            }
+            string path = audiofile.Path;
+            File.Delete(path);
+            return true;
+
+        }
+        catch (Exception e)
+        {
+            _logger.LogInformation(e.Message);
+            return false;
+        }
+
     }
 
     public async Task<IFormFile> GetAudioRecording(int textId)
