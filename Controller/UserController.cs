@@ -11,19 +11,12 @@ namespace Bachelor_backend.Controller
     {
 
         private readonly IVoiceRepository _voiceRep;
-        private readonly DatabaseContext t;
 
-        public UserController(IVoiceRepository voiceRep, DatabaseContext t)
+        public UserController(IVoiceRepository voiceRep)
         {
             _voiceRep = voiceRep;
-            t = t;
         }
-        [HttpGet]
-        public List<Text> test()
-        {
-            List<Text> liste = t.Texts.ToList();
-            return liste;
-        }
+   
         [HttpPost]
         public async Task<ActionResult<string>> SaveFile(IFormFile recording)
         {
