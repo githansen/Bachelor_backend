@@ -8,10 +8,12 @@ public class VoiceRepository : IVoiceRepository
 {
 
     private readonly DatabaseContext _db;
+    private readonly ILogger<VoiceRepository> _logger;
 
-    public VoiceRepository(DatabaseContext db)
+    public VoiceRepository(DatabaseContext db, ILogger<VoiceRepository> logger)
     {
         _db = db;
+        _logger = logger;
     }
 
 
@@ -52,7 +54,7 @@ public class VoiceRepository : IVoiceRepository
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            _logger.LogInformation(e.Message);
             return null;
         }
     }
@@ -73,6 +75,7 @@ public class VoiceRepository : IVoiceRepository
         }
         catch (Exception e)
         {
+            _logger.LogInformation(e.Message);
             return false;
         }
 
