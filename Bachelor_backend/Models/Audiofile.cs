@@ -10,8 +10,8 @@ namespace Bachelor_backend.Models
         public Guid UUID { get; set; }
         public string? Path { get; set; }
         public DateTime? DateCreated = DateTime.Now;
-        public User? user { get; set; }
-        public Text text { get; set; }
+        public User? User { get; set; }
+        public Text? Text { get; set; }
 
     }
 }

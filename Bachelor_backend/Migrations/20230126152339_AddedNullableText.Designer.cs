@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bachelorbackend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230125210234_Initial")]
-    partial class Initial
+    [Migration("20230126152339_AddedNullableText")]
+    partial class AddedNullableText
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,7 +49,7 @@ namespace Bachelorbackend.Migrations
                     b.Property<string>("Path")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TextId")
+                    b.Property<int?>("TextId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UserId")
@@ -141,19 +141,17 @@ namespace Bachelorbackend.Migrations
 
             modelBuilder.Entity("Bachelor_backend.Models.Audiofile", b =>
                 {
-                    b.HasOne("Bachelor_backend.Models.Text", "text")
+                    b.HasOne("Bachelor_backend.Models.Text", "Text")
                         .WithMany()
-                        .HasForeignKey("TextId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TextId");
 
-                    b.HasOne("Bachelor_backend.Models.User", "user")
+                    b.HasOne("Bachelor_backend.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
-                    b.Navigation("text");
+                    b.Navigation("Text");
 
-                    b.Navigation("user");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Bachelor_backend.Models.Tag", b =>
