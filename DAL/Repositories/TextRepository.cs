@@ -13,7 +13,7 @@ namespace Bachelor_backend.DAL.Repositories
                 var NewTag = new Tag
                 {
                     TagText = text,
-                    texts = null
+                    Texts = null
 
                 };
                 _db.Tags.Add(NewTag);
