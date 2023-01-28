@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bachelor_backend", "Bachelor_backend.csproj", "{625E1BE9-A2B9-4C5F-90E4-A1D93290027A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bachelor_backend", "Bachelor_backend/Bachelor_backend.csproj", "{625E1BE9-A2B9-4C5F-90E4-A1D93290027A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xUnitBackendTest", "..\xUnitBackendTest\xUnitBackendTest.csproj", "{8E5339CC-EFDE-4F6B-A6D5-30E5620EF4CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xUnitBackendTest", "xUnitBackendTest\xUnitBackendTest.csproj", "{8E5339CC-EFDE-4F6B-A6D5-30E5620EF4CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
