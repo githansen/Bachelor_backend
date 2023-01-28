@@ -35,6 +35,12 @@ builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(b
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = ".AdventureWorks.Session";
+    options.IdleTimeout = TimeSpan.FromSeconds(1800); //30 Minutes session
+    options.Cookie.IsEssential = true;
+});
 builder.Services.AddScoped<DBInitializer, DBInitializer>();
 var app = builder.Build();
 void SeedDatabase()
@@ -45,6 +51,10 @@ void SeedDatabase()
         dbInitializer.Initialize();
     }
 }
+
+app.UseCors(MyAllowSpecificOrigins);
+app.UseSession();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
