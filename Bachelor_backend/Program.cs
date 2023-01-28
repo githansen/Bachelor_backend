@@ -32,7 +32,16 @@ builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(b
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = ".AdventureWorks.Session";
+    options.IdleTimeout = TimeSpan.FromSeconds(1800); //30 Minutes session
+    options.Cookie.IsEssential = true;
+});
 var app = builder.Build();
+
+app.UseCors(MyAllowSpecificOrigins);
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
