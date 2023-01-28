@@ -85,7 +85,7 @@ namespace Bachelorbackend.Migrations
                     UUID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: true),
-                    TextId = table.Column<int>(type: "int", nullable: false)
+                    TextId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -94,8 +94,7 @@ namespace Bachelorbackend.Migrations
                         name: "FK_Audiofiles_Texts_TextId",
                         column: x => x.TextId,
                         principalTable: "Texts",
-                        principalColumn: "TextId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "TextId");
                     table.ForeignKey(
                         name: "FK_Audiofiles_Users_UserId",
                         column: x => x.UserId,
@@ -121,12 +120,12 @@ namespace Bachelorbackend.Migrations
                     { 2, "Jeg har Bakke kontakt jeg lar dem fly\r\nDu hakke sett en shit lil boy hold tyst\r\nBle født i et mørkt sted men jeg fant lys\r\nJeg har bitches overalt nå boy i alle byer\r\nFor her i hooden det går fast\r\nVarer går fram og tilbake neger vi gjør task\r\nLeker du big man bitch du får slapp\r\nFakk hva de sier rambow starta fra scratch (hæ)\r\nFor jeg har gjort tusenvis av feil\r\nMen jeg har lært av dem alle jeg holder meg til samme spor\r\nHaterne for snakke for jeg blikke lei\r\nRambow on the track det er fortsatt fire in the booth\r\nJeg vil bare catche green green (green green)\r\nIngen av oss hadde læg tro meg vi levde tungt\r\nJeg vil bare catche ti på ti på ti\r\nMine brødre i gata hakke jobb de catcher floos\r\nOps ved vår blokk de fåkke bli\r\nJeg følger ikke andres sti jeg lager min\r\nFuck haters nigga vi gjør vår ting\r\nDu sier du er best lil boy stop å lyv\r\nDu leker g til du møter på veggen\r\nVi lekte politi og tyv det ække lek lenger\r\nHadde mange før nå har jeg 3 venner\r\nFordi fake ble til real og real ble til fake neger\r\nPappa lærte meg trust får deg drept\r\nVanskelig å lære men tok step by step\r\nFikk fame nå er alle sammen glad i meg igjen\r\nVi ække brødre eller day ones bitch ass hold kjeft\r\nNå vil alle bli bros for real\r\nHold deg unna bitch stop tråkke på min tå\r\nNå har jeg hoes og freaky bitches\r\nJeg ække g men jeg trykker om jeg må\r\nJeg vil bare catche green green (green green)\r\nIngen av oss hadde læg tro meg vi levde tungt\r\nJeg vil bare catche ti på ti på ti\r\nMine brødre i gata hakke jobb de catcher floos" }
                 });
             migrationBuilder.InsertData(
-                table: "TagsForTexts",
-                columns: new[] {"TagsTagId", "TextsTextId"},
-                values: new object[,]
-                {
+               table: "TagsForTexts",
+               columns: new[] { "TagsTagId", "TextsTextId" },
+               values: new object[,]
+               {
                     { 1,1}, {1,2}, {2,1}, {2,2 } }
-                ); 
+               );
             migrationBuilder.CreateIndex(
                 name: "IX_Audiofiles_TextId",
                 table: "Audiofiles",
