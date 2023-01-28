@@ -42,6 +42,12 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 builder.Services.AddScoped<DBInitializer, DBInitializer>();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = ".AdventureWorks.Session";
+    options.IdleTimeout = TimeSpan.FromSeconds(1800); //30 Minutes session
+    options.Cookie.IsEssential = true;
+});
 var app = builder.Build();
 void SeedDatabase()
 {
@@ -51,6 +57,9 @@ void SeedDatabase()
         dbInitializer.Initialize();
     }
 }
+
+app.UseCors(MyAllowSpecificOrigins);
+app.UseSession();
 
 app.UseCors(MyAllowSpecificOrigins);
 app.UseSession();
