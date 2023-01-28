@@ -76,9 +76,13 @@ namespace Bachelor_backend.DAL.Repositories
             //Text out to one user. Not decided yet how this should be done. 
             throw new NotImplementedException();
         }
-        public async Task<bool> login()
+        public async Task<User> GetUserInfo(User user)
         {
-            throw new NotImplementedException();
+            //TODO: Regex on user items
+
+            _db.Users.Add(user);
+            await _db.SaveChangesAsync();
+            return user;
         }
     }
 }
