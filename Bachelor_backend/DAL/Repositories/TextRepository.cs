@@ -88,6 +88,14 @@ namespace Bachelor_backend.DAL.Repositories
             var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.texts").ToListAsync();
             return getRandom(liste2);
         }
+
+        public Text getRandom(List<Text> list)
+        {
+            Random r = new Random();
+            return list[r.Next(0,list.Count)];
+            
+        }
+
         public async Task<User> GetUserInfo(User user)
         {
             //TODO: Regex on user items
@@ -95,12 +103,6 @@ namespace Bachelor_backend.DAL.Repositories
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
             return user;
-        }
-
-        public Text getRandom(List<Text> list)
-        {
-            Random r = new Random();
-            return list[r.Next(0,list.Count)];
         }
     }
 }
