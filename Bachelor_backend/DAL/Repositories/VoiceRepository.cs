@@ -21,12 +21,13 @@ public class VoiceRepository : IVoiceRepository
     {
         try
         {
+            Console.WriteLine("test: " + Directory.GetCurrentDirectory());
             //Creates a recording directory if it doesnt exist
             if (!Directory.Exists($@"{Directory.GetCurrentDirectory()}\recordings"))
             {
                 Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\recordings");
             }
-
+            Console.WriteLine(recording.FileName);
 
             string extension = Path.GetExtension(recording.FileName);
 
@@ -54,6 +55,7 @@ public class VoiceRepository : IVoiceRepository
         }
         catch (Exception e)
         {
+            Console.WriteLine(e);
             _logger.LogInformation(e.Message);
             return null;
         }

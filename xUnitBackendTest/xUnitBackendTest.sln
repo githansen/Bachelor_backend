@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xUnitBackendTest", "xUnitBackendTest.csproj", "{FC1C7A63-F733-438A-BFB9-46BE610D3274}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bachelor_backend", "..\Bachelor_backend\Bachelor_backend.csproj", "{A03C872B-1190-454D-B0EE-EAAC100EFE80}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC1C7A63-F733-438A-BFB9-46BE610D3274}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC1C7A63-F733-438A-BFB9-46BE610D3274}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC1C7A63-F733-438A-BFB9-46BE610D3274}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC1C7A63-F733-438A-BFB9-46BE610D3274}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A03C872B-1190-454D-B0EE-EAAC100EFE80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A03C872B-1190-454D-B0EE-EAAC100EFE80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A03C872B-1190-454D-B0EE-EAAC100EFE80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A03C872B-1190-454D-B0EE-EAAC100EFE80}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C74AF13-0373-4727-AF24-A99B6317B5DD}
+	EndGlobalSection
+EndGlobal
