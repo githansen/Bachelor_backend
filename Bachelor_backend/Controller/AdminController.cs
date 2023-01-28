@@ -12,7 +12,7 @@ namespace Bachelor_backend.Controller
         }
         public async Task<ActionResult> LogIn()
         {
-            bool success = await _textRep.login();
+            //bool success = await _textRep.login();
             throw new NotImplementedException();
         }
         public async Task<ActionResult> CreateTag(string text)

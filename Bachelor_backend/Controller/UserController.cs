@@ -9,7 +9,10 @@ namespace Bachelor_backend.Controller
     [Route("[controller]/[action]")]
     public class UserController : ControllerBase
     {
+        private const string _loggedIn = "UserSession";
+        
         private readonly IVoiceRepository _voiceRep;
+        private readonly ITextRepository _textRep;
 
         private readonly ILogger<UserController> _logger;
 
@@ -48,9 +51,12 @@ namespace Bachelor_backend.Controller
 
         //Login a good name? 
         [HttpPost]
-        public async Task<ActionResult> Login()
+        public async Task<ActionResult> GetUserInfo(User user)
         {
-            throw new NotImplementedException();
+            user = await _textRep.GetUserInfo(user);
+            //TODO: Return user id from db
+            HttpContext.Session.SetString(_loggedIn, user.UserId.ToString());
+            return Ok("Ok");
         }
     }
 }
