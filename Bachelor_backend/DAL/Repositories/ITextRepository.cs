@@ -7,7 +7,7 @@ namespace Bachelor_backend.DAL.Repositories
         Task<bool> CreateTag(string text);
         Task<bool> CreateText(string text);
         Task<List<Text>> GetAllTexts();
-        Task<Text> GetText();
+        Task<Text> GetText(User user);
         Task<List<Tag>> GetAllTags();
         Task<bool> login();
     }

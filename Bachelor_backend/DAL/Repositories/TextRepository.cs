@@ -6,6 +6,10 @@ namespace Bachelor_backend.DAL.Repositories
     public class TextRepository : ITextRepository
     {
         private readonly DatabaseContext _db;
+        public TextRepository(DatabaseContext db)
+        {
+            _db = db;
+        }
         public async Task<bool> CreateTag(string text)
         {
             try
@@ -71,14 +75,28 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-        public async Task<Text> GetText()
+        public async Task<Text> GetText(User user)
         {
+
+            var NativeLanguage = user.NativeLanguage;
+            var AgeGroup = user.AgeGroup;
+            var Dialect = user.Dialect;
+            var target = "Target";
+            var liste = _db.Texts.FromSql($"SELECT dbo.Texts.* FROM dbo.Users, dbo.Texts WHERE dbo.Users.UserId = dbo.Texts.UserId AND dbo.Texts.UserId is not NULL AND dbo.Users.Type ={target} AND (dbo.Users.NativeLanguage is NULL or dbo.Users.NativeLanguage={NativeLanguage}) AND (dbo.Users.AgeGroup is NULL or dbo.Users.AgeGroup={AgeGroup}) AND (dbo.Users.Dialect is NULL or dbo.Users.Dialect={Dialect})").ToList();
             //Text out to one user. Not decided yet how this should be done. 
-            throw new NotImplementedException();
+            if (liste.Count > 0) return liste[0];
+            var liste2 = _db.Texts.FromSql($"SELECT * FROM dbo.texts").ToList();
+            return getRandom(liste2);
         }
         public async Task<bool> login()
         {
             throw new NotImplementedException();
+        }
+
+        public Text getRandom(List<Text> list)
+        {
+            Random r = new Random();
+            return list[r.Next(0,list.Count)];
         }
     }
 }

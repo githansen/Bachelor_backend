@@ -8,6 +8,7 @@ namespace Bachelor_backend.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
+        public string? Type { get; set; } //TargetUser and RealUser
         public string? NativeLanguage { get; set; }
         public string? AgeGroup { get; set; }
         public string? Dialect { get; set; }

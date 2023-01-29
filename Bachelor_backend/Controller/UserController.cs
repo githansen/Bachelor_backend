@@ -12,14 +12,16 @@ namespace Bachelor_backend.Controller
         private readonly IVoiceRepository _voiceRep;
 
         private readonly ILogger<UserController> _logger;
+        private readonly ITextRepository _text;
 
-        public UserController(IVoiceRepository voiceRep, ILogger<UserController> logger)
+        public UserController(IVoiceRepository voiceRep, ITextRepository text, ILogger<UserController> logger)
         {
             _voiceRep = voiceRep;
             _logger = logger;
+            _text = text;
         }
 
-
+      
         [HttpPost]
         public async Task<ActionResult<string>> SaveFile(IFormFile recording)
         {
@@ -41,9 +43,15 @@ namespace Bachelor_backend.Controller
         }
         //Get text based on session value, discuss later
         [HttpGet]
-        public async Task<ActionResult> GetText()
+        public async Task<ActionResult> GetText( )
         {
-            throw new NotImplementedException();
+            User u = new User()
+            {
+                AgeGroup= "18-29",
+                NativeLanguage="English"
+            };
+            Text t = await _text.GetText(u);
+            return Ok(t);
         }
 
         //Login a good name? 
