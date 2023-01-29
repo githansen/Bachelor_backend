@@ -82,10 +82,10 @@ namespace Bachelor_backend.DAL.Repositories
             var AgeGroup = user.AgeGroup;
             var Dialect = user.Dialect;
             var target = "Target";
-            var liste = _db.Texts.FromSql($"SELECT dbo.Texts.* FROM dbo.Users, dbo.Texts WHERE dbo.Users.UserId = dbo.Texts.UserId AND dbo.Texts.UserId is not NULL AND dbo.Users.Type ={target} AND (dbo.Users.NativeLanguage is NULL or dbo.Users.NativeLanguage={NativeLanguage}) AND (dbo.Users.AgeGroup is NULL or dbo.Users.AgeGroup={AgeGroup}) AND (dbo.Users.Dialect is NULL or dbo.Users.Dialect={Dialect})").ToList();
+            var liste = await _db.Texts.FromSql($"SELECT dbo.Texts.* FROM dbo.Users, dbo.Texts WHERE dbo.Users.UserId = dbo.Texts.UserId AND dbo.Texts.UserId is not NULL AND dbo.Users.Type ={target} AND (dbo.Users.NativeLanguage is NULL or dbo.Users.NativeLanguage={NativeLanguage}) AND (dbo.Users.AgeGroup is NULL or dbo.Users.AgeGroup={AgeGroup}) AND (dbo.Users.Dialect is NULL or dbo.Users.Dialect={Dialect})").ToListAsync();
             //Text out to one user. Not decided yet how this should be done. 
-            if (liste.Count > 0) return liste[0];
-            var liste2 = _db.Texts.FromSql($"SELECT * FROM dbo.texts").ToList();
+            if (liste.Count > 0) return getRandom(liste);
+            var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.texts").ToListAsync();
             return getRandom(liste2);
         }
         public async Task<bool> login()
