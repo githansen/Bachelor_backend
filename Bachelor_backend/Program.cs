@@ -28,10 +28,14 @@ builder.Logging.AddSerilog(logger);
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<IVoiceRepository, VoiceRepository>();
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("JohanDesktop")));
+builder.Services.AddScoped<ITextRepository, TextRepository>();
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Henrik")));
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
+
+// Configuring sessions
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = ".AdventureWorks.Session";
@@ -40,7 +44,10 @@ builder.Services.AddSession(options =>
 });
 var app = builder.Build();
 
+
 app.UseCors(MyAllowSpecificOrigins);
+app.UseRouting();
+
 app.UseSession();
 
 app.MapControllerRoute(

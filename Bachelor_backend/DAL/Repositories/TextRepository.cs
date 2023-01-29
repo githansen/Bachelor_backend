@@ -6,6 +6,13 @@ namespace Bachelor_backend.DAL.Repositories
     public class TextRepository : ITextRepository
     {
         private readonly DatabaseContext _db;
+
+        public TextRepository(DatabaseContext db)
+        {
+            _db = db;
+        }
+
+
         public async Task<bool> CreateTag(string text)
         {
             try
@@ -80,7 +87,8 @@ namespace Bachelor_backend.DAL.Repositories
         {
             //TODO: Regex on user items
 
-            _db.Users.Add(user);
+            await _db.Users.AddAsync(user);
+
             await _db.SaveChangesAsync();
             return user;
         }
