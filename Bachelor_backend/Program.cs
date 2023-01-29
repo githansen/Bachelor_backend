@@ -2,6 +2,7 @@
 //https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-6.0 accessed 18.01.2023. Used to set up CORS
 using Bachelor_backend.DAL;
 using Bachelor_backend.DAL.Repositories;
+using Bachelor_backend.DBInitializer;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -34,10 +35,19 @@ builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(b
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
+builder.Services.AddScoped<DBInitializer, DBInitializer>();
 var app = builder.Build();
-
+void SeedDatabase()
+{
+    using(var scope = app.Services.CreateScope())
+    {
+        var dbInitializer = scope.ServiceProvider.GetService<DBInitializer>();
+        dbInitializer.Initialize();
+    }
+}
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
+SeedDatabase();
 
 app.Run();
