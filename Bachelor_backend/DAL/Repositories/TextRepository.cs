@@ -100,7 +100,7 @@ namespace Bachelor_backend.DAL.Repositories
         {
             //TODO: Regex on user items
 
-            _db.Users.Add(user);
+            await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
             return user;
         }

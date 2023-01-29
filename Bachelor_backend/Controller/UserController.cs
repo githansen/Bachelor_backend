@@ -15,16 +15,15 @@ namespace Bachelor_backend.Controller
         private readonly ITextRepository _textRep;
 
         private readonly ILogger<UserController> _logger;
-        private readonly ITextRepository _text;
 
-        public UserController(IVoiceRepository voiceRep, ITextRepository text, ILogger<UserController> logger)
+        public UserController(IVoiceRepository voiceRep, ITextRepository textRep, ILogger<UserController> logger)
         {
             _voiceRep = voiceRep;
+            _textRep = textRep;
             _logger = logger;
-            _text = text;
         }
 
-      
+
         [HttpPost]
         public async Task<ActionResult<string>> SaveFile(IFormFile recording)
         {
@@ -46,19 +45,19 @@ namespace Bachelor_backend.Controller
         }
         //Get text based on session value, discuss later
         [HttpGet]
-        public async Task<ActionResult> GetText( User u)
+        public async Task<ActionResult> GetText( User user)
         {
-            Text t = await _text.GetText(u);
+            Text t = await _textRep.GetText(user);
             return Ok(t);
         }
 
         //Login a good name? 
         [HttpPost]
-        public async Task<ActionResult> GetUserInfo(User user)
+        public async Task<ActionResult> GetUserInfo([FromBody] User user)
         {
-            user = await _textRep.GetUserInfo(user);
+            var userFromDb = await _textRep.GetUserInfo(user);
             //TODO: Return user id from db
-            HttpContext.Session.SetString(_loggedIn, user.UserId.ToString());
+            HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
             return Ok("Ok");
         }
     }
