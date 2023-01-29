@@ -43,13 +43,8 @@ namespace Bachelor_backend.Controller
         }
         //Get text based on session value, discuss later
         [HttpGet]
-        public async Task<ActionResult> GetText( )
+        public async Task<ActionResult> GetText( User u)
         {
-            User u = new User()
-            {
-                AgeGroup= "18-29",
-                NativeLanguage="English"
-            };
             Text t = await _text.GetText(u);
             return Ok(t);
         }
