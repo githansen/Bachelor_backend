@@ -33,7 +33,7 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                var NewText = new Text { TextText = text };
+                var NewText = new Text { TextText = text, Active =true, UserId=null, TargetUser=null};
                 _db.Texts.Add(NewText);
                 await _db.SaveChangesAsync();
                 return true;
@@ -85,7 +85,7 @@ namespace Bachelor_backend.DAL.Repositories
             var liste = await _db.Texts.FromSql($"SELECT dbo.Texts.* FROM dbo.Users, dbo.Texts WHERE dbo.Users.UserId = dbo.Texts.UserId AND dbo.Texts.UserId is not NULL AND dbo.Users.Type ={target} AND (dbo.Users.NativeLanguage is NULL or dbo.Users.NativeLanguage={NativeLanguage}) AND (dbo.Users.AgeGroup is NULL or dbo.Users.AgeGroup={AgeGroup}) AND (dbo.Users.Dialect is NULL or dbo.Users.Dialect={Dialect})").ToListAsync();
             //Text out to one user. Not decided yet how this should be done. 
             if (liste.Count > 0) return getRandom(liste);
-            var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.texts").ToListAsync();
+            var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.Texts WHERE dbo.Texts.Active = 1").ToListAsync();
             return getRandom(liste2);
         }
         public async Task<bool> login()

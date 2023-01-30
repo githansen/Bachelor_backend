@@ -23,7 +23,7 @@ namespace Bachelor_backend.Controller
 
       
         [HttpPost]
-        public async Task<ActionResult<string>> SaveFile(IFormFile recording)
+        public async Task<ActionResult<string>> SaveFile([FromBody] IFormFile recording)
         {
 
             string uuid = await _voiceRep.SaveFile(recording);
@@ -36,14 +36,15 @@ namespace Bachelor_backend.Controller
 
         }
 
-        public async Task<ActionResult<bool>> DeleteFile(string uuid)
+        [HttpDelete]
+        public async Task<ActionResult<bool>> DeleteFile([FromBody] string uuid)
         {
             bool deleted = await _voiceRep.DeleteFile(uuid);
             return Ok(deleted);
         }
         //Get text based on session value, discuss later
         [HttpGet]
-        public async Task<ActionResult> GetText( User u)
+        public async Task<ActionResult> GetText(User u)
         {
             Text t = await _text.GetText(u);
             return Ok(t);

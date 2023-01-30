@@ -3,7 +3,9 @@
 using Bachelor_backend.DAL;
 using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.DBInitializer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Serilog;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -36,6 +38,12 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
 builder.Services.AddScoped<DBInitializer, DBInitializer>();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API WSVAP (WebSmartView)", Version = "v1" });
+    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()); //This line
+});
+
 var app = builder.Build();
 void SeedDatabase()
 {
@@ -50,4 +58,12 @@ app.MapControllerRoute(
     pattern: "{controller}/{action=Index}/{id?}");
 SeedDatabase();
 
+app.UseSwagger(options =>
+{
+    options.SerializeAsV2 = true;
+});
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("./v1/swagger.json", "My API V1"); //originally "./swagger/v1/swagger.json"
+});
 app.Run();

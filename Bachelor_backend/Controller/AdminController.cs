@@ -10,12 +10,14 @@ namespace Bachelor_backend.Controller
         public AdminController(ITextRepository textrep) {
         _textRep= textrep;
         }
+        [HttpGet]
         public async Task<ActionResult> LogIn()
         {
             bool success = await _textRep.login();
             throw new NotImplementedException();
         }
-        public async Task<ActionResult> CreateTag(string text)
+        [HttpPost]
+        public async Task<ActionResult> CreateTag( string text)
         {
             bool success = await _textRep.CreateTag(text);
             if (success)
@@ -27,16 +29,19 @@ namespace Bachelor_backend.Controller
                 return BadRequest(false);
             }
         }
+        [HttpGet]
         public async Task<ActionResult> GetTags()
         {
             var list = await _textRep.GetAllTags();
             return Ok(list);
         }
-        public async Task<ActionResult> CreateText(string text)
+        [HttpPost]
+        public async Task<ActionResult> CreateText( string text)
         {
             bool success = await _textRep.CreateText(text);
             return Ok(success);
         }
+        [HttpGet]
         public async Task<ActionResult> GetTexts()
         {
             var list = await _textRep.GetAllTexts();
