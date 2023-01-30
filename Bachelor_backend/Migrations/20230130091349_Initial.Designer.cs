@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bachelorbackend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230129154350_Initial")]
+    [Migration("20230130091349_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -73,6 +73,9 @@ namespace Bachelorbackend.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TextId"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
 
                     b.Property<string>("TextText")
                         .IsRequired()

@@ -71,6 +71,9 @@ namespace Bachelorbackend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TextId"));
 
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
                     b.Property<string>("TextText")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
