@@ -23,7 +23,7 @@ namespace Bachelor_backend.Controller
 
       
         [HttpPost]
-        public async Task<ActionResult<string>> SaveFile([FromBody] IFormFile recording)
+        public async Task<ActionResult<string>> SaveFile(IFormFile recording)
         {
 
             string uuid = await _voiceRep.SaveFile(recording);
