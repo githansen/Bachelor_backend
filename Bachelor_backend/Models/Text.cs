@@ -12,6 +12,9 @@ namespace Bachelor_backend.Models
         public string TextText { get; set; }
         public virtual List<Tag> Tags { get; set; }
 
-
+        [ForeignKey("TargetUser")]
+        public int? UserId { get; set; }
+        public User? TargetUser { get; set; }
+        public bool Active { get; set; }
     }
 }
