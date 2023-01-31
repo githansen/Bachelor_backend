@@ -69,6 +69,12 @@ app.UseRouting();
 
 app.UseSession();
 
+
+app.UseCors(MyAllowSpecificOrigins);
+app.UseRouting();
+
+app.UseSession();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
