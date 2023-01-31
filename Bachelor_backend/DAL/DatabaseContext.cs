@@ -7,13 +7,7 @@ namespace Bachelor_backend.DAL
 
     public class DatabaseContext : DbContext
     {
-        public class TagForText
-        {
-            public int TagId { get; set; }
-            public Tag tag { get; set; }
-            public int TextId { get; set; }
-            public Text Text { get; set; }
-        }
+      
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }

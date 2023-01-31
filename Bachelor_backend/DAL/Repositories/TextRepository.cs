@@ -31,11 +31,13 @@ namespace Bachelor_backend.DAL.Repositories
 
         }
 
-        public async Task<bool> CreateText(string text)
+        public async Task<bool> CreateText(Text text)
         {
             try
             {
-                var NewText = new Text { TextText = text, Active =true, UserId=null, TargetUser=null};
+                var NewText = text;
+                text.Tags = null;
+                text.TargetUser = null;
                 _db.Texts.Add(NewText);
                 await _db.SaveChangesAsync();
                 return true;
@@ -98,14 +100,24 @@ namespace Bachelor_backend.DAL.Repositories
             return list[r.Next(0, list.Count)];
 
         }
-
-        public async Task<User> GetUserInfo(User user)
+        
+        public async Task<User> RegisterUserInfo(User user)
         {
             //TODO: Regex on user items
             user.Type = "RealUser";
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
             return user;
+        }
+
+        public async Task<User> getUser(int userId)
+        {
+            try { 
+            var user = await _db.Users.FindAsync(userId);
+            return user;
+            }
+            catch { return null; }
+               
         }
     }
 }
