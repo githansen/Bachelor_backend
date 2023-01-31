@@ -9,6 +9,6 @@ namespace Bachelor_backend.DAL.Repositories
         Task<List<Text>> GetAllTexts();
         Task<Text> GetText(User user);
         Task<List<Tag>> GetAllTags();
-        Task<bool> login();
+        Task<User> GetUserInfo(User user);
     }
 }

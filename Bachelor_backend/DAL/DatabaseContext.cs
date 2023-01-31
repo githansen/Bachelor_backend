@@ -24,12 +24,12 @@ namespace Bachelor_backend.DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-           modelBuilder.Entity<Text>()
-                .HasMany(t => t.Tags)
-                .WithMany(t => t.Texts)
-                .UsingEntity(t => t.ToTable("TagsForTexts"));
-           
+            modelBuilder.Entity<Text>()
+                 .HasMany(t => t.Tags)
+                 .WithMany(t => t.Texts)
+                 .UsingEntity(t => t.ToTable("TagsForTexts"));
+
         }
-      
+
     }
 }
