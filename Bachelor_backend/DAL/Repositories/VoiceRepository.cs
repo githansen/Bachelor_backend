@@ -27,7 +27,7 @@ public class VoiceRepository : IVoiceRepository
             {
                 Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\recordings");
             }
-            Console.WriteLine(recording.FileName);
+            //Console.WriteLine(recording.FileName);
 
             string extension = Path.GetExtension(recording.FileName);
 
@@ -57,7 +57,7 @@ public class VoiceRepository : IVoiceRepository
         {
             Console.WriteLine(e);
             _logger.LogInformation(e.Message);
-            return null;
+            return "";
         }
     }
 

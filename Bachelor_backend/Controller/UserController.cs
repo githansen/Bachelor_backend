@@ -24,7 +24,7 @@ namespace Bachelor_backend.Controller
 
 
         [HttpPost]
-        public async Task<ActionResult<string>> SaveFile(IFormFile recording)
+        public async Task<ActionResult> SaveFile(IFormFile recording)
         {
             if (string.IsNullOrEmpty(HttpContext.Session.GetString(_loggedIn)))
             {

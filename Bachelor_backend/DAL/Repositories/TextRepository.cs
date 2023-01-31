@@ -102,7 +102,7 @@ namespace Bachelor_backend.DAL.Repositories
         public async Task<User> GetUserInfo(User user)
         {
             //TODO: Regex on user items
-
+            user.Type = "RealUser";
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
             return user;
