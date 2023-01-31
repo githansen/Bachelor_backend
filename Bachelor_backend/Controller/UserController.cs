@@ -47,8 +47,8 @@ namespace Bachelor_backend.Controller
             return Ok(deleted);
         }
         //Get text based on session value, discuss later
-        [HttpGet]
-        public async Task<ActionResult> GetText(User user)
+        [HttpPost]
+        public async Task<ActionResult> GetText([FromBody] User user)
         {
             if (string.IsNullOrEmpty(HttpContext.Session.GetString(_loggedIn)))
             {
