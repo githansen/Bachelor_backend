@@ -1,5 +1,4 @@
-﻿using Bachelor_backend.DAL;
-using Bachelor_backend.DAL.Repositories;
+﻿using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -9,22 +8,28 @@ namespace Bachelor_backend.Controller
     [Route("[controller]/[action]")]
     public class UserController : ControllerBase
     {
+        private const string _loggedIn = "UserSession";
+
         private readonly IVoiceRepository _voiceRep;
+        private readonly ITextRepository _textRep;
 
         private readonly ILogger<UserController> _logger;
-        private readonly ITextRepository _text;
 
-        public UserController(IVoiceRepository voiceRep, ITextRepository text, ILogger<UserController> logger)
+        public UserController(IVoiceRepository voiceRep, ITextRepository textRep, ILogger<UserController> logger)
         {
             _voiceRep = voiceRep;
+            _textRep = textRep;
             _logger = logger;
-            _text = text;
         }
 
-      
+
         [HttpPost]
-        public async Task<ActionResult<string>> SaveFile(IFormFile recording)
+        public async Task<ActionResult> SaveFile(IFormFile recording)
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(_loggedIn)))
+            {
+                return Unauthorized("Not logged in");
+            }
 
             string uuid = await _voiceRep.SaveFile(recording);
             if (uuid.IsNullOrEmpty())
@@ -43,18 +48,26 @@ namespace Bachelor_backend.Controller
             return Ok(deleted);
         }
         //Get text based on session value, discuss later
-        [HttpGet]
-        public async Task<ActionResult> GetText(User u)
+        [HttpPost]
+        public async Task<ActionResult> GetText([FromBody] User user)
         {
-            Text t = await _text.GetText(u);
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(_loggedIn)))
+            {
+                return Unauthorized();
+            }
+            Text t = await _textRep.GetText(user);
             return Ok(t);
         }
 
         //Login a good name? 
         [HttpPost]
-        public async Task<ActionResult> Login()
+        public async Task<ActionResult> GetUserInfo([FromBody] User user)
         {
-            throw new NotImplementedException();
+            var userFromDb = await _textRep.GetUserInfo(user);
+
+            //TODO: Return user id from db
+            HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
+            return Ok("Ok");
         }
     }
 }

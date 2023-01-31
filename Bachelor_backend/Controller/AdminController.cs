@@ -7,13 +7,14 @@ namespace Bachelor_backend.Controller
     public class AdminController : ControllerBase
     {
         private readonly ITextRepository _textRep;
-        public AdminController(ITextRepository textrep) {
-        _textRep= textrep;
+        public AdminController(ITextRepository textrep)
+        {
+            _textRep = textrep;
         }
         [HttpGet]
         public async Task<ActionResult> LogIn()
         {
-            bool success = await _textRep.login();
+            //bool success = await _textRep.login();
             throw new NotImplementedException();
         }
         [HttpPost]

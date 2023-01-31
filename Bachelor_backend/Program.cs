@@ -33,11 +33,26 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IVoiceRepository, VoiceRepository>();
 builder.Services.AddScoped<ITextRepository, TextRepository>();
 
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("JohanDesktop")));
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Henrik")));
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
+
+// Configuring sessions
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = ".AdventureWorks.Session";
+    options.IdleTimeout = TimeSpan.FromSeconds(1800); //30 Minutes session
+    options.Cookie.IsEssential = true;
+});
 builder.Services.AddScoped<DBInitializer, DBInitializer>();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = ".AdventureWorks.Session";
+    options.IdleTimeout = TimeSpan.FromSeconds(1800); //30 Minutes session
+    options.Cookie.IsEssential = true;
+});
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "API WSVAP (WebSmartView)", Version = "v1" });
@@ -47,12 +62,27 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 void SeedDatabase()
 {
-    using(var scope = app.Services.CreateScope())
+    using (var scope = app.Services.CreateScope())
     {
         var dbInitializer = scope.ServiceProvider.GetService<DBInitializer>();
         dbInitializer.Initialize();
     }
 }
+
+app.UseCors(MyAllowSpecificOrigins);
+app.UseSession();
+
+app.UseCors(MyAllowSpecificOrigins);
+app.UseRouting();
+
+app.UseSession();
+
+
+app.UseCors(MyAllowSpecificOrigins);
+app.UseRouting();
+
+app.UseSession();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");

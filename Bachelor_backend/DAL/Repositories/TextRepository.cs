@@ -22,11 +22,13 @@ namespace Bachelor_backend.DAL.Repositories
                 };
                 _db.Tags.Add(NewTag);
                 await _db.SaveChangesAsync();
-                  return true;
-            } catch {
+                return true;
+            }
+            catch
+            {
                 return false;
             }
-        
+
         }
 
         public async Task<bool> CreateText(string text)
@@ -64,13 +66,14 @@ namespace Bachelor_backend.DAL.Repositories
             {
                 List<Text> texts = await _db.Texts.Select(t => new Text
                 {
-                    TextId= t.TextId,
+                    TextId = t.TextId,
                     TextText = t.TextText,
                     Tags = t.Tags.ToList()
                 }).ToListAsync();
                 return texts;
             }
-            catch {
+            catch
+            {
                 return null;
             }
         }
@@ -88,15 +91,21 @@ namespace Bachelor_backend.DAL.Repositories
             var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.Texts WHERE dbo.Texts.Active = 1").ToListAsync();
             return getRandom(liste2);
         }
-        public async Task<bool> login()
-        {
-            throw new NotImplementedException();
-        }
 
         public Text getRandom(List<Text> list)
         {
             Random r = new Random();
-            return list[r.Next(0,list.Count)];
+            return list[r.Next(0, list.Count)];
+
+        }
+
+        public async Task<User> GetUserInfo(User user)
+        {
+            //TODO: Regex on user items
+            user.Type = "RealUser";
+            await _db.Users.AddAsync(user);
+            await _db.SaveChangesAsync();
+            return user;
         }
     }
 }
