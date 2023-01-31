@@ -54,7 +54,7 @@ builder.Services.AddSession(options =>
 var app = builder.Build();
 void SeedDatabase()
 {
-    using(var scope = app.Services.CreateScope())
+    using (var scope = app.Services.CreateScope())
     {
         var dbInitializer = scope.ServiceProvider.GetService<DBInitializer>();
         dbInitializer.Initialize();

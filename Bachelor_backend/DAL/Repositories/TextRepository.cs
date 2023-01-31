@@ -22,11 +22,13 @@ namespace Bachelor_backend.DAL.Repositories
                 };
                 _db.Tags.Add(NewTag);
                 await _db.SaveChangesAsync();
-                  return true;
-            } catch {
+                return true;
+            }
+            catch
+            {
                 return false;
             }
-        
+
         }
 
         public async Task<bool> CreateText(string text)
@@ -64,13 +66,14 @@ namespace Bachelor_backend.DAL.Repositories
             {
                 List<Text> texts = await _db.Texts.Select(t => new Text
                 {
-                    TextId= t.TextId,
+                    TextId = t.TextId,
                     TextText = t.TextText,
                     Tags = t.Tags.ToList()
                 }).ToListAsync();
                 return texts;
             }
-            catch {
+            catch
+            {
                 return null;
             }
         }
@@ -92,8 +95,8 @@ namespace Bachelor_backend.DAL.Repositories
         public Text getRandom(List<Text> list)
         {
             Random r = new Random();
-            return list[r.Next(0,list.Count)];
-            
+            return list[r.Next(0, list.Count)];
+
         }
 
         public async Task<User> GetUserInfo(User user)

@@ -1,5 +1,4 @@
-﻿using Bachelor_backend.DAL;
-using Bachelor_backend.DAL.Repositories;
+﻿using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -10,7 +9,7 @@ namespace Bachelor_backend.Controller
     public class UserController : ControllerBase
     {
         private const string _loggedIn = "UserSession";
-        
+
         private readonly IVoiceRepository _voiceRep;
         private readonly ITextRepository _textRep;
 
@@ -27,6 +26,10 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult<string>> SaveFile(IFormFile recording)
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(_loggedIn)))
+            {
+                return Unauthorized("Not logged in");
+            }
 
             string uuid = await _voiceRep.SaveFile(recording);
             if (uuid.IsNullOrEmpty())
@@ -45,8 +48,12 @@ namespace Bachelor_backend.Controller
         }
         //Get text based on session value, discuss later
         [HttpGet]
-        public async Task<ActionResult> GetText( User user)
+        public async Task<ActionResult> GetText(User user)
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(_loggedIn)))
+            {
+                return Unauthorized();
+            }
             Text t = await _textRep.GetText(user);
             return Ok(t);
         }

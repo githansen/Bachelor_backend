@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static Bachelor_backend.DAL.DatabaseContext;
 
 namespace Bachelor_backend.Models
 {
