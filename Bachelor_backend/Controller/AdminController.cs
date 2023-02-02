@@ -1,4 +1,5 @@
 ﻿using Bachelor_backend.DAL.Repositories;
+using Bachelor_backend.Models.APIModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bachelor_backend.Controller
@@ -11,11 +12,13 @@ namespace Bachelor_backend.Controller
         {
             _textRep = textrep;
         }
+        [HttpGet]
         public async Task<ActionResult> LogIn()
         {
             //bool success = await _textRep.login();
             throw new NotImplementedException();
         }
+        [HttpPost]
         public async Task<ActionResult> CreateTag(string text)
         {
             bool success = await _textRep.CreateTag(text);
@@ -28,17 +31,20 @@ namespace Bachelor_backend.Controller
                 return BadRequest(false);
             }
         }
+        [HttpGet]
         public async Task<ActionResult> GetTags()
         {
             var list = await _textRep.GetAllTags();
             return Ok(list);
         }
-        public async Task<ActionResult> CreateText(string text)
+        [HttpPost]
+        public async Task<ActionResult> CreateText(SaveText text)
         {
             bool success = await _textRep.CreateText(text);
             return Ok(success);
         }
-        public async Task<ActionResult> GetTexts()
+        [HttpGet]
+        public async Task<ActionResult> GetAllTexts()
         {
             var list = await _textRep.GetAllTexts();
             return Ok(list);

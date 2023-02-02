@@ -2,6 +2,7 @@
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Numerics;
 
 namespace Bachelor_backend.Controller
 {
@@ -41,28 +42,36 @@ namespace Bachelor_backend.Controller
 
         }
 
-        public async Task<ActionResult<bool>> DeleteFile(string uuid)
+        [HttpDelete]
+        public async Task<ActionResult<bool>> DeleteFile([FromBody] string uuid)
         {
             bool deleted = await _voiceRep.DeleteFile(uuid);
             return Ok(deleted);
         }
         //Get text based on session value, discuss later
         [HttpPost]
-        public async Task<ActionResult> GetText([FromBody] User user)
+        public async Task<ActionResult> GetText()
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString(_loggedIn)))
+            string SessionString = HttpContext.Session.GetString(_loggedIn);
+            if (string.IsNullOrEmpty(SessionString))
             {
                 return Unauthorized();
             }
-            Text t = await _textRep.GetText(user);
-            return Ok(t);
+            else
+            {
+                int UserId = int.Parse(SessionString[SessionString.Length - 1].ToString());
+                User user = await _textRep.getUser(UserId);
+                Text t = await _textRep.GetText(user);
+                return Ok(t);
+            }
+            
         }
 
         //Login a good name? 
         [HttpPost]
-        public async Task<ActionResult> GetUserInfo([FromBody] User user)
+        public async Task<ActionResult> RegisterUserInfo([FromBody] User user)
         {
-            var userFromDb = await _textRep.GetUserInfo(user);
+            var userFromDb = await _textRep.RegisterUserInfo(user);
 
             //TODO: Return user id from db
             HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());

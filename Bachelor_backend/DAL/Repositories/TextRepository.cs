@@ -1,4 +1,5 @@
 ﻿using Bachelor_backend.Models;
+using Bachelor_backend.Models.APIModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bachelor_backend.DAL.Repositories
@@ -31,12 +32,52 @@ namespace Bachelor_backend.DAL.Repositories
 
         }
 
-        public async Task<bool> CreateText(string text)
+        public async Task<bool> CreateText(SaveText text)
         {
+            var TagList = new List<Tag>();
+            if(text.TagIds == null || text.TagIds.Count == 0)
+            {
+                TagList = null;
+            }
+            else
+            {
+                foreach (int i in text.TagIds)
+                {
+                    try
+                    {
+                        Tag newtag = await _db.Tags.FindAsync(i);
+                        TagList.Add(newtag);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+            }
+            
+        
+
+            var newUser = new User()
+            {
+                Type="TargetUser",
+                NativeLanguage = text.NativeLanguage,
+                Dialect = text.Dialect,
+                AgeGroup = text.AgeGroup,
+            };
+
+            if (newUser.NativeLanguage == null && newUser.Dialect == null && newUser.AgeGroup == null) {
+                newUser = null;
+            }
             try
             {
-                var NewText = new Text { TextText = text };
-                _db.Texts.Add(NewText);
+                var NewText = new Text()
+                {
+                    TextText = text.TextText,
+                    Active= true,
+                    Tags= TagList,
+                    TargetUser = newUser
+                };
+                _db.Add(NewText);
                 await _db.SaveChangesAsync();
                 return true;
             }
@@ -88,7 +129,7 @@ namespace Bachelor_backend.DAL.Repositories
             var liste = await _db.Texts.FromSql($"SELECT dbo.Texts.* FROM dbo.Users, dbo.Texts WHERE dbo.Users.UserId = dbo.Texts.UserId AND dbo.Texts.UserId is not NULL AND dbo.Users.Type ={target} AND (dbo.Users.NativeLanguage is NULL or dbo.Users.NativeLanguage={NativeLanguage}) AND (dbo.Users.AgeGroup is NULL or dbo.Users.AgeGroup={AgeGroup}) AND (dbo.Users.Dialect is NULL or dbo.Users.Dialect={Dialect})").ToListAsync();
             //Text out to one user. Not decided yet how this should be done. 
             if (liste.Count > 0) return getRandom(liste);
-            var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.texts").ToListAsync();
+            var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.Texts WHERE dbo.Texts.Active = 1").ToListAsync();
             return getRandom(liste2);
         }
 
@@ -98,14 +139,24 @@ namespace Bachelor_backend.DAL.Repositories
             return list[r.Next(0, list.Count)];
 
         }
-
-        public async Task<User> GetUserInfo(User user)
+        
+        public async Task<User> RegisterUserInfo(User user)
         {
             //TODO: Regex on user items
             user.Type = "RealUser";
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
             return user;
+        }
+
+        public async Task<User> getUser(int userId)
+        {
+            try { 
+            var user = await _db.Users.FindAsync(userId);
+            return user;
+            }
+            catch { return null; }
+               
         }
     }
 }
