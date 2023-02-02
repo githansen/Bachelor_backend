@@ -7,5 +7,6 @@
         public string? NativeLanguage { get; set; }
         public string? AgeGroup { get; set; }
         public string? Dialect { get; set; }
+
     }
 }
