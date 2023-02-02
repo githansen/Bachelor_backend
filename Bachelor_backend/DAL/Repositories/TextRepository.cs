@@ -1,4 +1,5 @@
 ﻿using Bachelor_backend.Models;
+using Bachelor_backend.Models.APIModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bachelor_backend.DAL.Repositories
@@ -31,14 +32,52 @@ namespace Bachelor_backend.DAL.Repositories
 
         }
 
-        public async Task<bool> CreateText(Text text)
+        public async Task<bool> CreateText(SaveText text)
         {
+            var TagList = new List<Tag>();
+            if(text.TagIds == null || text.TagIds.Count == 0)
+            {
+                TagList = null;
+            }
+            else
+            {
+                foreach (int i in text.TagIds)
+                {
+                    try
+                    {
+                        Tag newtag = await _db.Tags.FindAsync(i);
+                        TagList.Add(newtag);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+            }
+            
+        
+
+            var newUser = new User()
+            {
+                Type="TargetUser",
+                NativeLanguage = text.NativeLanguage,
+                Dialect = text.Dialect,
+                AgeGroup = text.AgeGroup,
+            };
+
+            if (newUser.NativeLanguage == null && newUser.Dialect == null && newUser.AgeGroup == null) {
+                newUser = null;
+            }
             try
             {
-                var NewText = text;
-                text.Tags = null;
-                text.TargetUser = null;
-                _db.Texts.Add(NewText);
+                var NewText = new Text()
+                {
+                    TextText = text.TextText,
+                    Active= true,
+                    Tags= TagList,
+                    TargetUser = newUser
+                };
+                _db.Add(NewText);
                 await _db.SaveChangesAsync();
                 return true;
             }
