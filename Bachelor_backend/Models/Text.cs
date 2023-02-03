@@ -13,7 +13,7 @@ namespace Bachelor_backend.Models
 
         [ForeignKey("TargetUser")]
         public int? UserId { get; set; }
-        public User? TargetUser { get; set; }
+        public virtual User? TargetUser { get; set; }
         public bool Active { get; set; }
     }
 }

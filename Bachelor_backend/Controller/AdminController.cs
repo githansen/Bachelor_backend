@@ -1,6 +1,7 @@
 ﻿using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models.APIModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
 
 namespace Bachelor_backend.Controller
 {
@@ -49,5 +50,17 @@ namespace Bachelor_backend.Controller
             var list = await _textRep.GetAllTexts();
             return Ok(list);
         }
-    }
+        [HttpDelete]
+        public async Task<ActionResult> DeleteText(int TextId) {
+            bool success = await _textRep.DeleteText(TextId);
+
+            return Ok(success);
+        }
+        [HttpDelete]
+        public async Task<ActionResult> DeleteTag(int TagId) {
+            bool success = await _textRep.DeleteTag(TagId);
+            return Ok(success);
+        }
+
+           }
 }

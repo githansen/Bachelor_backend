@@ -1,5 +1,6 @@
 ﻿using Bachelor_backend.Models;
 using Bachelor_backend.Models.APIModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bachelor_backend.DAL.Repositories
@@ -18,7 +19,7 @@ namespace Bachelor_backend.DAL.Repositories
                 var NewTag = new Tag
                 {
                     TagText = text,
-                    Texts = null
+                    Texts = new List<Text>()
 
                 };
                 _db.Tags.Add(NewTag);
@@ -91,7 +92,8 @@ namespace Bachelor_backend.DAL.Repositories
                 List<Tag> tags = await _db.Tags.Select(t => new Tag
                 {
                     TagId = t.TagId,
-                    TagText = t.TagText
+                    TagText = t.TagText,
+                    Texts = t.Texts.ToList()
                 }).ToListAsync();
                 return tags;
             }
@@ -157,6 +159,42 @@ namespace Bachelor_backend.DAL.Repositories
             }
             catch { return null; }
                
+        }
+        public async Task<bool> DeleteText(int TextId)
+        {
+            var TextInAudioFile = _db.Audiofiles.FromSql($"SELECT * from dbo.Audiofiles WHERE dbo.Audiofiles.UserId ={TextId}").ToList();
+            if(TextInAudioFile.Count > 0)
+            {
+                return false;
+            }
+            try
+            {
+                Text text = await _db.Texts.FindAsync(TextId);
+                _db.Texts.Remove(text);
+                _db.SaveChanges();
+                return true;
+            }
+            catch { return false; }
+           
+        }
+        public async Task<bool> DeleteTag(int TagId) {
+            try
+            {
+                var x = await  GetAllTags();
+                Tag tag = x.Where(i => i.TagId == TagId).FirstOrDefault();
+                if(tag == null || tag.Texts.Count > 0)
+                {
+                    return false;
+                }
+                _db.Tags.Remove(tag);
+                await _db.SaveChangesAsync();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
