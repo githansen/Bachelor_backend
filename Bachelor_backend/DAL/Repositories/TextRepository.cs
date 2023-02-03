@@ -107,7 +107,14 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                List<Text> texts = await _db.Texts.FromSql($"SELECT * FROM dbo.texts WHERE active=1").ToListAsync();
+                List<Text> texts = await _db.Texts.Select(t => new Text
+                {
+                    TextId = t.TextId,
+                    TextText = t.TextText,
+                    Tags = t.Tags.ToList(),
+                    Active = t.Active,
+                    TargetUser = t.TargetUser
+                }).ToListAsync();
 
                 return texts;
             }
