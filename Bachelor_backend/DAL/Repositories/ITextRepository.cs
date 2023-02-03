@@ -1,5 +1,6 @@
 ﻿using Bachelor_backend.Models;
 using Bachelor_backend.Models.APIModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Bachelor_backend.DAL.Repositories
 {
@@ -12,5 +13,7 @@ namespace Bachelor_backend.DAL.Repositories
         Task<List<Tag>> GetAllTags();
         Task<User> RegisterUserInfo(User user);
         Task<User> getUser(int userId);
+        Task<bool> DeleteTag(int TextId);
+        Task<bool> DeleteText(int TextId);
     }
 }
