@@ -39,7 +39,7 @@ namespace Bachelor_backend.Controller
             return Ok(list);
         }
         [HttpPost]
-        public async Task<ActionResult> CreateText(SaveText text)
+        public async Task<ActionResult> CreateText([FromBody]SaveText text)
         {
             bool success = await _textRep.CreateText(text);
             return Ok(success);
