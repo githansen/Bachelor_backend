@@ -39,23 +39,24 @@ namespace Bachelor_backend.Controller
                 _logger.LogInformation("Fault in saving voice recording");
                 return BadRequest("Voice recording is not saved");
             }
-            return Ok(uuid);
 
+            return Ok(uuid);
         }
 
         [HttpDelete]
         public async Task<ActionResult> DeleteFile([FromBody] string uuid)
         {
-            
             bool deleted = await _voiceRep.DeleteFile(uuid);
-            
+
             if (!deleted)
             {
                 _logger.LogInformation("Fault in deleting voice recording");
                 return BadRequest("Voice recording is not deleted");
             }
+
             return Ok("Voice recording is deleted");
         }
+
         //Get text based on session value, discuss later
         [HttpPost]
         public async Task<ActionResult> GetText()
@@ -65,15 +66,12 @@ namespace Bachelor_backend.Controller
             {
                 return Unauthorized();
             }
-            else
-            {
-                int UserId = int.Parse(Regex.Match(SessionString, @"\d+").Value);
-                Debug.Write(UserId);
-                User user = await _textRep.getUser(UserId);
-                Text t = await _textRep.GetText(user);
-                return Ok(t);
-            }
-            
+
+            int UserId = int.Parse(Regex.Match(SessionString, @"\d+").Value);
+            Debug.Write(UserId);
+            User user = await _textRep.GetUser(UserId);
+            Text t = await _textRep.GetText(user);
+            return Ok(t);
         }
 
         //Login a good name? 

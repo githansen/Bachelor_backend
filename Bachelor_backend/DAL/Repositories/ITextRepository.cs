@@ -12,7 +12,7 @@ namespace Bachelor_backend.DAL.Repositories
         Task<Text> GetText(User user);
         Task<List<Tag>> GetAllTags();
         Task<User> RegisterUserInfo(User user);
-        Task<User> getUser(int userId);
+        Task<User> GetUser(int userId);
         Task<bool> DeleteTag(int TextId);
         Task<bool> DeleteText(int TextId);
     }
