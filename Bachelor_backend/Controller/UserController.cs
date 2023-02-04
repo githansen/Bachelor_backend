@@ -44,10 +44,17 @@ namespace Bachelor_backend.Controller
         }
 
         [HttpDelete]
-        public async Task<ActionResult<bool>> DeleteFile([FromBody] string uuid)
+        public async Task<ActionResult> DeleteFile([FromBody] string uuid)
         {
+            
             bool deleted = await _voiceRep.DeleteFile(uuid);
-            return Ok(deleted);
+            
+            if (!deleted)
+            {
+                _logger.LogInformation("Fault in deleting voice recording");
+                return BadRequest("Voice recording is not deleted");
+            }
+            return Ok("Voice recording is deleted");
         }
         //Get text based on session value, discuss later
         [HttpPost]
