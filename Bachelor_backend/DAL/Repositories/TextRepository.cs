@@ -2,6 +2,7 @@
 using Bachelor_backend.Models.APIModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Bachelor_backend.DAL.Repositories
 {
@@ -131,10 +132,28 @@ namespace Bachelor_backend.DAL.Repositories
             var AgeGroup = user.AgeGroup;
             var Dialect = user.Dialect;
             var target = "Target";
-            var liste = await _db.Texts.FromSql($"SELECT dbo.Texts.* FROM dbo.Users, dbo.Texts WHERE dbo.Users.UserId = dbo.Texts.UserId AND dbo.Texts.UserId is not NULL AND dbo.Users.Type ={target} AND (dbo.Users.NativeLanguage is NULL or dbo.Users.NativeLanguage={NativeLanguage}) AND (dbo.Users.AgeGroup is NULL or dbo.Users.AgeGroup={AgeGroup}) AND (dbo.Users.Dialect is NULL or dbo.Users.Dialect={Dialect})").ToListAsync();
+            var liste = await _db.Texts.FromSql($"SELECT dbo.Texts.* FROM dbo.Users, dbo.Texts WHERE dbo.Texts.Active=1 AND dbo.Users.UserId = dbo.Texts.UserId AND dbo.Texts.UserId is not NULL AND dbo.Users.Type ={target} AND (dbo.Users.NativeLanguage is NULL or dbo.Users.NativeLanguage={NativeLanguage}) AND (dbo.Users.AgeGroup is NULL or dbo.Users.AgeGroup={AgeGroup}) AND (dbo.Users.Dialect is NULL or dbo.Users.Dialect={Dialect})").Select(t => new Text
+            {
+                TextId = t.TextId,
+                TextText=t.TextText,
+                Tags = t.Tags.ToList(),
+                Active = t.Active,
+                TargetUser = t.TargetUser
+            }).ToListAsync();
+            foreach (var t in liste)
+            {
+             //   Debug.WriteLine(t.TextId);
+            }
             //Text out to one user. Not decided yet how this should be done. 
             if (liste.Count > 0) return getRandom(liste);
-            var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.Texts WHERE dbo.Texts.Active = 1").ToListAsync();
+            var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.Texts WHERE dbo.Texts.Active = 1").Select(t => new Text
+            {
+                TextId= t.TextId,
+                TextText = t.TextText,
+                Tags = t.Tags.ToList(),
+                Active = t.Active,
+                TargetUser = t.TargetUser
+            }).ToListAsync();
             return getRandom(liste2);
         }
 

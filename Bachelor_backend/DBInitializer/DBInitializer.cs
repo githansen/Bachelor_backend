@@ -44,8 +44,9 @@ namespace Bachelor_backend.DBInitializer
                 _db.Tags.Add(tag);
                 _db.SaveChanges();
             }
+
             string filepathTexts = System.IO.Path.Combine(CurrentDirectory, @"TestData\Texts.txt"); ;
-           
+            
             reader = new StreamReader(filepathTexts);
             while (!reader.EndOfStream)
                 {
@@ -56,11 +57,16 @@ namespace Bachelor_backend.DBInitializer
                 {
                     TextText = line,
                     Active = true,
-                    Tags = new List<Tag> { Taglist[r.Next(0,Taglist.Count)], Taglist[r.Next(0, Taglist.Count)] }
+                    Tags = new List<Tag> { Taglist[r.Next(0, Taglist.Count)], Taglist[r.Next(0, Taglist.Count)] },
                     };
+                if(r.Next(0,2) == 1)
+                {
+                    text.TargetUser = new User() { Type="Target", AgeGroup = "18-28" };
+                }
                 _db.Texts.Add(text);
                 _db.SaveChanges();
                 }
+          
             string filepathUsers = System.IO.Path.Combine(CurrentDirectory, @"TestData\Users.txt");
             reader = new StreamReader(filepathUsers);
             while (!reader.EndOfStream)

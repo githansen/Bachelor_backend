@@ -2,7 +2,9 @@
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics;
 using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace Bachelor_backend.Controller
 {
@@ -58,7 +60,8 @@ namespace Bachelor_backend.Controller
             }
             else
             {
-                int UserId = int.Parse(SessionString[SessionString.Length - 1].ToString());
+                int UserId = int.Parse(Regex.Match(SessionString, @"\d+").Value);
+                Debug.Write(UserId);
                 User user = await _textRep.getUser(UserId);
                 Text t = await _textRep.GetText(user);
                 return Ok(t);
