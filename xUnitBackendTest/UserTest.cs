@@ -80,5 +80,33 @@ namespace xUnitBackendTest
             Assert.Equal("Not logged in", result.Value);
 
         }
+
+        [Fact]
+        public async Task DeleteFileOk()
+        {
+            //Arrange
+            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(true);
+            
+            //Act
+            var result = await _userController.DeleteFile(It.IsAny<string>()) as OkObjectResult;
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal("Voice recording is deleted", result.Value);
+        }
+        
+        [Fact]
+        public async Task DeleteFileFault()
+        {
+            //Arrange
+            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(false);
+            
+            //Act
+            var result = await _userController.DeleteFile(It.IsAny<string>()) as BadRequestObjectResult;
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.Equal("Voice recording is not deleted", result.Value);
+        }
     }
 }
