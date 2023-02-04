@@ -39,8 +39,8 @@ namespace Bachelor_backend.Controller
                 _logger.LogInformation("Fault in saving voice recording");
                 return BadRequest("Voice recording is not saved");
             }
-
             return Ok(uuid);
+
         }
 
         [HttpDelete]
@@ -61,13 +61,13 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> GetText()
         {
-            string SessionString = HttpContext.Session.GetString(_loggedIn);
-            if (string.IsNullOrEmpty(SessionString))
+            string sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (string.IsNullOrEmpty(sessionString))
             {
                 return Unauthorized();
             }
 
-            int UserId = int.Parse(Regex.Match(SessionString, @"\d+").Value);
+            int UserId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
             Debug.Write(UserId);
             User user = await _textRep.GetUser(UserId);
             Text t = await _textRep.GetText(user);
