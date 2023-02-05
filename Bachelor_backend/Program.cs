@@ -16,7 +16,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins("https://localhost:3000");
+            policy.AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowAnyOrigin();
         });
 });
 
@@ -69,10 +71,10 @@ void SeedDatabase()
     }
 }
 
-app.UseCors(MyAllowSpecificOrigins);
+
 app.UseSession();
 app.UseRouting();
-
+app.UseCors(MyAllowSpecificOrigins);
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");

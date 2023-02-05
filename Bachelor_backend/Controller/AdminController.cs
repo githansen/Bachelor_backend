@@ -51,13 +51,13 @@ namespace Bachelor_backend.Controller
             return Ok(list);
         }
         [HttpDelete]
-        public async Task<ActionResult> DeleteText(int TextId) {
+        public async Task<ActionResult> DeleteText([FromQuery(Name ="TextId")]int TextId) {
             bool success = await _textRep.DeleteText(TextId);
 
             return Ok(success);
         }
         [HttpDelete]
-        public async Task<ActionResult> DeleteTag(int TagId) {
+        public async Task<ActionResult> DeleteTag([FromQuery(Name ="TagId")]int TagId) {
             bool success = await _textRep.DeleteTag(TagId);
             return Ok(success);
         }
