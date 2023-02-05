@@ -80,5 +80,74 @@ namespace xUnitBackendTest
             Assert.Equal("Not logged in", result.Value);
 
         }
+
+        [Fact]
+        public async Task DeleteFileOk()
+        {
+            //Arrange
+            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(true);
+            
+            //Act
+            var result = await _userController.DeleteFile(It.IsAny<string>()) as OkObjectResult;
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal("Voice recording is deleted", result.Value);
+        }
+        
+        [Fact]
+        public async Task DeleteFileFault()
+        {
+            //Arrange
+            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(false);
+            
+            //Act
+            var result = await _userController.DeleteFile(It.IsAny<string>()) as BadRequestObjectResult;
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.Equal("Voice recording is not deleted", result.Value);
+        }
+
+        [Fact]
+        public async Task GetTextOk()
+        {
+            //Arrange
+            var tags = new List<Tag>
+            {
+                new()
+                {
+                    TagId = 1,
+                    TagText = "Lorem ipsum"
+                },
+                new()
+                {
+                    TagId = 2,
+                    TagText = "Random text"
+                }
+            };
+
+            var text = new Text
+            {
+                TextId = 1,
+                TextText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus blandit dolor mi, et hendrerit ipsum rhoncus ac. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aliquam vitae neque quis dolor lacinia elementum faucibus in lacus. Vivamus eleifend fringilla justo sit amet vulputate. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nam hendrerit eu lacus quis finibus. Integer fringilla justo vel massa pellentesque, ac semper dolor aliquam. Curabitur congue lorem sit amet felis luctus tincidunt. Suspendisse ipsum orci, euismod varius pellentesque vitae, fermentum a tortor. Etiam pulvinar facilisis tempus. Suspendisse risus odio, convallis in eros sit amet, efficitur congue ipsum. Curabitur tincidunt urna at nunc imperdiet, non accumsan tellus dignissim.",
+                Tags = tags,
+                Active = true
+            };
+            mockTextRep.Setup(x => x.GetText(It.IsAny<User>())).ReturnsAsync(text);
+            
+            mockSession[_loggedIn] = "1";
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
+            
+            var result = await _userController.GetText() as OkObjectResult;
+            
+            
+            //Assert
+            Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal(text, result.Value);
+        }
     }
 }
