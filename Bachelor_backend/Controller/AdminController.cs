@@ -1,6 +1,7 @@
 ﻿using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models.APIModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Bachelor_backend.Models;
 
@@ -109,7 +110,8 @@ namespace Bachelor_backend.Controller
         /// <param name="TextId"></param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task<ActionResult> DeleteText([FromQuery(Name ="TextId")]int TextId) {
+        public async Task<ActionResult> DeleteText(int TextId) {
+            Debug.WriteLine(TextId);
             bool success = await _textRep.DeleteText(TextId);
 
             return Ok(success);
@@ -120,7 +122,7 @@ namespace Bachelor_backend.Controller
         /// <param name="TagId"></param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task<ActionResult> DeleteTag([FromQuery(Name ="TagId")]int TagId) {
+        public async Task<ActionResult> DeleteTag(int TagId) {
             bool success = await _textRep.DeleteTag(TagId);
             return Ok(success);
         }
