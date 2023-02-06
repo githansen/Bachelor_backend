@@ -2,6 +2,7 @@
 using Bachelor_backend.Models.APIModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.CompilerServices;
+using Bachelor_backend.Models;
 
 namespace Bachelor_backend.Controller
 {
@@ -39,7 +40,7 @@ namespace Bachelor_backend.Controller
             return Ok(list);
         }
         [HttpPost]
-        public async Task<ActionResult> CreateText([FromBody]SaveText text)
+        public async Task<ActionResult> CreateText([FromBody] Text text)
         {
             bool success = await _textRep.CreateText(text);
             return Ok(success);

@@ -3,6 +3,7 @@ using Bachelor_backend.Models.APIModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Bachelor_backend.DAL.Repositories
 {
@@ -34,8 +35,47 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-        public async Task<bool> CreateText(SaveText text)
+        public async Task<bool> CreateText(Text text)
         {
+            try
+            {
+                //Creates tags if they don't exist
+                var TagList = text.Tags;
+                if (TagList != null)
+                {
+                    foreach (Tag tag in TagList)
+                    {
+                        //Check if tag exists in db
+                        var tagInDb = await _db.Tags.Where(x => x.TagText == tag.TagText).FirstOrDefaultAsync();
+                    
+                        //If tag doesn't exist, create it
+                        if (tagInDb.TagText.IsNullOrEmpty())
+                        {
+                            await _db.Tags.AddAsync(tag);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                //TODO log error
+                return false;
+            }
+            
+            //Add text to db
+            try
+            {
+                await _db.Texts.AddAsync(text);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                //TODO log error
+                return false;
+            }
+
+            /*
             var TagList = new List<Tag>();
             if (text.TagIds == null || text.TagIds.Count == 0)
             {
@@ -80,7 +120,7 @@ namespace Bachelor_backend.DAL.Repositories
                     Tags = TagList,
                     TargetUser = newUser
                 };
-                _db.Add(NewText);
+                await _db.AddAsync(NewText);
                 await _db.SaveChangesAsync();
                 return true;
             }
@@ -88,6 +128,7 @@ namespace Bachelor_backend.DAL.Repositories
             {
                 return false;
             }
+            */
         }
 
         public async Task<List<Tag>> GetAllTags()
