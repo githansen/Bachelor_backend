@@ -1,19 +1,17 @@
 ﻿using Bachelor_backend.Models;
-using Bachelor_backend.Models.APIModels;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Bachelor_backend.DAL.Repositories
 {
     public class TextRepository : ITextRepository
     {
         private readonly DatabaseContext _db;
+        private readonly ILogger<TextRepository> _logger;
 
-        public TextRepository(DatabaseContext db)
+        public TextRepository(DatabaseContext db, ILogger<TextRepository> logger)
         {
             _db = db;
+            _logger = logger;
         }
 
         public async Task<bool> CreateTag(string text)
@@ -40,95 +38,44 @@ namespace Bachelor_backend.DAL.Repositories
             try
             {
                 //Creates tags if they don't exist
-                var TagList = text.Tags;
-                if (TagList != null)
+                var tagList = text.Tags;
+                if (tagList != null)
                 {
-                    foreach (Tag tag in TagList)
+                    for (int i = 0; i < tagList.Count(); i++)
                     {
                         //Check if tag exists in db
-                        var tagInDb = await _db.Tags.Where(x => x.TagText == tag.TagText).FirstOrDefaultAsync();
-                    
-                        //If tag doesn't exist, create it
-                        if (tagInDb.TagText.IsNullOrEmpty())
+                        var tagInDb = await _db.Tags.Where(x => x.TagText.Equals(tagList[i].TagText)).FirstOrDefaultAsync();
+
+                        // Gives the tag an id if it exists
+                        if (tagInDb != null)
                         {
-                            await _db.Tags.AddAsync(tag);
+                            tagList[i] = tagInDb;
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                //TODO log error
+                _logger.LogInformation(e.Message);
                 return false;
             }
-            
+
             //Add text to db
             try
             {
+                var user = text.TargetUser;
+                user.Type = "TargetUser";
+                await _db.Users.AddAsync(user);
                 await _db.Texts.AddAsync(text);
+
                 await _db.SaveChangesAsync();
                 return true;
             }
             catch (Exception e)
             {
-                //TODO log error
+                _logger.LogInformation(e.Message);
                 return false;
             }
-
-            /*
-            var TagList = new List<Tag>();
-            if (text.TagIds == null || text.TagIds.Count == 0)
-            {
-                TagList = null;
-            }
-            else
-            {
-                foreach (int i in text.TagIds)
-                {
-                    try
-                    {
-                        Tag newtag = await _db.Tags.FindAsync(i);
-                        TagList.Add(newtag);
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                }
-            }
-
-
-            var newUser = new User()
-            {
-                Type = "TargetUser",
-                NativeLanguage = text.NativeLanguage,
-                Dialect = text.Dialect,
-                AgeGroup = text.AgeGroup,
-            };
-
-            if (newUser.NativeLanguage == null && newUser.Dialect == null && newUser.AgeGroup == null)
-            {
-                newUser = null;
-            }
-
-            try
-            {
-                var NewText = new Text()
-                {
-                    TextText = text.TextText,
-                    Active = true,
-                    Tags = TagList,
-                    TargetUser = newUser
-                };
-                await _db.AddAsync(NewText);
-                await _db.SaveChangesAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-            */
         }
 
         public async Task<List<Tag>> GetAllTags()
@@ -143,8 +90,9 @@ namespace Bachelor_backend.DAL.Repositories
                 }).ToListAsync();
                 return tags;
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return null;
             }
         }

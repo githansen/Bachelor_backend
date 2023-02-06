@@ -1,9 +1,9 @@
 ﻿using Bachelor_backend.DAL.Repositories;
-using Bachelor_backend.Models.APIModels;
+using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Bachelor_backend.Models;
+
 
 namespace Bachelor_backend.Controller
 {
@@ -127,5 +127,5 @@ namespace Bachelor_backend.Controller
             return Ok(success);
         }
 
-           }
+    }
 }
