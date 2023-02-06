@@ -57,6 +57,8 @@ builder.Services.AddSession(options =>
 });
 builder.Services.AddSwaggerGen(c =>
 {
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
+ $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "API WSVAP (WebSmartView)", Version = "v1" });
     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()); //This line
 });
