@@ -1,8 +1,9 @@
 ﻿using Bachelor_backend.DAL.Repositories;
-using Bachelor_backend.Models.APIModels;
+using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+
 
 namespace Bachelor_backend.Controller
 {
@@ -40,7 +41,7 @@ namespace Bachelor_backend.Controller
             return Ok(list);
         }
         [HttpPost]
-        public async Task<ActionResult> CreateText([FromBody]SaveText text)
+        public async Task<ActionResult> CreateText([FromBody] Text text)
         {
             bool success = await _textRep.CreateText(text);
             return Ok(success);
@@ -64,5 +65,5 @@ namespace Bachelor_backend.Controller
             return Ok(success);
         }
 
-           }
+    }
 }

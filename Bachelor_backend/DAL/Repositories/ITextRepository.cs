@@ -7,7 +7,7 @@ namespace Bachelor_backend.DAL.Repositories
     public interface ITextRepository
     {
         Task<bool> CreateTag(string text);
-        Task<bool> CreateText(SaveText text);
+        Task<bool> CreateText(Text text);
         Task<List<Text>> GetAllTexts();
         Task<Text> GetText(User user);
         Task<List<Tag>> GetAllTags();

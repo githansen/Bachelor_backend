@@ -1,18 +1,17 @@
 ﻿using Bachelor_backend.Models;
-using Bachelor_backend.Models.APIModels;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 
 namespace Bachelor_backend.DAL.Repositories
 {
     public class TextRepository : ITextRepository
     {
         private readonly DatabaseContext _db;
+        private readonly ILogger<TextRepository> _logger;
 
-        public TextRepository(DatabaseContext db)
+        public TextRepository(DatabaseContext db, ILogger<TextRepository> logger)
         {
             _db = db;
+            _logger = logger;
         }
 
         public async Task<bool> CreateTag(string text)
@@ -34,58 +33,47 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-        public async Task<bool> CreateText(SaveText text)
+        public async Task<bool> CreateText(Text text)
         {
-            var TagList = new List<Tag>();
-            if (text.TagIds == null || text.TagIds.Count == 0)
+            try
             {
-                TagList = null;
-            }
-            else
-            {
-                foreach (int i in text.TagIds)
+                //Creates tags if they don't exist
+                var tagList = text.Tags;
+                if (tagList != null)
                 {
-                    try
+                    for (int i = 0; i < tagList.Count(); i++)
                     {
-                        Tag newtag = await _db.Tags.FindAsync(i);
-                        TagList.Add(newtag);
-                    }
-                    catch
-                    {
-                        return false;
+                        //Check if tag exists in db
+                        var tagInDb = await _db.Tags.Where(x => x.TagText.Equals(tagList[i].TagText)).FirstOrDefaultAsync();
+
+                        // Gives the tag an id if it exists
+                        if (tagInDb != null)
+                        {
+                            tagList[i] = tagInDb;
+                        }
                     }
                 }
             }
-
-
-            var newUser = new User()
+            catch (Exception e)
             {
-                Type = "TargetUser",
-                NativeLanguage = text.NativeLanguage,
-                Dialect = text.Dialect,
-                AgeGroup = text.AgeGroup,
-            };
-
-            if (newUser.NativeLanguage == null && newUser.Dialect == null && newUser.AgeGroup == null)
-            {
-                newUser = null;
+                _logger.LogInformation(e.Message);
+                return false;
             }
 
+            //Add text to db
             try
             {
-                var NewText = new Text()
-                {
-                    TextText = text.TextText,
-                    Active = true,
-                    Tags = TagList,
-                    TargetUser = newUser
-                };
-                _db.Add(NewText);
+                var user = text.TargetUser;
+                user.Type = "TargetUser";
+                await _db.Users.AddAsync(user);
+                await _db.Texts.AddAsync(text);
+
                 await _db.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return false;
             }
         }
@@ -102,8 +90,9 @@ namespace Bachelor_backend.DAL.Repositories
                 }).ToListAsync();
                 return tags;
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return null;
             }
         }
