@@ -1,9 +1,5 @@
 ﻿using Bachelor_backend.Models;
-using Bachelor_backend.Models.APIModels;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Bachelor_backend.DAL.Repositories
 {
@@ -40,18 +36,17 @@ namespace Bachelor_backend.DAL.Repositories
             try
             {
                 //Creates tags if they don't exist
-                var TagList = text.Tags;
-                if (TagList != null)
+                var tagList = text.Tags;
+                if (tagList != null)
                 {
-                    foreach (Tag tag in TagList)
+                    for (int i = 0; i < tagList.Count(); i++)
                     {
                         //Check if tag exists in db
-                        var tagInDb = await _db.Tags.Where(x => x.TagText == tag.TagText).FirstOrDefaultAsync();
-                    
-                        //If tag doesn't exist, create it
-                        if (tagInDb.TagText.IsNullOrEmpty())
+                        var tagInDb = await _db.Tags.Where(x => x.TagText.Equals(tagList[i].TagText)).FirstOrDefaultAsync();
+
+                        if (tagInDb != null)
                         {
-                            await _db.Tags.AddAsync(tag);
+                            tagList[i] = tagInDb;
                         }
                     }
                 }
@@ -61,11 +56,15 @@ namespace Bachelor_backend.DAL.Repositories
                 //TODO log error
                 return false;
             }
-            
+
             //Add text to db
             try
             {
+                var user = text.TargetUser;
+                user.Type = "TargetUser";
+                await _db.Users.AddAsync(user);
                 await _db.Texts.AddAsync(text);
+
                 await _db.SaveChangesAsync();
                 return true;
             }
@@ -74,6 +73,7 @@ namespace Bachelor_backend.DAL.Repositories
                 //TODO log error
                 return false;
             }
+
 
             /*
             var TagList = new List<Tag>();
