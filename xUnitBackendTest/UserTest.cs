@@ -149,5 +149,73 @@ namespace xUnitBackendTest
             Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
             Assert.Equal(text, result.Value);
         }
+        
+        [Fact]
+        public async Task GetTextNotLoggedIn()
+        {
+            //Arrange
+            mockSession[_loggedIn] = _notLoggedIn;
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
+            
+            var result = await _userController.GetText() as UnauthorizedResult;
+            
+            
+            //Assert
+            Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task RegisterUserInfoOk()
+        {
+            //Arrange
+            var user = new User()
+            {
+                UserId = 1,
+                NativeLanguage = "Norwegian",
+                AgeGroup = "18-20",
+                Dialect = "Østlandsk"
+            };
+            
+            mockTextRep.Setup(x => x.RegisterUserInfo(It.IsAny<User>())).ReturnsAsync(user);
+
+            mockSession[_loggedIn] = user.UserId;
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
+            var result = await _userController.RegisterUserInfo(It.IsAny<User>()) as OkObjectResult;
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal("Ok", result.Value);
+        }
+        [Fact]
+        public async Task RegisterUserInfoNull()
+        {
+            //Arrange
+            var user = new User()
+            {
+                UserId = 1,
+                NativeLanguage = null,
+                AgeGroup = null,
+                Dialect = null
+            };
+            
+            mockTextRep.Setup(x => x.RegisterUserInfo(It.IsAny<User>())).ReturnsAsync(user);
+
+            mockSession[_loggedIn] = user.UserId;
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
+            var result = await _userController.RegisterUserInfo(It.IsAny<User>()) as OkObjectResult;
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal("Ok", result.Value);
+        }
     }
 }
