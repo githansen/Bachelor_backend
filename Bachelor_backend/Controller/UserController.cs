@@ -2,6 +2,7 @@
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 using System.Text.RegularExpressions;
@@ -31,6 +32,7 @@ namespace Bachelor_backend.Controller
         /// <returns></returns>
         /// <response code="401">Not authorized</response>"
         /// <response code="200">Successfully saved file</response>
+        /// <response code="500">Error while saving file</response>
         [HttpPost]
         public async Task<ActionResult> SaveFile(IFormFile recording)
         {
@@ -43,7 +45,7 @@ namespace Bachelor_backend.Controller
             if (uuid.IsNullOrEmpty())
             {
                 _logger.LogInformation("Fault in saving voice recording");
-                return BadRequest("Voice recording is not saved");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Voice recording is not saved");
             }
             return Ok(uuid);
 
@@ -92,7 +94,6 @@ namespace Bachelor_backend.Controller
             }
 
             int UserId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
-            Debug.Write(UserId);
             User user = await _textRep.GetUser(UserId);
             Text t = await _textRep.GetText(user);
             return Ok(t);
@@ -111,15 +112,23 @@ namespace Bachelor_backend.Controller
         /// "ageGroup":"18-28"
         /// }
         /// </remarks>
-        /// <response code="200"> Userinfo saved to database </response>
+        /// <response code="200"> Userinfo saved to database, returns true </response>
+        /// <response code="500">Error on server, returns false</response>
         [HttpPost]
         public async Task<ActionResult> RegisterUserInfo([FromBody] User user)
         {
             var userFromDb = await _textRep.RegisterUserInfo(user);
-
             //TODO: Return user id from db
-            HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
-            return Ok("Ok");
+            if (userFromDb != null)
+            {
+                HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
+                return Ok(true);
+            }
+            else
+            {
+                _logger.LogInformation("Error while creating user");
+                return StatusCode(StatusCodes.Status500InternalServerError, false);
+            }
         }
     }
 }

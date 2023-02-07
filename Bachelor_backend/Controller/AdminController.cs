@@ -1,6 +1,7 @@
 ﻿using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -89,47 +90,76 @@ namespace Bachelor_backend.Controller
         /// </remarks>
         /// <param name="text"></param>
         /// <returns></returns>
-        /// <response code="200">Successfully saved text</response>
-        /// <response code="400">Failed</response>
+        /// <response code="200">Successfully saved text, returns true</response>
+        /// <response code="500">Failed, returns false</response>
         [HttpPost]
         public async Task<ActionResult> CreateText([FromBody] Text text)
         {
             bool success = await _textRep.CreateText(text);
-            return Ok(success);
+            if(success)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, false);
+            }
         }
         /// <summary>
         /// Get all texts
         /// </summary>
         /// <returns></returns>
         /// <response code="200">OK - returns list of all texts</response>
-        /// <response code="400">Returns empty list</response>
+        /// <response code="500">Returns empty list</response>
         [HttpGet]
         public async Task<ActionResult> GetAllTexts()
         {
             var list = await _textRep.GetAllTexts();
-            return Ok(list);
+            if(list != null)
+            {
+                return Ok(list);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, list);
+            }
         }
         /// <summary>
         /// Delete text
         /// </summary>
         /// <param name="TextId"></param>
-        /// <returns></returns>
+        /// <response code="200">OK - returns true, deletion successful</response>
+        /// <response code="400">Bad request, returns false. Likely from sending non existent TextId</response>
         [HttpDelete]
         public async Task<ActionResult> DeleteText(int TextId) {
             Debug.WriteLine(TextId);
             bool success = await _textRep.DeleteText(TextId);
-
-            return Ok(success);
+            if (success)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest(false);
+            }
         }
         /// <summary>
         /// Delete tag
         /// </summary>
         /// <param name="TagId"></param>
-        /// <returns></returns>
+        /// <response code="200">OK - returns true, deletion successful</response>
+        /// <response code="400">Bad request, returns false. Likely from sending non existent TextId</response>
         [HttpDelete]
         public async Task<ActionResult> DeleteTag(int TagId) {
             bool success = await _textRep.DeleteTag(TagId);
-            return Ok(success);
+            if (success)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest(false);   
+            }
         }
 
     }
