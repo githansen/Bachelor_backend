@@ -67,11 +67,10 @@ namespace Bachelor_backend.Controller
                 return Unauthorized();
             }
 
-            int UserId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
-            Debug.Write(UserId);
-            User user = await _textRep.GetUser(UserId);
-            Text t = await _textRep.GetText(user);
-            return Ok(t);
+            int userId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
+            var user = await _textRep.GetUser(userId);
+            var text = await _textRep.GetText(user);
+            return Ok(text);
         }
 
         //Login a good name? 
