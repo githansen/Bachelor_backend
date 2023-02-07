@@ -15,6 +15,11 @@ namespace Bachelor_backend.Controller
         {
             _textRep = textrep;
         }
+        /// <summary>
+        /// Login as admin
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         [HttpGet]
         public async Task<ActionResult> LogIn()
         {
@@ -68,16 +73,16 @@ namespace Bachelor_backend.Controller
         /// "tags":
         ///     [
         ///         {
-        ///             tagText: "vold"
+        ///             "tagText": "vold"
         ///         },
         ///         {
-        ///             tagText: "narkotika"
+        ///             "tagText": "narkotika"
         ///         }
         ///     ],
         /// "targetUser": 
         ///     {
         ///         "nativeLanguage": "Norsk",
-        ///         "ageGroup": "18-28,
+        ///         "ageGroup": "18-28",
         ///         "dialect": "østlandsk"
         ///     }
         /// }
