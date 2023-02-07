@@ -78,10 +78,16 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> RegisterUserInfo([FromBody] User user)
         {
+            //Save yser info in db and returns user with id
             var userFromDb = await _textRep.RegisterUserInfo(user);
-
-            //TODO: Return user id from db
+            
             HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
+            return Ok("Ok");
+        }
+        
+        public async Task<ActionResult> LogOut()
+        {
+            HttpContext.Session.Remove(_loggedIn);
             return Ok("Ok");
         }
     }
