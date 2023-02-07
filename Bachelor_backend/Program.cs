@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Reflection;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -35,7 +36,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IVoiceRepository, VoiceRepository>();
 builder.Services.AddScoped<ITextRepository, TextRepository>();
 
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Henrik")));
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("JohanDesktop")));
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
@@ -57,7 +58,9 @@ builder.Services.AddSession(options =>
 });
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API WSVAP (WebSmartView)", Version = "v1" });
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
+ $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API GiDinStemme", Version = "v1" });
     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()); //This line
 });
 
@@ -86,6 +89,6 @@ app.UseSwagger(options =>
 });
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("./v1/swagger.json", "My API V1"); //originally "./swagger/v1/swagger.json"
+    c.SwaggerEndpoint("./v1/swagger.json", "GiDinStemme API"); //originally "./swagger/v1/swagger.json"
 });
 app.Run();

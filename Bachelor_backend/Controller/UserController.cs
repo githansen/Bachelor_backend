@@ -2,6 +2,7 @@
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 using System.Text.RegularExpressions;
@@ -24,7 +25,14 @@ namespace Bachelor_backend.Controller
             _logger = logger;
         }
 
-
+        /// <summary>
+        /// Saves recording to database
+        /// </summary>
+        /// <param name="recording"></param>
+        /// <returns></returns>
+        /// <response code="401">Not authorized</response>"
+        /// <response code="200">Successfully saved file</response>
+        /// <response code="500">Error while saving file</response>
         [HttpPost]
         public async Task<ActionResult> SaveFile(IFormFile recording)
         {
@@ -37,14 +45,25 @@ namespace Bachelor_backend.Controller
             if (uuid.IsNullOrEmpty())
             {
                 _logger.LogInformation("Fault in saving voice recording");
-                return BadRequest("Voice recording is not saved");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Voice recording is not saved");
             }
             return Ok(uuid);
 
         }
+        /// <summary>
+        /// Deletes recording
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <remarks>
+        /// Argument needs to be a uuid. 
+        /// Example: 123e4567-e89b-12d3-a456-426614174000
+        /// </remarks>
+        /// <returns>String describing whether or not deletion was successful</returns>
+        /// <response code="200">Deletion succeeded </response>
+        /// <response code="400">Deletion unsuccessful - likely non existent uuid</response>
 
         [HttpDelete]
-        public async Task<ActionResult> DeleteFile([FromBody] string uuid)
+        public async Task<ActionResult> DeleteFile([FromQuery] string uuid)
         {
             bool deleted = await _voiceRep.DeleteFile(uuid);
 
@@ -57,7 +76,14 @@ namespace Bachelor_backend.Controller
             return Ok("Voice recording is deleted");
         }
 
-        //Get text based on session value, discuss later
+        /// <summary>
+        /// GET text
+        /// </summary>
+        /// <remarks>
+        /// No parameters needed, uses Session string to find text
+        /// </remarks>
+        /// <response code="401">Not Authorized</response>
+        /// <response code="200">OK, returns text</response>
         [HttpPost]
         public async Task<ActionResult> GetText()
         {
@@ -68,21 +94,41 @@ namespace Bachelor_backend.Controller
             }
 
             int UserId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
-            Debug.Write(UserId);
             User user = await _textRep.GetUser(UserId);
             Text t = await _textRep.GetText(user);
             return Ok(t);
         }
 
-        //Login a good name? 
+        ///<summary>Post user data</summary> 
+        ///<param Name="user"></param>
+        ///<remarks>
+        ///Needs user data as parameter
+        ///Dont include UserId - generated on creation
+        /// Example:
+        /// user = 
+        /// {
+        /// "nativeLanguage": "Norsk",
+        /// "dialect": "Østlandsk",
+        /// "ageGroup":"18-28"
+        /// }
+        /// </remarks>
+        /// <response code="200"> Userinfo saved to database, returns true </response>
+        /// <response code="500">Error on server, returns false</response>
         [HttpPost]
         public async Task<ActionResult> RegisterUserInfo([FromBody] User user)
         {
             var userFromDb = await _textRep.RegisterUserInfo(user);
-
             //TODO: Return user id from db
-            HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
-            return Ok("Ok");
+            if (userFromDb != null)
+            {
+                HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
+                return Ok(true);
+            }
+            else
+            {
+                _logger.LogInformation("Error while creating user");
+                return StatusCode(StatusCodes.Status500InternalServerError, false);
+            }
         }
     }
 }
