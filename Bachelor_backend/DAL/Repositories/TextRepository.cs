@@ -112,8 +112,9 @@ namespace Bachelor_backend.DAL.Repositories
 
                 return texts;
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return null;
             }
         }
@@ -176,8 +177,9 @@ namespace Bachelor_backend.DAL.Repositories
                 var user = await _db.Users.FindAsync(userId);
                 return user;
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return null;
             }
         }
@@ -198,8 +200,9 @@ namespace Bachelor_backend.DAL.Repositories
                 await _db.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return false;
             }
         }
@@ -220,8 +223,9 @@ namespace Bachelor_backend.DAL.Repositories
 
                 return true;
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return false;
             }
         }
