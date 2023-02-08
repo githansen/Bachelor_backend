@@ -26,7 +26,7 @@ namespace xUnitBackendTest
         public async Task SaveFileOk()
         {
             //Arrange
-            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>())).ReturnsAsync("76185658-eb35-4095-8491-08daffb158a5");
+            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<int>())).ReturnsAsync("76185658-eb35-4095-8491-08daffb158a5");
 
             mockSession[_loggedIn] = "1";
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
@@ -34,7 +34,7 @@ namespace xUnitBackendTest
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
             
             //Act
-            var result = await _userController.SaveFile(It.IsAny<IFormFile>()) as OkObjectResult;
+            var result = await _userController.SaveFile(It.IsAny<IFormFile>(),1) as OkObjectResult;
 
 
             //Assert
@@ -46,14 +46,14 @@ namespace xUnitBackendTest
         public async Task SaveFileFault()
         {
             //Arrange
-            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>())).ReturnsAsync("");
+            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<int>())).ReturnsAsync("");
             
             mockSession[_loggedIn] = "1";
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
             
             //Act
-            var result = await _userController.SaveFile(It.IsAny<IFormFile>()) as BadRequestObjectResult;
+            var result = await _userController.SaveFile(It.IsAny<IFormFile>(),1) as BadRequestObjectResult;
 
 
             //Assert
@@ -72,12 +72,11 @@ namespace xUnitBackendTest
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
             
             //Act
-            var result = await _userController.SaveFile(It.IsAny<IFormFile>()) as UnauthorizedObjectResult;
+            var result = await _userController.SaveFile(It.IsAny<IFormFile>(), 1) as UnauthorizedResult;
 
 
             //Assert
-            Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
-            Assert.Equal("Not logged in", result.Value);
+            Assert.Equal((int)HttpStatusCode.Unauthorized, result.StatusCode);
 
         }
 
