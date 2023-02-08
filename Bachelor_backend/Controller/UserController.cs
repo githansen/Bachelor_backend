@@ -26,14 +26,16 @@ namespace Bachelor_backend.Controller
 
 
         [HttpPost]
-        public async Task<ActionResult> SaveFile(IFormFile recording)
+        public async Task<ActionResult> SaveFile(IFormFile recording, int textId)
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString(_loggedIn)))
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (string.IsNullOrEmpty(sessionString))
             {
-                return Unauthorized("Not logged in");
+                return Unauthorized();
             }
 
-            string uuid = await _voiceRep.SaveFile(recording);
+            string uuid = await _voiceRep.SaveFile(recording, textId, int.Parse(Regex.Match(sessionString, @"\d+").Value));
+            
             if (uuid.IsNullOrEmpty())
             {
                 _logger.LogInformation("Fault in saving voice recording");
@@ -81,12 +83,6 @@ namespace Bachelor_backend.Controller
             var userFromDb = await _textRep.RegisterUserInfo(user);
             
             HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
-            return Ok("Ok");
-        }
-        
-        public async Task<ActionResult> LogOut()
-        {
-            HttpContext.Session.Remove(_loggedIn);
             return Ok("Ok");
         }
     }

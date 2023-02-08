@@ -17,7 +17,7 @@ public class VoiceRepository : IVoiceRepository
     }
 
 
-    public async Task<string> SaveFile(IFormFile recording)
+    public async Task<string> SaveFile(IFormFile recording, int textId, int userId)
     {
         try
         {
@@ -27,11 +27,18 @@ public class VoiceRepository : IVoiceRepository
             {
                 Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\recordings");
             }
-            //Console.WriteLine(recording.FileName);
+
 
             string extension = Path.GetExtension(recording.FileName);
+            
+            var text = await _db.Texts.FindAsync(textId);
+            var user = await _db.Users.FindAsync(userId);
 
-            var audioFile = new Audiofile();
+            var audioFile = new Audiofile()
+            {
+                Text = text,
+                User = user,
+            };
 
             await _db.Audiofiles.AddAsync(audioFile);
 
@@ -39,8 +46,7 @@ public class VoiceRepository : IVoiceRepository
 
             string newFileName = uuid + extension;
             string uploadPath = Path.Combine($@"{Directory.GetCurrentDirectory()}\recordings", newFileName);
-
-            //TODO: Insert uuid and file path in db
+            
             audioFile.Path = uploadPath;
 
 
