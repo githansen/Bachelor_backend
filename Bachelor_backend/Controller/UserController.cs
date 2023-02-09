@@ -39,7 +39,7 @@ namespace Bachelor_backend.Controller
             if (uuid.IsNullOrEmpty())
             {
                 _logger.LogInformation("Fault in saving voice recording");
-                return BadRequest("Voice recording is not saved");
+                return StatusCode(500, "Voice recording is not saved");
             }
 
             if (uuid.Equals("File extension not allowed"))
@@ -47,8 +47,11 @@ namespace Bachelor_backend.Controller
                 _logger.LogInformation("File extension not allowed");
                 return BadRequest("File extension not allowed");
             }
+
+            if (uuid.Equals("File size too large"))
             {
-                
+                _logger.LogInformation("File size too large");
+                return BadRequest("File size too large");
             }
             return Ok(uuid);
 

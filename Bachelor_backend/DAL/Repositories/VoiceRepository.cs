@@ -21,16 +21,23 @@ public class VoiceRepository : IVoiceRepository
     {
         try
         {
-            Console.WriteLine("test: " + Directory.GetCurrentDirectory());
+            
             //Creates a recording directory if it doesnt exist
             if (!Directory.Exists($@"{Directory.GetCurrentDirectory()}\recordings"))
             {
                 Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\recordings");
             }
-
+            
+            //TODO: Calibrate file size limit
+            //Checks file size and returns error if file is too big
+            if (recording.Length > 1000000)
+            {
+                return "Audio file is too long";
+            }
 
             string extension = Path.GetExtension(recording.FileName);
             
+            //TODO: Add/Remove accepted file extensions
             //List with allowed file extensions
             var fileExtensions = new List<string>() { ".mp3", ".wav", ".flac", ".aac" };
             
@@ -57,20 +64,18 @@ public class VoiceRepository : IVoiceRepository
             string uploadPath = Path.Combine($@"{Directory.GetCurrentDirectory()}\recordings", newFileName);
             
             audioFile.Path = uploadPath;
-
-
-            await _db.SaveChangesAsync();
-
+            
             //Using stream to copy the content of the recording file to disk
             using (var stream = new FileStream(uploadPath, FileMode.Create))
             {
                 await recording.CopyToAsync(stream);
             }
+            
+            await _db.SaveChangesAsync();
             return uuid;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
             _logger.LogInformation(e.Message);
             return "";
         }
