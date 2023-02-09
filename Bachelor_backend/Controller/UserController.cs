@@ -48,10 +48,10 @@ namespace Bachelor_backend.Controller
                 return BadRequest("File extension not allowed");
             }
 
-            if (uuid.Equals("File size too large"))
+            if (uuid.Equals("Audiofile is too big"))
             {
-                _logger.LogInformation("File size too large");
-                return BadRequest("File size too large");
+                _logger.LogInformation("Audiofile is too big");
+                return BadRequest("Audiofile is too big");
             }
             return Ok(uuid);
 

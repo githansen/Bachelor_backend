@@ -32,7 +32,7 @@ public class VoiceRepository : IVoiceRepository
             //Checks file size and returns error if file is too big
             if (recording.Length > 1000000)
             {
-                return "Audio file is too long";
+                return "Audiofile is too big";
             }
 
             string extension = Path.GetExtension(recording.FileName);

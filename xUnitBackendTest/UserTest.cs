@@ -53,12 +53,54 @@ namespace xUnitBackendTest
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
             
             //Act
+            var result = await _userController.SaveFile(It.IsAny<IFormFile>(),1) as ObjectResult;
+
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
+            Assert.Equal("Voice recording is not saved", result.Value);
+
+        }
+        
+        [Fact]
+        public async Task SaveFileTooBigFile()
+        {
+            //Arrange
+            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<int>())).ReturnsAsync("Audiofile is too big");
+
+            mockSession[_loggedIn] = "1";
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
             var result = await _userController.SaveFile(It.IsAny<IFormFile>(),1) as BadRequestObjectResult;
 
 
             //Assert
-            Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.Equal("Voice recording is not saved", result.Value);
+            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.Equal("Audiofile is too big", result.Value);
+
+        }
+        
+        [Fact]
+        public async Task SaveFileWrongFileType()
+        {
+            //Arrange
+            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<int>())).ReturnsAsync("File extension not allowed");
+
+            mockSession[_loggedIn] = "1";
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
+            var result = await _userController.SaveFile(It.IsAny<IFormFile>(),1) as BadRequestObjectResult;
+
+
+            //Assert
+            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.Equal("File extension not allowed", result.Value);
 
         }
         
