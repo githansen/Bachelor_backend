@@ -34,18 +34,32 @@ namespace Bachelor_backend.Controller
         /// <response code="200">Successfully saved file</response>
         /// <response code="500">Error while saving file</response>
         [HttpPost]
-        public async Task<ActionResult> SaveFile(IFormFile recording)
+        public async Task<ActionResult> SaveFile(IFormFile recording, int textId)
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString(_loggedIn)))
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (string.IsNullOrEmpty(sessionString))
             {
-                return Unauthorized("Not logged in");
+                return Unauthorized();
             }
 
-            string uuid = await _voiceRep.SaveFile(recording);
+            string uuid = await _voiceRep.SaveFile(recording, textId, int.Parse(Regex.Match(sessionString, @"\d+").Value));
+            
             if (uuid.IsNullOrEmpty())
             {
                 _logger.LogInformation("Fault in saving voice recording");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Voice recording is not saved");
+            }
+
+            if (uuid.Equals("File extension not allowed"))
+            {
+                _logger.LogInformation("File extension not allowed");
+                return BadRequest("File extension not allowed");
+            }
+
+            if (uuid.Equals("Audiofile is too big"))
+            {
+                _logger.LogInformation("Audiofile is too big");
+                return BadRequest("Audiofile is too big");
             }
             return Ok(uuid);
 
@@ -93,10 +107,10 @@ namespace Bachelor_backend.Controller
                 return Unauthorized();
             }
 
-            int UserId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
-            User user = await _textRep.GetUser(UserId);
-            Text t = await _textRep.GetText(user);
-            return Ok(t);
+            int userId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
+            var user = await _textRep.GetUser(userId);
+            var text = await _textRep.GetText(user);
+            return Ok(text);
         }
 
         ///<summary>Post user data</summary> 
@@ -117,6 +131,7 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> RegisterUserInfo([FromBody] User user)
         {
+            //Save yser info in db and returns user with id
             var userFromDb = await _textRep.RegisterUserInfo(user);
             //TODO: Return user id from db
             if (userFromDb != null)
