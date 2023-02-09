@@ -41,6 +41,15 @@ namespace Bachelor_backend.Controller
                 _logger.LogInformation("Fault in saving voice recording");
                 return BadRequest("Voice recording is not saved");
             }
+
+            if (uuid.Equals("File extension not allowed"))
+            {
+                _logger.LogInformation("File extension not allowed");
+                return BadRequest("File extension not allowed");
+            }
+            {
+                
+            }
             return Ok(uuid);
 
         }

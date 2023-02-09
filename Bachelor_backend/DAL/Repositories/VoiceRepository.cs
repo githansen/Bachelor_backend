@@ -31,6 +31,15 @@ public class VoiceRepository : IVoiceRepository
 
             string extension = Path.GetExtension(recording.FileName);
             
+            //List with allowed file extensions
+            var fileExtensions = new List<string>() { ".mp3", ".wav", ".flac", ".aac" };
+            
+            //Checks if the file extension is allowed
+            if (!fileExtensions.Contains(extension))
+            {
+                return "File extension not allowed";
+            }
+            
             var text = await _db.Texts.FindAsync(textId);
             var user = await _db.Users.FindAsync(userId);
 
