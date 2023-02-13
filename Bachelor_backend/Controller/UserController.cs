@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using Microsoft.Net.Http.Headers;
 
 namespace Bachelor_backend.Controller
 {
@@ -145,5 +147,26 @@ namespace Bachelor_backend.Controller
                 return StatusCode(StatusCodes.Status500InternalServerError, false);
             }
         }
+        
+        public HttpResponseMessage SetCookie()
+        {
+            //Get user id from session
+            string sessionString = HttpContext.Session.GetString(_loggedIn);
+            if(sessionString != null)
+            {
+                return new HttpResponseMessage (HttpStatusCode.BadRequest);
+            }
+            //Create cookie
+            var response = new HttpResponseMessage();
+
+            var cookie = new CookieOptions();
+            cookie.Expires = DateTimeOffset.Now.AddMonths(1); //Expires in 1 month
+            cookie.Path = "/";
+            
+            HttpContext.Response.Cookies.Append("userid", sessionString, cookie);
+            return response;
+        }
+        
+        //TODO GetCookie
     }
 }
