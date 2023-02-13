@@ -147,6 +147,16 @@ namespace Bachelor_backend.Controller
                 return StatusCode(StatusCodes.Status500InternalServerError, false);
             }
         }
+
+        public bool IsLoggedIn()
+        {
+            string sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (string.IsNullOrEmpty(sessionString))
+            {
+                return false;
+            }
+            return true;
+        }
         
         public HttpResponseMessage SetCookie()
         {
