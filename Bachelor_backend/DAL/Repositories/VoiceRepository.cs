@@ -1,6 +1,7 @@
 ﻿// https://learn.microsoft.com/en-us/dotnet/api/system.guid.newguid?view=net-6.0
 
 using Bachelor_backend.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Bachelor_backend.DAL.Repositories;
 
@@ -30,7 +31,7 @@ public class VoiceRepository : IVoiceRepository
             
             //TODO: Calibrate file size limit
             //Checks file size and returns error if file is too big
-            if (recording.Length > 1000000)
+            if (recording.Length > 10000000)
             {
                 return "Audiofile is too big";
             }
@@ -80,24 +81,28 @@ public class VoiceRepository : IVoiceRepository
             return "";
         }
     }
-
+    
     public async Task<bool> DeleteFile(string uuid)
     {
         try
         {
+
             var audiofile = await _db.Audiofiles.FindAsync(Guid.Parse(uuid));
             if (audiofile == null)
             {
                 return false;
             }
             string path = audiofile.Path;
+            _db.Audiofiles.Remove(audiofile);
             File.Delete(path);
+            await _db.SaveChangesAsync();
             return true;
 
         }
         catch (Exception e)
         {
             _logger.LogInformation(e.Message);
+            Console.WriteLine(e.Message);
             return false;
         }
 

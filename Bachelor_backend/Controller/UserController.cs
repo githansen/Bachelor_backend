@@ -77,7 +77,7 @@ namespace Bachelor_backend.Controller
         /// <response code="400">Deletion unsuccessful - likely non existent uuid</response>
 
         [HttpDelete]
-        public async Task<ActionResult> DeleteFile([FromQuery] string uuid)
+        public async Task<ActionResult> DeleteFile([FromBody] string uuid)
         {
             bool deleted = await _voiceRep.DeleteFile(uuid);
 
