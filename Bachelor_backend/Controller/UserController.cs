@@ -151,10 +151,13 @@ namespace Bachelor_backend.Controller
         public bool IsLoggedIn()
         {
             string sessionString = HttpContext.Session.GetString(_loggedIn);
-            if (string.IsNullOrEmpty(sessionString))
+            var cookie = Request.Cookies["userid"];
+            if (string.IsNullOrEmpty(cookie))
             {
                 return false;
             }
+            //Sets session string if cookie exists
+            HttpContext.Session.SetString(_loggedIn, cookie);
             return true;
         }
         
@@ -176,7 +179,5 @@ namespace Bachelor_backend.Controller
             HttpContext.Response.Cookies.Append("userid", sessionString, cookie);
             return response;
         }
-        
-        //TODO GetCookie
     }
 }
