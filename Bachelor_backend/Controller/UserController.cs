@@ -141,11 +141,8 @@ namespace Bachelor_backend.Controller
                 HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
                 return Ok(true);
             }
-            else
-            {
-                _logger.LogInformation("Error while creating user");
-                return StatusCode(StatusCodes.Status500InternalServerError, false);
-            }
+            _logger.LogInformation("Error while creating user");
+            return StatusCode(StatusCodes.Status500InternalServerError, false);
         }
 
         public bool IsLoggedIn()
@@ -156,8 +153,11 @@ namespace Bachelor_backend.Controller
             {
                 return false;
             }
-            //Sets session string if cookie exists
-            HttpContext.Session.SetString(_loggedIn, cookie);
+            if(string.IsNullOrEmpty(sessionString))
+            {
+                //Sets session string if cookie exists
+                HttpContext.Session.SetString(_loggedIn, cookie);
+            }
             return true;
         }
         
@@ -179,5 +179,7 @@ namespace Bachelor_backend.Controller
             HttpContext.Response.Cookies.Append("userid", sessionString, cookie);
             return response;
         }
+        
+        //TODO: Use crypto to encrypt cookie or set cookie as user parameters
     }
 }
