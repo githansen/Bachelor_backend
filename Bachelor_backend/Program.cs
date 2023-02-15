@@ -36,7 +36,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IVoiceRepository, VoiceRepository>();
 builder.Services.AddScoped<ITextRepository, TextRepository>();
 
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Henrik")));
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("JohanLaptop")));
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );

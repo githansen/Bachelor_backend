@@ -79,7 +79,7 @@ namespace Bachelor_backend.Controller
         /// <response code="400">Deletion unsuccessful - likely non existent uuid</response>
 
         [HttpDelete]
-        public async Task<ActionResult> DeleteFile([FromQuery] string uuid)
+        public async Task<ActionResult> DeleteFile([FromBody] string uuid)
         {
             bool deleted = await _voiceRep.DeleteFile(uuid);
 
@@ -112,7 +112,15 @@ namespace Bachelor_backend.Controller
             int userId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
             var user = await _textRep.GetUser(userId);
             var text = await _textRep.GetText(user);
-            return Ok(text);
+            if (text != null)
+            {
+                return Ok(text);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, null);
+
+            }
         }
 
         ///<summary>Post user data</summary> 
@@ -179,7 +187,6 @@ namespace Bachelor_backend.Controller
             HttpContext.Response.Cookies.Append("userid", sessionString, cookie);
             return response;
         }
-        
         //TODO: Use crypto to encrypt cookie or set cookie as user parameters
     }
 }

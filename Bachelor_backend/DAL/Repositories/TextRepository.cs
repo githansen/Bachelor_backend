@@ -127,37 +127,44 @@ namespace Bachelor_backend.DAL.Repositories
             var target = "Target";
             var userid = user.UserId;
             // Finds lists of texts with a target group that fits the user requesting text
-            var list = await _db.Texts
-                .FromSql(
-                    $"SELECT dbo.Texts.* FROM dbo.Users, dbo.Texts WHERE dbo.Texts.Active=1 AND dbo.Users.UserId = dbo.Texts.UserId AND dbo.Texts.UserId is not NULL AND dbo.Users.Type ={target} AND (dbo.Users.NativeLanguage is NULL or dbo.Users.NativeLanguage={NativeLanguage}) AND (dbo.Users.AgeGroup is NULL or dbo.Users.AgeGroup={AgeGroup}) AND (dbo.Users.Dialect is NULL or dbo.Users.Dialect={Dialect}) AND dbo.Texts.TextId NOT IN(SELECT dbo.Audiofiles.TextId from dbo.Audiofiles, dbo.Texts WHERE dbo.Texts.TextId = dbo.Audiofiles.TextId AND dbo.Audiofiles.UserId ={userid})")
-                .Select(t => new Text
-                {
-                    TextId = t.TextId,
-                    TextText = t.TextText,
-                    Tags = t.Tags.ToList(),
-                    Active = t.Active,
-                    TargetUser = t.TargetUser
-                }).ToListAsync();
+            try
+            {
+                var liste = await _db.Texts
+                    .FromSql(
+                        $"SELECT dbo.Texts.* FROM dbo.Users, dbo.Texts WHERE dbo.Texts.Active=1 AND dbo.Users.UserId = dbo.Texts.UserId AND dbo.Texts.UserId is not NULL AND dbo.Users.Type ={target} AND (dbo.Users.NativeLanguage is NULL or dbo.Users.NativeLanguage={NativeLanguage}) AND (dbo.Users.AgeGroup is NULL or dbo.Users.AgeGroup={AgeGroup}) AND (dbo.Users.Dialect is NULL or dbo.Users.Dialect={Dialect}) AND dbo.Texts.TextId NOT IN(SELECT dbo.Audiofiles.TextId from dbo.Audiofiles, dbo.Texts WHERE dbo.Texts.TextId = dbo.Audiofiles.TextId AND dbo.Audiofiles.UserId ={userid})")
+                    .Select(t => new Text
+                    {
+                        TextId = t.TextId,
+                        TextText = t.TextText,
+                        Tags = t.Tags.ToList(),
+                        Active = t.Active,
+                        TargetUser = t.TargetUser
+                    }).ToListAsync();
+                if (liste.Count > 0) return GetRandom(liste);
+            }
+            catch
+            {
+                return null;
+            }
 
-
-            if (list.Count > 0) return GetRandom(list);
-
-            // Gets all active texts
-            list = await _db.Texts.FromSql($"SELECT * FROM dbo.Texts WHERE dbo.Texts.Active = 1 AND dbo.Texts.TextId NOT IN(SELECT dbo.Audiofiles.TextId from dbo.Audiofiles, dbo.Texts WHERE dbo.Texts.TextId = dbo.Audiofiles.TextId AND dbo.Audiofiles.UserId ={userid})").Select(t =>
-                new Text
-                {
-                    TextId = t.TextId,
-                    TextText = t.TextText,
-                    Tags = t.Tags.ToList(),
-                    Active = t.Active,
-                    TargetUser = t.TargetUser
-                }).ToListAsync();
-            if(list.Count > 0) return GetRandom(list);
-            
-            // Gets random text if the user have no texts left
-            list = await _db.Texts.ToListAsync();
-            return GetRandom(list);
-            //TODO: Should return null if no texts are found or duplicate of text
+            try
+            {
+                // Gets all active texts
+                var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.Texts WHERE dbo.Texts.Active = 1 AND dbo.Texts.TextId NOT IN(SELECT dbo.Audiofiles.TextId from dbo.Audiofiles, dbo.Texts WHERE dbo.Texts.TextId = dbo.Audiofiles.TextId AND dbo.Audiofiles.UserId ={userid})").Select(t =>
+                    new Text
+                    {
+                        TextId = t.TextId,
+                        TextText = t.TextText,
+                        Tags = t.Tags.ToList(),
+                        Active = t.Active,
+                        TargetUser = t.TargetUser
+                    }).ToListAsync();
+                return GetRandom(liste2);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public Text GetRandom(List<Text> list)
