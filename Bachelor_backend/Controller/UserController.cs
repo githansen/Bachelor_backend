@@ -165,9 +165,9 @@ namespace Bachelor_backend.Controller
         {
             //Get user id from session
             string sessionString = HttpContext.Session.GetString(_loggedIn);
-            if(sessionString != null)
+            if(sessionString == null)
             {
-                return new HttpResponseMessage (HttpStatusCode.BadRequest);
+                return new HttpResponseMessage (HttpStatusCode.Unauthorized);
             }
             //Create cookie
             var response = new HttpResponseMessage();

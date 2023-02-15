@@ -30,7 +30,7 @@ public class VoiceRepository : IVoiceRepository
             
             //TODO: Calibrate file size limit
             //Checks file size and returns error if file is too big
-            if (recording.Length > 1000000)
+            if (recording.Length > 10000000)
             {
                 return "Audiofile is too big";
             }
