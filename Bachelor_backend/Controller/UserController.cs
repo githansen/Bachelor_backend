@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using Microsoft.Net.Http.Headers;
 
 namespace Bachelor_backend.Controller
 {
@@ -147,12 +149,44 @@ namespace Bachelor_backend.Controller
                 HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
                 return Ok(true);
             }
-            else
+            _logger.LogInformation("Error while creating user");
+            return StatusCode(StatusCodes.Status500InternalServerError, false);
+        }
+
+        public bool IsLoggedIn()
+        {
+            string sessionString = HttpContext.Session.GetString(_loggedIn);
+            var cookie = Request.Cookies["userid"];
+            if (string.IsNullOrEmpty(cookie))
             {
-                _logger.LogInformation("Error while creating user");
-                return StatusCode(StatusCodes.Status500InternalServerError, false);
+                return false;
             }
+            if(string.IsNullOrEmpty(sessionString))
+            {
+                //Sets session string if cookie exists
+                HttpContext.Session.SetString(_loggedIn, cookie);
+            }
+            return true;
         }
         
+        public HttpResponseMessage SetCookie()
+        {
+            //Get user id from session
+            string sessionString = HttpContext.Session.GetString(_loggedIn);
+            if(sessionString == null)
+            {
+                return new HttpResponseMessage (HttpStatusCode.Unauthorized);
+            }
+            //Create cookie
+            var response = new HttpResponseMessage();
+
+            var cookie = new CookieOptions();
+            cookie.Expires = DateTimeOffset.Now.AddMonths(1); //Expires in 1 month
+            cookie.Path = "/";
+            
+            HttpContext.Response.Cookies.Append("userid", sessionString, cookie);
+            return response;
+        }
+        //TODO: Use crypto to encrypt cookie or set cookie as user parameters
     }
 }

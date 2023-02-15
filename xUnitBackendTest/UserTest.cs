@@ -231,7 +231,7 @@ namespace xUnitBackendTest
 
             //Assert
             Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal("Ok", result.Value);
+            Assert.Equal(true, result.Value);
         }
         [Fact]
         public async Task RegisterUserInfoNull()
@@ -256,7 +256,7 @@ namespace xUnitBackendTest
 
             //Assert
             Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal("Ok", result.Value);
+            Assert.Equal(true, result.Value);
         }
     }
 }
