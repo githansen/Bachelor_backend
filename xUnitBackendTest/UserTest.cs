@@ -14,13 +14,13 @@ namespace xUnitBackendTest
         private const string _loggedIn = "UserSession";
         private const string _notLoggedIn = "";
         
-        private static readonly Mock<IVoiceRepository> mockVoiceRep = new Mock<IVoiceRepository>();
-        private static readonly Mock<ITextRepository> mockTextRep = new Mock<ITextRepository>();
-        private static readonly Mock<ILogger<UserController>> _logger = new Mock<ILogger<UserController>>();
-        private readonly UserController _userController = new UserController(mockVoiceRep.Object, mockTextRep.Object, _logger.Object);
+        private static readonly Mock<IVoiceRepository> mockVoiceRep = new();
+        private static readonly Mock<ITextRepository> mockTextRep = new();
+        private static readonly Mock<ILogger<UserController>> _logger = new();
+        private readonly UserController _userController = new (mockVoiceRep.Object, mockTextRep.Object, _logger.Object);
 
-        private readonly Mock<HttpContext> mockHttpContext = new Mock<HttpContext>();
-        private readonly MockHttpSession mockSession = new MockHttpSession();
+        private readonly Mock<HttpContext> mockHttpContext = new();
+        private readonly MockHttpSession mockSession = new();
 
         [Fact]
         public async Task SaveFileOk()

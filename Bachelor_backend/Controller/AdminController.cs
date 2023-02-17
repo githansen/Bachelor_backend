@@ -12,9 +12,11 @@ namespace Bachelor_backend.Controller
     public class AdminController : ControllerBase
     {
         private readonly ITextRepository _textRep;
-        public AdminController(ITextRepository textrep)
+        private readonly ILogger<AdminController> _logger;
+        public AdminController(ITextRepository textrep, ILogger<AdminController> logger)
         {
             _textRep = textrep;
+            _logger = logger;
         }
         /// <summary>
         /// Login as admin
@@ -45,10 +47,8 @@ namespace Bachelor_backend.Controller
             {
                 return Ok(true);
             }
-            else
-            {
-                return BadRequest(false);
-            }
+            _logger.LogInformation("Fault in creating tag");
+            return BadRequest(false);
         }
         /// <summary>
         /// Get all tags
