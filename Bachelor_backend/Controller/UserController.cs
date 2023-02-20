@@ -81,12 +81,18 @@ namespace Bachelor_backend.Controller
         [HttpDelete]
         public async Task<ActionResult> DeleteFile([FromBody] string uuid)
         {
-            bool deleted = await _voiceRep.DeleteFile(uuid);
+            var deleted = await _voiceRep.DeleteFile(uuid);
 
-            if (!deleted)
+            if (deleted.Equals("Audiofile not found"))
             {
-                _logger.LogInformation("Fault in deleting voice recording");
-                return BadRequest("Voice recording is not deleted");
+                _logger.LogInformation("Voice recording is not found");
+                return NotFound("Voice recording is not found");
+            }
+
+            if (deleted.Equals("Audiofile not deleted"))
+            {
+                _logger.LogInformation("Audiofile not deleted");
+                return StatusCode(StatusCodes.Status500InternalServerError, null);
             }
 
             return Ok("Voice recording is deleted");
