@@ -141,20 +141,23 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> RegisterUserInfo([FromBody] User user)
         {
-            //Save yser info in db and returns user with id
-            var userFromDb = await _textRep.RegisterUserInfo(user);
-            //TODO: Return user id from db
-            if (userFromDb != null)
-            {
-                HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
-                SetCookie();
-                return Ok(true);
+            if (ModelState.IsValid){
+                //Save yser info in db and returns user with id
+                var userFromDb = await _textRep.RegisterUserInfo(user);
+                //TODO: Return user id from db
+                if (userFromDb != null)
+                {
+                    HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
+                    SetCookie();
+                    return Ok(true);
+                }
+                _logger.LogInformation("Error while creating user");
+                return StatusCode(StatusCodes.Status500InternalServerError, false);
             }
-            _logger.LogInformation("Error while creating user");
-            return StatusCode(StatusCodes.Status500InternalServerError, false);
+            _logger.LogInformation("Fault in input");
+            return BadRequest("Fault in input");
         }
-
-        [HttpGet]
+        
         public bool IsLoggedIn()
         {
             string sessionString = HttpContext.Session.GetString(_loggedIn);
