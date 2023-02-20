@@ -103,6 +103,8 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> GetText()
         {
+            var watch = Stopwatch.StartNew();
+
             string sessionString = HttpContext.Session.GetString(_loggedIn);
             if (string.IsNullOrEmpty(sessionString))
             {
@@ -112,6 +114,9 @@ namespace Bachelor_backend.Controller
             int userId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
             var user = await _textRep.GetUser(userId);
             var text = await _textRep.GetText(user);
+            watch.Stop();
+            var elapsedMs = watch.ElapsedMilliseconds;
+            Debug.WriteLine(elapsedMs);
             if (text != null)
             {
                 return Ok(text);

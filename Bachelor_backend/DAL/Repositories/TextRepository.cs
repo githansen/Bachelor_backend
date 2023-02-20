@@ -122,7 +122,6 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<Text> GetText(User user)
         {
-            var watch = System.Diagnostics.Stopwatch.StartNew();
             var NativeLanguage = user.NativeLanguage;
             var AgeGroup = user.AgeGroup;
             var Dialect = user.Dialect;
@@ -142,9 +141,6 @@ namespace Bachelor_backend.DAL.Repositories
                     }).ToListAsync();
                 if (liste.Count > 0)
                 {
-                    watch.Stop();
-                    var elapsedMs = watch.ElapsedMilliseconds;
-                    Debug.WriteLine(elapsedMs);
                     return GetRandom(liste);
                 }
             }
@@ -163,9 +159,7 @@ namespace Bachelor_backend.DAL.Repositories
                         TextText = t.TextText,
 
                     }).ToListAsync();
-                watch.Stop();
-                var elapsedMs = watch.ElapsedMilliseconds;
-                Debug.WriteLine(elapsedMs);
+
                 return GetRandom(liste2);
             }
             catch
