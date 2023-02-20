@@ -81,12 +81,18 @@ namespace Bachelor_backend.Controller
         [HttpDelete]
         public async Task<ActionResult> DeleteFile([FromBody] string uuid)
         {
-            bool deleted = await _voiceRep.DeleteFile(uuid);
+            var deleted = await _voiceRep.DeleteFile(uuid);
 
-            if (!deleted)
+            if (deleted.Equals("Audiofile not found"))
             {
-                _logger.LogInformation("Fault in deleting voice recording");
-                return BadRequest("Voice recording is not deleted");
+                _logger.LogInformation("Voice recording is not found");
+                return NotFound("Voice recording is not found");
+            }
+
+            if (deleted.Equals("Audiofile not deleted"))
+            {
+                _logger.LogInformation("Audiofile not deleted");
+                return StatusCode(StatusCodes.Status500InternalServerError, null);
             }
 
             return Ok("Voice recording is deleted");
@@ -152,8 +158,9 @@ namespace Bachelor_backend.Controller
             if (userFromDb != null)
             {
                 HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
-                SetCookie();
-                return Ok(true);
+                var res = SetCookie();
+                res.Content.Headers.Add("loggedIn","true");
+                return Ok(res);
             }
             _logger.LogInformation("Error while creating user");
             return StatusCode(StatusCodes.Status500InternalServerError, false);

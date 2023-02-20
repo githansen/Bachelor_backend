@@ -3,6 +3,6 @@
 public interface IVoiceRepository
 {
     Task<string> SaveFile(IFormFile recording, int textId, int userId);
-    Task<bool> DeleteFile(string uuid);
+    Task<string> DeleteFile(string uuid);
     Task<IFormFile> GetAudioRecording(int textId);
 }
