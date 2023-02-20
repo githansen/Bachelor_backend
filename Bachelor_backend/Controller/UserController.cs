@@ -147,7 +147,7 @@ namespace Bachelor_backend.Controller
             if (userFromDb != null)
             {
                 HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
-                //SetCookie();
+                SetCookie();
                 return Ok(true);
             }
             _logger.LogInformation("Error while creating user");
@@ -170,7 +170,7 @@ namespace Bachelor_backend.Controller
             }
             return true;
         }
-        /*
+        
 
         public HttpResponseMessage SetCookie()
         {
@@ -191,6 +191,6 @@ namespace Bachelor_backend.Controller
             return response;
         }
         //TODO: Use crypto to encrypt cookie or set cookie as user parameters
-        */
+        
     }
 }
