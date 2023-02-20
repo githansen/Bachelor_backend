@@ -40,7 +40,7 @@ public class VoiceRepository : IVoiceRepository
             
             //TODO: Add/Remove accepted file extensions
             //List with allowed file extensions
-            var fileExtensions = new List<string>() { ".mp3", ".wav", ".flac", ".aac" };
+            var fileExtensions = new List<string>() { ".mp3", ".wav", ".flac", ".aac",".m4a", ".mp4" };
             
             //Checks if the file extension is allowed
             if (!fileExtensions.Contains(extension))
