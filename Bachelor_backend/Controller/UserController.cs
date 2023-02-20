@@ -147,8 +147,9 @@ namespace Bachelor_backend.Controller
             if (userFromDb != null)
             {
                 HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
-                SetCookie();
-                return Ok(true);
+                var res = SetCookie();
+                res.Content.Headers.Add("loggedIn","true");
+                return Ok(res);
             }
             _logger.LogInformation("Error while creating user");
             return StatusCode(StatusCodes.Status500InternalServerError, false);
