@@ -28,7 +28,7 @@ namespace Bachelor_backend.DBInitializer
             string CurrentDirectory = Directory.GetCurrentDirectory();
             Console.Write(Directory.GetCurrentDirectory());
             StreamReader reader = null;
-            string filepathTags = System.IO.Path.Combine(CurrentDirectory, @"TestData/Tags.txt");
+            string filepathTags = System.IO.Path.Combine(CurrentDirectory, @"TestData\Tags.txt");
             Console.WriteLine(filepathTags);
             reader = new StreamReader(filepathTags);
             var Taglist = new List<Tag>();
@@ -45,7 +45,7 @@ namespace Bachelor_backend.DBInitializer
                 _db.SaveChanges();
             }
 
-            string filepathTexts = System.IO.Path.Combine(CurrentDirectory, @"TestData/Texts.txt"); ;
+            string filepathTexts = System.IO.Path.Combine(CurrentDirectory, @"TestData\Texts.txt"); ;
             
             reader = new StreamReader(filepathTexts);
             while (!reader.EndOfStream)
@@ -67,7 +67,7 @@ namespace Bachelor_backend.DBInitializer
                 _db.SaveChanges();
                 }
           
-            string filepathUsers = System.IO.Path.Combine(CurrentDirectory, @"TestData/Users.txt");
+            string filepathUsers = System.IO.Path.Combine(CurrentDirectory, @"TestData\Users.txt");
             reader = new StreamReader(filepathUsers);
             while (!reader.EndOfStream)
             {
