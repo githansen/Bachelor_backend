@@ -1,5 +1,6 @@
 ﻿using Bachelor_backend.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Bachelor_backend.DAL.Repositories
 {
@@ -121,6 +122,7 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<Text> GetText(User user)
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             var NativeLanguage = user.NativeLanguage;
             var AgeGroup = user.AgeGroup;
             var Dialect = user.Dialect;
@@ -136,11 +138,15 @@ namespace Bachelor_backend.DAL.Repositories
                     {
                         TextId = t.TextId,
                         TextText = t.TextText,
-                        Tags = t.Tags.ToList(),
-                        Active = t.Active,
-                        TargetUser = t.TargetUser
+
                     }).ToListAsync();
-                if (liste.Count > 0) return GetRandom(liste);
+                if (liste.Count > 0)
+                {
+                    watch.Stop();
+                    var elapsedMs = watch.ElapsedMilliseconds;
+                    Debug.WriteLine(elapsedMs);
+                    return GetRandom(liste);
+                }
             }
             catch
             {
@@ -155,10 +161,11 @@ namespace Bachelor_backend.DAL.Repositories
                     {
                         TextId = t.TextId,
                         TextText = t.TextText,
-                        Tags = t.Tags.ToList(),
-                        Active = t.Active,
-                        TargetUser = t.TargetUser
+
                     }).ToListAsync();
+                watch.Stop();
+                var elapsedMs = watch.ElapsedMilliseconds;
+                Debug.WriteLine(elapsedMs);
                 return GetRandom(liste2);
             }
             catch
