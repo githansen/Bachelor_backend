@@ -36,7 +36,7 @@ namespace Bachelor_backend.Controller
         /// <response code="200">Successfully saved file</response>
         /// <response code="500">Error while saving file</response>
         [HttpPost]
-        public async Task<ActionResult> SaveFile(IFormFile recording, int textId)
+        public async Task<ActionResult> SaveFile([FromBody]IFormFile recording, int textId)
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
             if (string.IsNullOrEmpty(sessionString))
@@ -147,13 +147,14 @@ namespace Bachelor_backend.Controller
             if (userFromDb != null)
             {
                 HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
-                SetCookie();
+                //SetCookie();
                 return Ok(true);
             }
             _logger.LogInformation("Error while creating user");
             return StatusCode(StatusCodes.Status500InternalServerError, false);
         }
 
+        [HttpGet]
         public bool IsLoggedIn()
         {
             string sessionString = HttpContext.Session.GetString(_loggedIn);
@@ -169,7 +170,8 @@ namespace Bachelor_backend.Controller
             }
             return true;
         }
-        
+        /*
+
         public HttpResponseMessage SetCookie()
         {
             //Get user id from session
@@ -189,5 +191,6 @@ namespace Bachelor_backend.Controller
             return response;
         }
         //TODO: Use crypto to encrypt cookie or set cookie as user parameters
+        */
     }
 }
