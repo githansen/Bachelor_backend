@@ -170,8 +170,8 @@ namespace Bachelor_backend.Controller
             }
             return true;
         }
-        
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         public HttpResponseMessage SetCookie()
         {
             //Get user id from session
