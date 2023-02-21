@@ -8,6 +8,8 @@ namespace Bachelor_backend.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int TextId { get; set; }
+        
+        [RegularExpression("^([0-9a-zA-ZæøåÆØÅ.'? ]{2,})$")]
         public string TextText { get; set; }
         public virtual List<Tag> Tags { get; set; }
 
