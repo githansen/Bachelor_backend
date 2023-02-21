@@ -36,7 +36,7 @@ namespace Bachelor_backend.Controller
         /// <response code="200">Successfully saved file</response>
         /// <response code="500">Error while saving file</response>
         [HttpPost]
-        public async Task<ActionResult> SaveFile([FromBody]IFormFile recording, int textId)
+        public async Task<ActionResult> SaveFile(IFormFile recording, int textId)
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
             if (string.IsNullOrEmpty(sessionString))
