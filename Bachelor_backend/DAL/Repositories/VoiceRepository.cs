@@ -82,7 +82,7 @@ public class VoiceRepository : IVoiceRepository
         }
     }
     
-    public async Task<bool> DeleteFile(string uuid)
+    public async Task<string> DeleteFile(string uuid)
     {
         try
         {
@@ -90,20 +90,20 @@ public class VoiceRepository : IVoiceRepository
             var audiofile = await _db.Audiofiles.FindAsync(Guid.Parse(uuid));
             if (audiofile == null)
             {
-                return false;
+                return "Audiofile not found";
             }
             string path = audiofile.Path;
             _db.Audiofiles.Remove(audiofile);
             File.Delete(path);
             await _db.SaveChangesAsync();
-            return true;
+            return "Audiofile deleted";
 
         }
         catch (Exception e)
         {
             _logger.LogInformation(e.Message);
             Console.WriteLine(e.Message);
-            return false;
+            return "Audiofile not deleted";
         }
 
     }
