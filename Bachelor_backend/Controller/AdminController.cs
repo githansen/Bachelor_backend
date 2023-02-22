@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 
 namespace Bachelor_backend.Controller
@@ -40,16 +41,20 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> CreateTag([FromQuery]string text)
         {
+            var regex = new Regex("^([a-zA-ZæøåÆØÅ]{2,20})$");
+            if (!regex.IsMatch(text))
+            {
+                return BadRequest("Fault in input");
+            }
+            
             bool success = await _textRep.CreateTag(text);
             if (success)
             {
                 return Ok(true);
             }
-            else
-            {
-                return BadRequest(false);
-            }
+            return BadRequest(false);
         }
+        
         /// <summary>
         /// Get all tags
         /// </summary>
@@ -95,15 +100,18 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> CreateText([FromBody] Text text)
         {
-            bool success = await _textRep.CreateText(text);
-            if(success)
+            if (ModelState.IsValid)
             {
-                return Ok(true);
-            }
-            else
-            {
+                bool success = await _textRep.CreateText(text);
+                if(success)
+                {
+                    return Ok(true);
+                }
+                
                 return StatusCode(StatusCodes.Status500InternalServerError, false);
-            }
+                }
+
+            return BadRequest("Fault in input");
         }
         /// <summary>
         /// Get all texts
@@ -119,10 +127,7 @@ namespace Bachelor_backend.Controller
             {
                 return Ok(list);
             }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, list);
-            }
+            return StatusCode(StatusCodes.Status500InternalServerError, list);
         }
         /// <summary>
         /// Delete text
@@ -131,18 +136,18 @@ namespace Bachelor_backend.Controller
         /// <response code="200">OK - returns true, deletion successful</response>
         /// <response code="400">Bad request, returns false. Likely from sending non existent TextId</response>
         [HttpDelete]
-        public async Task<ActionResult> DeleteText(int TextId) {
-            Debug.WriteLine(TextId);
+        public async Task<ActionResult> DeleteText(int TextId)
+        {
             bool success = await _textRep.DeleteText(TextId);
+            
             if (success)
             {
                 return Ok(true);
             }
-            else
-            {
-                return BadRequest(false);
+            
+            return BadRequest(false);
             }
-        }
+        
         /// <summary>
         /// Delete tag
         /// </summary>
@@ -150,17 +155,15 @@ namespace Bachelor_backend.Controller
         /// <response code="200">OK - returns true, deletion successful</response>
         /// <response code="400">Bad request, returns false. Likely from sending non existent TextId</response>
         [HttpDelete]
-        public async Task<ActionResult> DeleteTag(int TagId) {
+        public async Task<ActionResult> DeleteTag(int TagId)
+        {
+            
             bool success = await _textRep.DeleteTag(TagId);
             if (success)
             {
                 return Ok(true);
             }
-            else
-            {
-                return BadRequest(false);   
-            }
+            return BadRequest(false);
         }
-
     }
 }
