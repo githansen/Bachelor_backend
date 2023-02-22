@@ -153,17 +153,20 @@ namespace Bachelor_backend.Controller
             //TODO: If we want to use a different type of input validation
             if (ModelState.IsValid)
             {
-              //Save yser info in db and returns user with id
-              var userFromDb = await _textRep.RegisterUserInfo(user);
-              //TODO: Return user id from db
-              if (userFromDb != null)
-              {
-                HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
-                var res = SetCookie();
-                res.Content.Headers.Add("loggedIn","true");
-                return Ok(res);
-              }
-              
+                //Save yser info in db and returns user with id
+                var userFromDb = await _textRep.RegisterUserInfo(user);
+                //TODO: Return user id from db
+                if (userFromDb != null)
+                {
+                    HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
+                    var res = SetCookie();
+                    res.Content.Headers.Add("loggedIn", "true");
+                    return Ok(res);
+                }
+                _logger.LogInformation("User not created");
+                return StatusCode(StatusCodes.Status500InternalServerError, "User not created");
+            }
+
             _logger.LogInformation("Fault in input");
             return BadRequest("Fault in input");
         }
