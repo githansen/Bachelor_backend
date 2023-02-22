@@ -36,7 +36,7 @@ namespace Bachelor_backend.Controller
         /// <response code="200">Successfully saved file</response>
         /// <response code="500">Error while saving file</response>
         [HttpPost]
-        public async Task<ActionResult> SaveFile([FromBody]IFormFile recording, int textId)
+        public async Task<ActionResult> SaveFile(IFormFile recording, int textId)
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
             if (string.IsNullOrEmpty(sessionString))
@@ -81,12 +81,18 @@ namespace Bachelor_backend.Controller
         [HttpDelete]
         public async Task<ActionResult> DeleteFile([FromBody] string uuid)
         {
-            bool deleted = await _voiceRep.DeleteFile(uuid);
+            var deleted = await _voiceRep.DeleteFile(uuid);
 
-            if (!deleted)
+            if (deleted.Equals("Audiofile not found"))
             {
-                _logger.LogInformation("Fault in deleting voice recording");
-                return BadRequest("Voice recording is not deleted");
+                _logger.LogInformation("Voice recording is not found");
+                return NotFound("Voice recording is not found");
+            }
+
+            if (deleted.Equals("Audiofile not deleted"))
+            {
+                _logger.LogInformation("Audiofile not deleted");
+                return StatusCode(StatusCodes.Status500InternalServerError, null);
             }
 
             return Ok("Voice recording is deleted");
@@ -111,7 +117,10 @@ namespace Bachelor_backend.Controller
 
             int userId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
             var user = await _textRep.GetUser(userId);
+            
+            var watch2 = Stopwatch.StartNew();
             var text = await _textRep.GetText(user);
+
             if (text != null)
             {
                 return Ok(text);
@@ -142,19 +151,22 @@ namespace Bachelor_backend.Controller
         public async Task<ActionResult> RegisterUserInfo([FromBody] User user)
         {
             //TODO: If we want to use a different type of input validation
-            if (ModelState.IsValid){
+            if (ModelState.IsValid)
+            {
                 //Save yser info in db and returns user with id
                 var userFromDb = await _textRep.RegisterUserInfo(user);
                 //TODO: Return user id from db
                 if (userFromDb != null)
                 {
                     HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
-                    SetCookie();
-                    return Ok(true);
+                    var res = SetCookie();
+                    res.Content.Headers.Add("loggedIn", "true");
+                    return Ok(res);
                 }
-                _logger.LogInformation("Error while creating user");
-                return StatusCode(StatusCodes.Status500InternalServerError, false);
+                _logger.LogInformation("User not created");
+                return StatusCode(StatusCodes.Status500InternalServerError, "User not created");
             }
+
             _logger.LogInformation("Fault in input");
             return BadRequest("Fault in input");
         }
