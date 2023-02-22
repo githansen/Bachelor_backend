@@ -1,4 +1,4 @@
-﻿using Bachelor_backend.DAL.Repositories;
+using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
