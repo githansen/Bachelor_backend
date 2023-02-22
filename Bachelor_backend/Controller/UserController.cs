@@ -141,6 +141,7 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> RegisterUserInfo([FromBody] User user)
         {
+            //TODO: If we want to use a different type of input validation
             if (ModelState.IsValid){
                 //Save yser info in db and returns user with id
                 var userFromDb = await _textRep.RegisterUserInfo(user);
