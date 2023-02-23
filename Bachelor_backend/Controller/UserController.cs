@@ -83,19 +83,19 @@ namespace Bachelor_backend.Controller
         {
             var deleted = await _voiceRep.DeleteFile(uuid);
 
+            
+            if (deleted.Equals("AudioFile deleted"))
+            {
+                return Ok("Voice recording is deleted");
+            }
+            
             if (deleted.Equals("Audiofile not found"))
             {
                 _logger.LogInformation("Voice recording is not found");
                 return NotFound("Voice recording is not found");
             }
-
-            if (deleted.Equals("Audiofile not deleted"))
-            {
-                _logger.LogInformation("Audiofile not deleted");
-                return StatusCode(StatusCodes.Status500InternalServerError, null);
-            }
-
-            return Ok("Voice recording is deleted");
+            _logger.LogInformation("Audiofile not deleted");
+            return StatusCode(StatusCodes.Status500InternalServerError, "Voice recording not deleted");
         }
 
         /// <summary>
@@ -159,9 +159,8 @@ namespace Bachelor_backend.Controller
                 if (userFromDb != null)
                 {
                     HttpContext.Session.SetString(_loggedIn, userFromDb.UserId.ToString());
-                    var res = SetCookie();
-                    res.Content.Headers.Add("loggedIn", "true");
-                    return Ok(res);
+                    SetCookie();
+                    return Ok("User logged in");
                 }
                 _logger.LogInformation("User not created");
                 return StatusCode(StatusCodes.Status500InternalServerError, "User not created");
@@ -173,13 +172,13 @@ namespace Bachelor_backend.Controller
         
         public bool IsLoggedIn()
         {
-            string sessionString = HttpContext.Session.GetString(_loggedIn);
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
             var cookie = Request.Cookies["userid"];
-            if (string.IsNullOrEmpty(cookie))
+            if (cookie.IsNullOrEmpty())
             {
                 return false;
             }
-            if(string.IsNullOrEmpty(sessionString))
+            if(sessionString.IsNullOrEmpty())
             {
                 //Sets session string if cookie exists
                 HttpContext.Session.SetString(_loggedIn, cookie);
@@ -188,23 +187,25 @@ namespace Bachelor_backend.Controller
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        public HttpResponseMessage SetCookie()
+        public ActionResult SetCookie()
         {
             //Get user id from session
             string sessionString = HttpContext.Session.GetString(_loggedIn);
-            if(sessionString == null)
+            if(sessionString.IsNullOrEmpty())
             {
-                return new HttpResponseMessage (HttpStatusCode.Unauthorized);
+                _logger.LogInformation("User has no session");
+                return Unauthorized();
             }
-            //Create cookie
-            var response = new HttpResponseMessage();
-
-            var cookie = new CookieOptions();
-            cookie.Expires = DateTimeOffset.Now.AddMonths(1); //Expires in 1 month
-            cookie.Path = "/";
             
+            //Creates cookie
+            var cookie = new CookieOptions
+            {
+                Expires = DateTimeOffset.Now.AddMonths(1), //Expires in 1 month
+                Path = "/"
+            };
+
             HttpContext.Response.Cookies.Append("userid", sessionString, cookie);
-            return response;
+            return Ok("Cookie is set");
         }
         //TODO: Use crypto to encrypt cookie or set cookie as user parameters
         

@@ -3,6 +3,7 @@ using Bachelor_backend.Controller;
 using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -51,7 +52,7 @@ namespace xUnitBackendTest
             mockSession[_loggedIn] = "1";
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
-            
+
             //Act
             var result = await _userController.SaveFile(It.IsAny<IFormFile>(),1) as ObjectResult;
 
@@ -70,7 +71,7 @@ namespace xUnitBackendTest
 
             mockSession[_loggedIn] = "1";
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
-            
+            mockHttpContext.Setup(s => s.Response.Cookies.Append("userid", "1", It.IsAny<CookieOptions>()));
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
             
             //Act
@@ -126,7 +127,7 @@ namespace xUnitBackendTest
         public async Task DeleteFileOk()
         {
             //Arrange
-            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(true);
+            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync("AudioFile deleted");
             
             //Act
             var result = await _userController.DeleteFile(It.IsAny<string>()) as OkObjectResult;
@@ -137,17 +138,17 @@ namespace xUnitBackendTest
         }
         
         [Fact]
-        public async Task DeleteFileFault()
+        public async Task DeleteFileNotFound()
         {
             //Arrange
-            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(false);
+            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync("Audiofile not found");
             
             //Act
-            var result = await _userController.DeleteFile(It.IsAny<string>()) as BadRequestObjectResult;
+            var result = await _userController.DeleteFile(It.IsAny<string>()) as NotFoundObjectResult;
 
             //Assert
-            Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.Equal("Voice recording is not deleted", result.Value);
+            Assert.Equal((int) HttpStatusCode.NotFound, result.StatusCode);
+            Assert.Equal("Voice recording is not found", result.Value);
         }
 
         [Fact]
@@ -224,6 +225,7 @@ namespace xUnitBackendTest
 
             mockSession[_loggedIn] = user.UserId;
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            mockHttpContext.Setup(s => s.Response.Cookies.Append("userid", "1", It.IsAny<CookieOptions>()));
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
             
             //Act
@@ -249,14 +251,51 @@ namespace xUnitBackendTest
 
             mockSession[_loggedIn] = user.UserId;
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            mockHttpContext.Setup(s => s.Response.Cookies.Append("userid", "1", It.IsAny<CookieOptions>()));
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
             
             //Act
             var result = await _userController.RegisterUserInfo(It.IsAny<User>()) as OkObjectResult;
 
             //Assert
             Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal(true, result.Value);
+            Assert.Equal(true, result.ToString().Contains("loggedIn: true"));
+        }
+
+        [Fact]
+        public void SetCookieOk()
+        {
+            //Arrange
+            mockSession[_loggedIn] = "1";
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            mockHttpContext.Setup(s => s.Response.Cookies.Append("userid", "1", It.IsAny<CookieOptions>()));
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
+            
+            var result = _userController.SetCookie() as OkObjectResult;
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal("Cookie set", result.Value);
+        }
+        
+        [Fact]
+        public void SetCookieNotSetSession()
+        {
+            //Arrange
+            mockSession[_loggedIn] = _notLoggedIn;
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            mockHttpContext.Setup(s => s.Response.Cookies.Append("userid", "1", It.IsAny<CookieOptions>()));
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
+
+            var result = _userController.SetCookie() as UnauthorizedResult;
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.Unauthorized, (int) result.StatusCode);
         }
     }
 }

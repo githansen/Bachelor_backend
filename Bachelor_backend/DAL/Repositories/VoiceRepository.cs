@@ -103,7 +103,7 @@ public class VoiceRepository : IVoiceRepository
         {
             _logger.LogInformation(e.Message);
             Console.WriteLine(e.Message);
-            return "Audiofile not deleted";
+            return null;
         }
 
     }
@@ -112,5 +112,5 @@ public class VoiceRepository : IVoiceRepository
     {
         throw new NotImplementedException();
     }
-
+    
 }
