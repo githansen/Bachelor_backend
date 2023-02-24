@@ -19,7 +19,7 @@ namespace Bachelor_backend.DAL.Repositories
             _logger = logger;
         }
 
-        public async Task<BlobResponseDto> UploadAsync(IFormFile blob)
+        public async Task<BlobResponseDto> UploadAsync(IFormFile file, string newFileName)
         {
             BlobResponseDto response = new();
 
@@ -27,15 +27,15 @@ namespace Bachelor_backend.DAL.Repositories
 
             try
             {
-                BlobClient client = container.GetBlobClient(blob.FileName);
+                BlobClient client = container.GetBlobClient(newFileName);
 
                 // Open a stream for the file we want to upload
-                await using (Stream? data = blob.OpenReadStream())
+                await using (Stream? data = file.OpenReadStream())
                 {
-                    await client.UploadAsync(data, new BlobHttpHeaders { ContentType = blob.ContentType });
+                    await client.UploadAsync(data, new BlobHttpHeaders { ContentType = file.ContentType });
                 }
 
-                response.Status = $"File {blob.FileName} Uploaded Sucessfully";
+                response.Status = $"File {file.FileName} Uploaded Sucessfully";
                 response.Error = false;
                 response.Blob.Uri = client.Uri.AbsoluteUri;
                 response.Blob.Name = client.Name;
@@ -44,7 +44,7 @@ namespace Bachelor_backend.DAL.Repositories
             catch (RequestFailedException e)
                 when (e.ErrorCode == BlobErrorCode.BlobAlreadyExists)
             {
-                _logger.LogInformation($"File {blob.FileName} already exists. Set another name to store the file in the container");
+                _logger.LogInformation($"File {file.FileName} already exists. Set another name to store the file in the container");
                 response.Error = true;
                 return response;
             }

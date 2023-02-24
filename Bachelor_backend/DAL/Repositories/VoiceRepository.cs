@@ -24,13 +24,6 @@ public class VoiceRepository : IVoiceRepository
     {
         try
         {
-            
-            //Creates a recording directory if it doesnt exist
-            if (!Directory.Exists($@"{Directory.GetCurrentDirectory()}\recordings"))
-            {
-                Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\recordings");
-            }
-            
             //TODO: Calibrate file size limit
             //Checks file size and returns error if file is too big
             if (recording.Length > 10000000)
@@ -43,13 +36,14 @@ public class VoiceRepository : IVoiceRepository
             //TODO: Add/Remove accepted file extensions
             //List with allowed file extensions
             var fileExtensions = new List<string>() { ".mp3", ".wav", ".flac", ".aac",".m4a", ".mp4" };
-            
+
             //Checks if the file extension is allowed
             if (!fileExtensions.Contains(extension))
             {
                 return "File extension not allowed";
             }
             
+            // Gets the text and user from the database
             var text = await _db.Texts.FindAsync(textId);
             var user = await _db.Users.FindAsync(userId);
 
@@ -60,29 +54,23 @@ public class VoiceRepository : IVoiceRepository
             };
 
             await _db.Audiofiles.AddAsync(audioFile);
-
+            
             var uuid = audioFile.UUID.ToString();
-            /*
+            
             string newFileName = uuid + extension;
-            //string uploadPath = Path.Combine(@"/", newFileName);
-            
             audioFile.Path = newFileName;
-            IFormFile newFile;
-            //Using stream to copy the content of the recording file to disk
-            using (var stream = new MemoryStream())
-            {
-                //await recording.CopyToAsync(stream);
-                newFile = new FormFile(stream, 0, recording.Length, recording.Name, newFileName);
-            }
-*/
-            var response = await _azureStorage.UploadAsync(recording);
             
+            //Uploads file to Azure blobstorage
+            var response = await _azureStorage.UploadAsync(recording, newFileName);
+            
+            //Checks if the file was uploaded to Azure
             if (response.Error)
             {
                 _logger.LogInformation("File not uploaded to Azure");
                 return "";
             }
             
+            //Saves database and returns the uuid of the audiofile
             await _db.SaveChangesAsync();
             return uuid;
         }
