@@ -113,4 +113,8 @@ public class VoiceRepository : IVoiceRepository
         throw new NotImplementedException();
     }
 
+    public Task<int> GetNumberOfRecordings()
+    {
+        throw new NotImplementedException();
+    }
 }

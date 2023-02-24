@@ -243,5 +243,20 @@ namespace Bachelor_backend.DAL.Repositories
                 return false;
             }
         }
+
+        public Task<int> GetNumberOfTexts()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetNumberOfUsers()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Text> GetOneText(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

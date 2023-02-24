@@ -1,11 +1,11 @@
-18-27 Engelsk 
-28-37 Norsk Østlandsk
-28-37 Swahili
-18-27 Norsk Vestlandsk
-38-47 Norsk midt-norsk
-38-47 Svensk
-38-47 Dansk
-38-47 Norsk Østlandsk
-18-27 Arabisk
-28-37 Swahili
-38-47 Swahili
+18-27 Engelsk Mann
+28-37 Norsk Østlandsk Mann
+28-37 Swahili Mann
+18-27 Norsk Vestlandsk Mann
+38-47 Norsk midt-norsk Mann
+38-47 Svensk Mann
+38-47 Dansk Kvinne
+38-47 Norsk Østlandsk Kvinne
+18-27 Arabisk Kvinne
+28-37 Swahili Kvinne
+38-47 Swahili Kvinne

@@ -15,5 +15,8 @@ namespace Bachelor_backend.DAL.Repositories
         Task<User> GetUser(int userId);
         Task<bool> DeleteTag(int TextId);
         Task<bool> DeleteText(int TextId);
+        Task<int> GetNumberOfTexts();
+        Task<int> GetNumberOfUsers();
+        Task<Text> GetOneText(int id);
     }
 }

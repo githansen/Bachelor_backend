@@ -33,7 +33,8 @@ namespace Bachelorbackend.Migrations
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NativeLanguage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AgeGroup = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Dialect = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Dialect = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -13,10 +13,13 @@ namespace Bachelor_backend.Controller
     public class AdminController : ControllerBase
     {
         private readonly ITextRepository _textRep;
-        public AdminController(ITextRepository textrep)
+        private readonly IVoiceRepository _voicerep;
+        public AdminController(ITextRepository textrep, IVoiceRepository voicerep)
         {
             _textRep = textrep;
+            _voicerep = voicerep;
         }
+
         /// <summary>
         /// Login as admin
         /// </summary>
@@ -165,5 +168,27 @@ namespace Bachelor_backend.Controller
             }
             return BadRequest(false);
         }
+
+        [HttpGet]
+        public async Task<ActionResult> GetNumberOfTexts()
+        {
+            throw new NotImplementedException();
+        }
+        [HttpGet]
+        public async Task<ActionResult> GetNumberOfRecordings()
+        {
+            throw new NotImplementedException();
+        }
+        [HttpGet]
+        public async Task<ActionResult> GetNumberOfUsers()
+        {
+            throw new NotImplementedException();
+        }
+        [HttpGet]
+        public async Task<ActionResult> GetOneText(int id)
+        {
+            throw new NotImplementedException();
+        }
+       
     }
 }

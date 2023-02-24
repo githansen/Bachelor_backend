@@ -80,8 +80,13 @@ namespace Bachelor_backend.DBInitializer
                 };
                 if (Equals(user.NativeLanguage, "Norsk"))
                 {
-                    user.Dialect = line.Split()[2]; 
-                };
+                    user.Dialect = line.Split()[2];
+                    user.Gender = line.Split()[3];
+                }
+                else
+                {
+                    user.Gender = line.Split()[2];
+                }
                 _db.Users.Add(user);
                 _db.SaveChanges();
             }

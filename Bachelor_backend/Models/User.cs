@@ -20,6 +20,6 @@ namespace Bachelor_backend.Models
         
         [RegularExpression("^([a-zA-ZæøåÆØÅ]{4,16})$")]
         public string? Dialect { get; set; }
-
+        public string? Gender { get; set; }
     }
 }
