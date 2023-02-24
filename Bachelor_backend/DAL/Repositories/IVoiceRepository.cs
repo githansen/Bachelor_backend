@@ -1,4 +1,6 @@
-﻿namespace Bachelor_backend.DAL.Repositories;
+﻿using Bachelor_backend.Models;
+
+namespace Bachelor_backend.DAL.Repositories;
 
 public interface IVoiceRepository
 {
@@ -6,4 +8,7 @@ public interface IVoiceRepository
     Task<string> DeleteFile(string uuid);
     Task<IFormFile> GetAudioRecording(int textId);
     Task<int> GetNumberOfRecordings();
+
+    Task<List<Audiofile>> GetAllRecordings();
+    
 }

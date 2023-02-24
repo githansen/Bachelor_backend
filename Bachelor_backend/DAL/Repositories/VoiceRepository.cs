@@ -117,4 +117,9 @@ public class VoiceRepository : IVoiceRepository
     {
         throw new NotImplementedException();
     }
+
+    public Task<List<Audiofile>> GetAllRecordings()
+    {
+        throw new NotImplementedException();
+    }
 }

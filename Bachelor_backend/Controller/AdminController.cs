@@ -170,25 +170,19 @@ namespace Bachelor_backend.Controller
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetNumberOfTexts()
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<ActionResult> GetNumberOfTexts(){throw new NotImplementedException();}
         [HttpGet]
-        public async Task<ActionResult> GetNumberOfRecordings()
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<ActionResult> GetNumberOfRecordings(){throw new NotImplementedException();}
         [HttpGet]
-        public async Task<ActionResult> GetNumberOfUsers()
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<ActionResult> GetNumberOfUsers(){ throw new NotImplementedException(); }
         [HttpGet]
-        public async Task<ActionResult> GetOneText(int id)
-        {
-            throw new NotImplementedException();
-        }
-       
+        public async Task<ActionResult> GetOneText(int id) {throw new NotImplementedException();}
+        [HttpGet]
+        public async Task<ActionResult> GetNumberOfDeletedRecordings() { throw new NotImplementedException(); }
+        [HttpGet]
+        public async Task<ActionResult> GetAllRecordings() { throw new NotImplementedException(); }
+        [HttpGet]
+        public async Task<ActionResult> GetOneRecording(int Id) { throw new NotImplementedException(); }
+
     }
 }
