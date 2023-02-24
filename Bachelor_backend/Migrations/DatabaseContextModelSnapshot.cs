@@ -102,6 +102,9 @@ namespace Bachelorbackend.Migrations
                     b.Property<string>("Dialect")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Gender")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NativeLanguage")
                         .HasColumnType("nvarchar(max)");
 

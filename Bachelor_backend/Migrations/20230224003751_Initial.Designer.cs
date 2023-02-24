@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bachelorbackend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230131164905_Initial")]
+    [Migration("20230224003751_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -103,6 +103,9 @@ namespace Bachelorbackend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Dialect")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NativeLanguage")
