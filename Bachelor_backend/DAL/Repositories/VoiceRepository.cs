@@ -9,11 +9,13 @@ public class VoiceRepository : IVoiceRepository
 {
 
     private readonly DatabaseContext _db;
+    private readonly IAzureStorage _azureStorage;
     private readonly ILogger<VoiceRepository> _logger;
 
-    public VoiceRepository(DatabaseContext db, ILogger<VoiceRepository> logger)
+    public VoiceRepository(DatabaseContext db, IAzureStorage azureStorage, ILogger<VoiceRepository> logger)
     {
         _db = db;
+        _azureStorage = azureStorage;
         _logger = logger;
     }
 
@@ -60,16 +62,25 @@ public class VoiceRepository : IVoiceRepository
             await _db.Audiofiles.AddAsync(audioFile);
 
             var uuid = audioFile.UUID.ToString();
-
+            /*
             string newFileName = uuid + extension;
-            string uploadPath = Path.Combine($@"{Directory.GetCurrentDirectory()}\recordings", newFileName);
+            //string uploadPath = Path.Combine(@"/", newFileName);
             
-            audioFile.Path = uploadPath;
-            
+            audioFile.Path = newFileName;
+            IFormFile newFile;
             //Using stream to copy the content of the recording file to disk
-            using (var stream = new FileStream(uploadPath, FileMode.Create))
+            using (var stream = new MemoryStream())
             {
-                await recording.CopyToAsync(stream);
+                //await recording.CopyToAsync(stream);
+                newFile = new FormFile(stream, 0, recording.Length, recording.Name, newFileName);
+            }
+*/
+            var response = await _azureStorage.UploadAsync(recording);
+            
+            if (response.Error)
+            {
+                _logger.LogInformation("File not uploaded to Azure");
+                return "";
             }
             
             await _db.SaveChangesAsync();
