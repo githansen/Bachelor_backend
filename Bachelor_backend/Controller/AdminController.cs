@@ -268,15 +268,24 @@ namespace Bachelor_backend.Controller
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         [HttpGet]
-        public async Task<ActionResult> test()
+        public async Task<ActionResult> GetAllUsers()
         {
-            Dictionary<string, int> t = new Dictionary<string, int>();
-            t.Add("Mann", 25);
-            t.Add("Kvinne", 30);
-            t.Add("Annet", 55);
-            t.Add("Ukjent", 45);
-            return Ok(t);
+            List<User> list = await _textRep.GetAllUsers();
+            if(list != null)
+            {
+                return Ok(list);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, null);
+            }
+
         }
     }
 }

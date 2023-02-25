@@ -284,9 +284,18 @@ namespace Bachelor_backend.DAL.Repositories
                 return null;
             }
         }
-      
 
-
-
+        public async Task<List<User>> GetAllUsers()
+        {
+            try
+            {
+                List<User> list = await _db.Users.Where(t => t.Type == "RealUser").ToListAsync();
+                return list;
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }
