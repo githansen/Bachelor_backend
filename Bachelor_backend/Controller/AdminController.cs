@@ -267,7 +267,7 @@ namespace Bachelor_backend.Controller
                 return BadRequest(null);
             }
         }
-     
-
+    
+        
     }
 }
