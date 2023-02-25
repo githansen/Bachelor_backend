@@ -267,7 +267,16 @@ namespace Bachelor_backend.Controller
                 return BadRequest(null);
             }
         }
-    
-        
+
+        [HttpGet]
+        public async Task<ActionResult> test()
+        {
+            Dictionary<string, int> t = new Dictionary<string, int>();
+            t.Add("Mann", 25);
+            t.Add("Kvinne", 30);
+            t.Add("Annet", 55);
+            t.Add("Ukjent", 45);
+            return Ok(t);
+        }
     }
 }

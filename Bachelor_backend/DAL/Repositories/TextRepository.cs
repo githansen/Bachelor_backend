@@ -3,6 +3,7 @@ using Bachelor_backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Data;
 
 namespace Bachelor_backend.DAL.Repositories
 {
@@ -262,7 +263,7 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                int total =  await _db.Users.Where(u => u.Type != "Target").CountAsync();
+                int total = await _db.Users.Where(u => u.Type != "Target").CountAsync();
                 return total;
             }
             catch
@@ -283,6 +284,9 @@ namespace Bachelor_backend.DAL.Repositories
                 return null;
             }
         }
+      
+
+
 
     }
 }
