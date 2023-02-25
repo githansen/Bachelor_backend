@@ -244,19 +244,43 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-        public Task<int> GetNumberOfTexts()
+        public async Task<int> GetNumberOfTexts()
         {
-            throw new NotImplementedException();
+            try
+            {
+                int total = await _db.Users.CountAsync();
+                return total;
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
-        public Task<int> GetNumberOfUsers()
+        public async Task<int> GetNumberOfUsers()
         {
-            throw new NotImplementedException();
+            try
+            {
+                int total =  await _db.Users.Where(u => u.Type != "Target").CountAsync();
+                return total;
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
-        public Task<Text> GetOneText(int id)
+        public async Task<Text> GetOneText(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Text text = await _db.Texts.FindAsync(id);
+                return text;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
