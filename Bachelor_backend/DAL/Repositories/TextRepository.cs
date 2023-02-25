@@ -177,7 +177,10 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<User> RegisterUserInfo(User user)
         {
-            //TODO: Regex on user items
+            //List of age groups
+            var ageGroups = new List<string> { "18-29", "30-39", "40-49", "50-59", "60+" };
+            
+            user.AgeGroup = ageGroups[int.Parse(user.AgeGroup) - 1];
             user.Type = "RealUser";
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
