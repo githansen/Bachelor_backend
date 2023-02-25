@@ -182,7 +182,7 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetAllRecordings() { throw new NotImplementedException(); }
         [HttpGet]
-        public async Task<ActionResult> GetOneRecording(int Id) { throw new NotImplementedException(); }
+        public async Task<ActionResult> GetOneRecording(string uuid) { throw new NotImplementedException(); }
 
     }
 }

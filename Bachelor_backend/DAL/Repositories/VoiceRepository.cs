@@ -107,7 +107,7 @@ public class VoiceRepository : IVoiceRepository
 
     }
 
-    public async Task<IFormFile> GetAudioRecording(int textId)
+    public async Task<IFormFile> GetAudioRecording(string uuid)
     {
         throw new NotImplementedException();
     }
