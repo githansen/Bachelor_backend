@@ -89,8 +89,7 @@ namespace Bachelor_backend.DAL.Repositories
                 List<Tag> tags = await _db.Tags.Select(t => new Tag
                 {
                     TagId = t.TagId,
-                    TagText = t.TagText,
-                    Texts = t.Texts.ToList()
+                    TagText = t.TagText
                 }).ToListAsync();
                 return tags;
             }
@@ -276,7 +275,16 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                Text text = await _db.Texts.FindAsync(id);
+                
+                Text text = _db.Texts.Where(t => t.TextId == id).Select(t => new Text
+                {
+                    TextId= t.TextId,
+                    Tags = t.Tags,
+                    TextText = t.TextText,
+                    TargetUser = t.TargetUser,
+                    Active = t.Active,
+                    UserId = t.UserId
+                }).FirstOrDefault();
                 return text;
             }
             catch
@@ -297,5 +305,41 @@ namespace Bachelor_backend.DAL.Repositories
                 return null;
             }
         }
+        public async Task<bool> EditText(Text text)
+        {
+            try
+            {
+                Text test = _db.Texts.Where(t => t.TextId == text.TextId).Select(t => new Text
+                {
+                    Tags = t.Tags,
+                }).FirstOrDefault();
+
+                Text textInDB = await _db.Texts.FindAsync(text.TextId);
+                textInDB.TextText = text.TextText;
+                textInDB.TargetUser = text.TargetUser;
+                textInDB.TargetUser.Type = "Target";
+                textInDB.Active= text.Active;
+                textInDB.Tags = new List<Tag>();
+                string sql = "DELETE FROM dbo.TagsForTexts WHERE TextsTextId="+text.TextId;
+                _db.Database.ExecuteSqlRaw(sql);
+                if (text.Tags != null)
+                {
+                    foreach (Tag t in text.Tags)
+                    {
+                        sql = "INSERT INTO dbo.TagsForTexts (TagsTagId, TextsTextId) VALUES (" + t.TagId + ", + " + text.TextId + ")";
+                        _db.Database.ExecuteSqlRaw(sql);
+                    }
+                }
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
     }
 }

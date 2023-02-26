@@ -19,5 +19,6 @@ namespace Bachelor_backend.DAL.Repositories
         Task<int> GetNumberOfUsers();
         Task<Text> GetOneText(int id);
         Task<List<User>> GetAllUsers();
+        Task<bool> EditText(Text text);
     }
 }

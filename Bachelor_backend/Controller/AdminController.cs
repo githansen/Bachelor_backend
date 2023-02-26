@@ -171,7 +171,10 @@ namespace Bachelor_backend.Controller
             return BadRequest(false);
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
 
         [HttpGet]
         public async Task<ActionResult> GetNumberOfTexts()
@@ -187,7 +190,10 @@ namespace Bachelor_backend.Controller
 
             }
         }
-        [ApiExplorerSettings(IgnoreApi = true)]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
 
         [HttpGet]
         public async Task<ActionResult> GetNumberOfRecordings(){
@@ -201,7 +207,10 @@ namespace Bachelor_backend.Controller
                 return StatusCode(StatusCodes.Status500InternalServerError, -1);
             }
         }
-        [ApiExplorerSettings(IgnoreApi = true)]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
 
         [HttpGet]
         public async Task<ActionResult> GetNumberOfUsers()
@@ -216,7 +225,11 @@ namespace Bachelor_backend.Controller
 
             }
         }
-        [ApiExplorerSettings(IgnoreApi = true)]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
 
         [HttpGet]
         public async Task<ActionResult> GetOneText(int id) 
@@ -232,11 +245,17 @@ namespace Bachelor_backend.Controller
             }
 
         }
-        [ApiExplorerSettings(IgnoreApi = true)]
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         [HttpGet]
         public async Task<ActionResult> GetNumberOfDeletedRecordings() { throw new NotImplementedException(); }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> GetAllRecordings() {
             List<Audiofile> list = await _voicerep.GetAllRecordings();
@@ -285,7 +304,24 @@ namespace Bachelor_backend.Controller
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, null);
             }
-
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> EditText([FromBody]Text text)
+        {
+            bool success = await _textRep.EditText(text);
+            if (success)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest(false);
+            }
         }
     }
 }
