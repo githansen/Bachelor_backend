@@ -307,12 +307,21 @@ namespace Bachelor_backend.DAL.Repositories
         }
         public async Task<bool> EditText(Text text)
         {
+            /* 
+             The FindAsync()-method does not get the list of tags since it's fetched from the join table between Texts and Tags
+            EF Core 7 does not do this automatically. Also, using Find/FindAsync is necessary for updating the table, 
+            therefore we need to get the same object twice -> once to get the tags, and once using the find-method. 
+
+            For the same reason, updates to the tag-list is not automatically updated. Therefore, raw SQL is used to first delete
+            all references to the Text we are working on in TagsForTexts table. Then, we insert the rows from the input object (text) 
+             */
             try
             {
                 Text test = _db.Texts.Where(t => t.TextId == text.TextId).Select(t => new Text
                 {
                     Tags = t.Tags,
                 }).FirstOrDefault();
+
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
                 textInDB.TextText = text.TextText;
@@ -341,5 +350,19 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
+        public async Task<bool> EditTag(Tag tag)
+        {
+            try
+            {
+                Tag TagFromDb = await _db.Tags.FindAsync(tag.TagId);
+                TagFromDb.TagText = tag.TagText;
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

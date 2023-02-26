@@ -20,5 +20,6 @@ namespace Bachelor_backend.DAL.Repositories
         Task<Text> GetOneText(int id);
         Task<List<User>> GetAllUsers();
         Task<bool> EditText(Text text);
+        Task<bool> EditTag(Tag tag);
     }
 }

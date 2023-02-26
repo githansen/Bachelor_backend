@@ -323,5 +323,18 @@ namespace Bachelor_backend.Controller
                 return BadRequest(false);
             }
         }
+        [HttpPost]
+        public async Task<ActionResult> EditTag([FromBody] Tag tag) 
+        {
+            bool success = await _textRep.EditTag(tag);
+            if (success)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest(false);
+            }
+        }
     }
 }
