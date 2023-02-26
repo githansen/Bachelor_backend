@@ -59,31 +59,32 @@ namespace Bachelor_backend.DAL.Repositories
 
             return response;
         }
-        public async Task<List<BlobDto>> ListAsync()
+
+        public async Task<BlobResponseDto> DeleteAsync(string filename)
         {
-            // Get a reference to a container named in appsettings.json
+            
+            BlobResponseDto response = new();
+            // Get a reference to a container
             BlobContainerClient container = new BlobContainerClient(_storageConnectionString, _storageContainerName);
-
-            // Create a new list object for 
-            List<BlobDto> files = new List<BlobDto>();
-
-            await foreach (BlobItem file in container.GetBlobsAsync())
+            
+            try
             {
-                // Add each file retrieved from the storage container to the files list by creating a BlobDto object
-                string uri = container.Uri.ToString();
-                var name = file.Name;
-                var fullUri = $"{uri}/{name}";
-
-                files.Add(new BlobDto
-                {
-                    Uri = fullUri,
-                    Name = name,
-                    ContentType = file.Properties.ContentType
-                });
+                // Get a reference to the blob
+                BlobClient client = container.GetBlobClient(filename);
+            
+                // Delete the blob
+                var responseFromAzure = await client.DeleteAsync();
+                response.Error = responseFromAzure.IsError;
+                response.Status = responseFromAzure.Status.ToString();
+                return response;
             }
-
-            // Return all files to the requesting method
-            return files;
+            catch (Exception e)
+            {
+                response.Error = true;
+                response.Status = $"{filename} could not be deleted. {e.Message}";
+                return response;
+            }
+            
         }
     }
 }

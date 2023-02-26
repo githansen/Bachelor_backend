@@ -43,7 +43,7 @@ namespace Bachelor_backend.Controller
             {
                 return Unauthorized();
             }
-
+            //TODO: Check textId number
             string uuid = await _voiceRep.SaveFile(recording, textId, int.Parse(Regex.Match(sessionString, @"\d+").Value));
             
             if (uuid.IsNullOrEmpty())
