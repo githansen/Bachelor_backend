@@ -6,6 +6,6 @@ namespace Bachelor_backend.DAL.Repositories
     {
         Task<BlobResponseDto> UploadAsync(IFormFile file, string newFileName);
 
-        Task<List<BlobDto>> ListAsync();
+        Task<BlobResponseDto> DeleteAsync(string filename);
     }
 }

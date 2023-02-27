@@ -93,7 +93,15 @@ public class VoiceRepository : IVoiceRepository
             }
             string path = audiofile.Path;
             _db.Audiofiles.Remove(audiofile);
-            File.Delete(path);
+            
+            //Deletes file from Azure blobstorage
+            var response = await _azureStorage.DeleteAsync(path);
+            if (response.Error)
+            {
+                _logger.LogInformation("File not deleted from Azure");
+                return "Audiofile not deleted";
+            }
+            
             await _db.SaveChangesAsync();
             return "Audiofile deleted";
 
