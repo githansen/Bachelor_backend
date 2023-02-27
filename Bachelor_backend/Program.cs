@@ -37,7 +37,7 @@ builder.Services.AddScoped<IVoiceRepository, VoiceRepository>();
 builder.Services.AddScoped<ITextRepository, TextRepository>();
 builder.Services.AddTransient<IAzureStorage, AzureStorage>();
 
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("JohanDesktop")));
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
@@ -82,7 +82,7 @@ app.UseCors(MyAllowSpecificOrigins);
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
-SeedDatabase();
+//SeedDatabase();
 
 app.UseSwagger(options =>
 {
