@@ -2,6 +2,7 @@
 
 using Bachelor_backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bachelor_backend.DAL.Repositories;
 
@@ -115,18 +116,58 @@ public class VoiceRepository : IVoiceRepository
 
     }
 
-    public async Task<IFormFile> GetAudioRecording(string uuid)
+    public async Task<FormFile> GetOneRecording(string uuid)
     {
-        throw new NotImplementedException();
+        //GJØR DENNE SENERE, usikker på om dette funker
+        try
+        {
+            Audiofile audiofile = await _db.Audiofiles.FindAsync(uuid);
+            using var stream = new MemoryStream(File.ReadAllBytes(audiofile.Path).ToArray());
+            var formFile = new FormFile(stream, 0, stream.Length, "streamFile", audiofile.Path);
+
+            return formFile;
+        }
+        catch
+        {
+            return null;
+        }
+        
+
     }
 
-    public Task<int> GetNumberOfRecordings()
+    public async Task<int> GetNumberOfRecordings()
     {
-        throw new NotImplementedException();
+        try
+        {
+            int total = _db.Audiofiles.Count();
+            return total;
+        }
+        catch
+        {
+            return -1;
+        }
+       
     }
 
-    public Task<List<Audiofile>> GetAllRecordings()
+    public async Task<List<Audiofile>> GetAllRecordings()
     {
-        throw new NotImplementedException();
+        try
+        {
+            List<Audiofile> list = await _db.Audiofiles.Select(t => new Audiofile
+            {
+                UUID = t.UUID,
+                Path = t.Path,
+                DateCreated= t.DateCreated,
+                User = t.User,
+                Text = t.Text
+            }).ToListAsync();
+
+
+            return list;    
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

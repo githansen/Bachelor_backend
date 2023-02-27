@@ -2,6 +2,8 @@
 using Bachelor_backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
+using System.Data;
 
 namespace Bachelor_backend.DAL.Repositories
 {
@@ -87,8 +89,7 @@ namespace Bachelor_backend.DAL.Repositories
                 List<Tag> tags = await _db.Tags.Select(t => new Tag
                 {
                     TagId = t.TagId,
-                    TagText = t.TagText,
-                    Texts = t.Texts.ToList()
+                    TagText = t.TagText
                 }).ToListAsync();
                 return tags;
             }
@@ -247,19 +248,124 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-        public Task<int> GetNumberOfTexts()
+        public async Task<int> GetNumberOfTexts()
         {
-            throw new NotImplementedException();
+            try
+            {
+                int total = await _db.Users.CountAsync();
+                return total;
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
-        public Task<int> GetNumberOfUsers()
+        public async Task<int> GetNumberOfUsers()
         {
-            throw new NotImplementedException();
+            try
+            {
+                int total = await _db.Users.Where(u => u.Type != "Target").CountAsync();
+                return total;
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
-        public Task<Text> GetOneText(int id)
+        public async Task<Text> GetOneText(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                
+                Text text = _db.Texts.Where(t => t.TextId == id).Select(t => new Text
+                {
+                    TextId= t.TextId,
+                    Tags = t.Tags,
+                    TextText = t.TextText,
+                    TargetUser = t.TargetUser,
+                    Active = t.Active,
+                    UserId = t.UserId
+                }).FirstOrDefault();
+                return text;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<User>> GetAllUsers()
+        {
+            try
+            {
+                List<User> list = await _db.Users.Where(t => t.Type == "RealUser").ToListAsync();
+                return list;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public async Task<bool> EditText(Text text)
+        {
+            /* 
+             The FindAsync()-method does not get the list of tags since it's fetched from the join table between Texts and Tags
+            EF Core 7 does not do this automatically. Also, using Find/FindAsync is necessary for updating the table, 
+            therefore we need to get the same object twice -> once to get the tags, and once using the find-method. 
+
+            For the same reason, updates to the tag-list is not automatically updated. Therefore, raw SQL is used to first delete
+            all references to the Text we are working on in TagsForTexts table. Then, we insert the rows from the input object (text) 
+             */
+            try
+            {
+                Text test = _db.Texts.Where(t => t.TextId == text.TextId).Select(t => new Text
+                {
+                    Tags = t.Tags,
+                }).FirstOrDefault();
+
+
+                Text textInDB = await _db.Texts.FindAsync(text.TextId);
+                textInDB.TextText = text.TextText;
+                textInDB.TargetUser = text.TargetUser;
+                textInDB.TargetUser.Type = "Target";
+                textInDB.Active= text.Active;
+                textInDB.Tags = new List<Tag>();
+                string sql = "DELETE FROM dbo.TagsForTexts WHERE TextsTextId="+text.TextId;
+                _db.Database.ExecuteSqlRaw(sql);
+                if (text.Tags != null)
+                {
+                    foreach (Tag t in text.Tags)
+                    {
+                        sql = "INSERT INTO dbo.TagsForTexts (TagsTagId, TextsTextId) VALUES (" + t.TagId + ", + " + text.TextId + ")";
+                        _db.Database.ExecuteSqlRaw(sql);
+                    }
+                }
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> EditTag(Tag tag)
+        {
+            try
+            {
+                Tag TagFromDb = await _db.Tags.FindAsync(tag.TagId);
+                TagFromDb.TagText = tag.TagText;
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
