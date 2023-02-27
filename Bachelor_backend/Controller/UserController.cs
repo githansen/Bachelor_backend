@@ -170,7 +170,8 @@ namespace Bachelor_backend.Controller
             _logger.LogInformation("Fault in input");
             return BadRequest("Fault in input");
         }
-        
+        [ApiExplorerSettings(IgnoreApi = true)]
+
         public bool IsLoggedIn()
         {
             string sessionString = HttpContext.Session.GetString(_loggedIn);

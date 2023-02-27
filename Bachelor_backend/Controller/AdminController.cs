@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-
+using System.Xml.Schema;
 
 namespace Bachelor_backend.Controller
 {
@@ -116,6 +116,8 @@ namespace Bachelor_backend.Controller
 
             return BadRequest("Fault in input");
         }
+
+
         /// <summary>
         /// Get all texts
         /// </summary>
@@ -169,20 +171,170 @@ namespace Bachelor_backend.Controller
             return BadRequest(false);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+
         [HttpGet]
-        public async Task<ActionResult> GetNumberOfTexts(){throw new NotImplementedException();}
+        public async Task<ActionResult> GetNumberOfTexts()
+        {
+            int total = await _textRep.GetNumberOfTexts();
+            if(total > -1)
+            {
+                return Ok(total);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, -1);
+
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+
         [HttpGet]
-        public async Task<ActionResult> GetNumberOfRecordings(){throw new NotImplementedException();}
+        public async Task<ActionResult> GetNumberOfRecordings(){
+            int total = await _voicerep.GetNumberOfRecordings();
+            if (total > -1)
+            {
+                return Ok(total);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, -1);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+
         [HttpGet]
-        public async Task<ActionResult> GetNumberOfUsers(){ throw new NotImplementedException(); }
+        public async Task<ActionResult> GetNumberOfUsers()
+        {
+            int total = await _textRep.GetNumberOfUsers();
+            if(total > -1) {
+                return Ok(total);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, -1);
+
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+
         [HttpGet]
-        public async Task<ActionResult> GetOneText(int id) {throw new NotImplementedException();}
+        public async Task<ActionResult> GetOneText(int id) 
+        {
+            Text text = await _textRep.GetOneText(id);
+            if(text != null)
+            {
+                return Ok(text);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, null);
+            }
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         [HttpGet]
         public async Task<ActionResult> GetNumberOfDeletedRecordings() { throw new NotImplementedException(); }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult> GetAllRecordings() { throw new NotImplementedException(); }
+        public async Task<ActionResult> GetAllRecordings() {
+            List<Audiofile> list = await _voicerep.GetAllRecordings();
+            if(list != null)
+            {
+                return Ok(list);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, null);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         [HttpGet]
-        public async Task<ActionResult> GetOneRecording(int Id) { throw new NotImplementedException(); }
+        public async Task<ActionResult> GetOneRecording(string uuid) {
+            IFormFile file = await _voicerep.GetOneRecording(uuid);
+            if(file != null)
+            {
+                return Ok(file);
+            }
+            else
+            {
+                return BadRequest(null);
+            }
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        [HttpGet]
+        public async Task<ActionResult> GetAllUsers()
+        {
+            List<User> list = await _textRep.GetAllUsers();
+            if(list != null)
+            {
+                return Ok(list);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, null);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> EditText([FromBody]Text text)
+        {
+            bool success = await _textRep.EditText(text);
+            if (success)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest(false);
+            }
+        }
+        [HttpPost]
+        public async Task<ActionResult> EditTag([FromBody] Tag tag) 
+        {
+            bool success = await _textRep.EditTag(tag);
+            if (success)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest(false);
+            }
+        }
     }
 }
