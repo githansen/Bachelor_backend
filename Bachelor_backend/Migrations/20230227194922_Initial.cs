@@ -25,6 +25,24 @@ namespace Bachelorbackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Texts",
+                columns: table => new
+                {
+                    TextId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TextText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TargetGenders = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetLanguages = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetDialects = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetAgeGroups = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Active = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Texts", x => x.TextId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -39,50 +57,6 @@ namespace Bachelorbackend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.UserId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Texts",
-                columns: table => new
-                {
-                    TextId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TextText = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    Active = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Texts", x => x.TextId);
-                    table.ForeignKey(
-                        name: "FK_Texts_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "UserId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Audiofiles",
-                columns: table => new
-                {
-                    UUID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    TextId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Audiofiles", x => x.UUID);
-                    table.ForeignKey(
-                        name: "FK_Audiofiles_Texts_TextId",
-                        column: x => x.TextId,
-                        principalTable: "Texts",
-                        principalColumn: "TextId");
-                    table.ForeignKey(
-                        name: "FK_Audiofiles_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
@@ -109,6 +83,30 @@ namespace Bachelorbackend.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Audiofiles",
+                columns: table => new
+                {
+                    UUID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    TextId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Audiofiles", x => x.UUID);
+                    table.ForeignKey(
+                        name: "FK_Audiofiles_Texts_TextId",
+                        column: x => x.TextId,
+                        principalTable: "Texts",
+                        principalColumn: "TextId");
+                    table.ForeignKey(
+                        name: "FK_Audiofiles_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Audiofiles_TextId",
                 table: "Audiofiles",
@@ -123,11 +121,6 @@ namespace Bachelorbackend.Migrations
                 name: "IX_TagsForTexts_TextsTextId",
                 table: "TagsForTexts",
                 column: "TextsTextId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Texts_UserId",
-                table: "Texts",
-                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -140,13 +133,13 @@ namespace Bachelorbackend.Migrations
                 name: "TagsForTexts");
 
             migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
                 name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "Texts");
-
-            migrationBuilder.DropTable(
-                name: "Users");
         }
     }
 }

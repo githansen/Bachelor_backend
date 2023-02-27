@@ -126,7 +126,7 @@ namespace xUnitBackendTest
         public async Task DeleteFileOk()
         {
             //Arrange
-            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(true);
+            //mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(true);
             
             //Act
             var result = await _userController.DeleteFile(It.IsAny<string>()) as OkObjectResult;
@@ -140,7 +140,7 @@ namespace xUnitBackendTest
         public async Task DeleteFileFault()
         {
             //Arrange
-            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(false);
+            //mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(false);
             
             //Act
             var result = await _userController.DeleteFile(It.IsAny<string>()) as BadRequestObjectResult;

@@ -39,6 +39,8 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<bool> CreateText(Text text)
         {
+            return true;
+          /*
             try
             {
                 //Creates tags if they don't exist
@@ -80,6 +82,7 @@ namespace Bachelor_backend.DAL.Repositories
                 _logger.LogInformation(e.Message);
                 return false;
             }
+          */
         }
 
         public async Task<List<Tag>> GetAllTags()
@@ -110,7 +113,10 @@ namespace Bachelor_backend.DAL.Repositories
                     TextText = t.TextText,
                     Tags = t.Tags.ToList(),
                     Active = t.Active,
-                    TargetUser = t.TargetUser
+                    TargetGenders = t.TargetGenders,
+                    TargetAgeGroups = t.TargetAgeGroups,
+                    TargetDialects = t.TargetDialects,
+                    TargetLanguages = t.TargetLanguages
                 }).ToListAsync();
 
                 return texts;
@@ -284,9 +290,11 @@ namespace Bachelor_backend.DAL.Repositories
                     TextId= t.TextId,
                     Tags = t.Tags,
                     TextText = t.TextText,
-                    TargetUser = t.TargetUser,
                     Active = t.Active,
-                    UserId = t.UserId
+                   TargetGenders = t.TargetGenders,
+                   TargetAgeGroups = t.TargetAgeGroups,
+                   TargetDialects = t.TargetDialects,
+                   TargetLanguages = t.TargetLanguages
                 }).FirstOrDefault();
                 return text;
             }
@@ -327,9 +335,11 @@ namespace Bachelor_backend.DAL.Repositories
 
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
+                textInDB.TargetLanguages = text.TargetLanguages;
+                textInDB.TargetGenders = text.TargetGenders;
+                textInDB.TargetAgeGroups = text.TargetAgeGroups;
+                textInDB.TargetDialects = text.TargetDialects;
                 textInDB.TextText = text.TextText;
-                textInDB.TargetUser = text.TargetUser;
-                textInDB.TargetUser.Type = "Target";
                 textInDB.Active= text.Active;
                 textInDB.Tags = new List<Tag>();
                 string sql = "DELETE FROM dbo.TagsForTexts WHERE TextsTextId="+text.TextId;

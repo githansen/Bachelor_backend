@@ -1,5 +1,7 @@
 ﻿using Bachelor_backend.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json;
 
 namespace Bachelor_backend.DAL
 {
@@ -22,6 +24,30 @@ namespace Bachelor_backend.DAL
                  .HasMany(t => t.Tags)
                  .WithMany(t => t.Texts)
                  .UsingEntity(t => t.ToTable("TagsForTexts"));
+
+
+            modelBuilder.Entity<Text>()
+                .Property(x => x.TargetGenders)
+                .HasConversion(new ValueConverter<List<string>?, string>(
+                   v => JsonConvert.SerializeObject(v), // Convert to string for persistence
+            v => JsonConvert.DeserializeObject<List<string>>(v))); // Convert to List<String> for use
+
+            modelBuilder.Entity<Text>()
+               .Property(x => x.TargetAgeGroups)
+               .HasConversion(new ValueConverter<List<string>?, string>(
+                  v => JsonConvert.SerializeObject(v), // Convert to string for persistence
+           v => JsonConvert.DeserializeObject<List<string>>(v))); // Convert to List<String> for use
+            modelBuilder.Entity<Text>()
+               .Property(x => x.TargetDialects)
+               .HasConversion(new ValueConverter<List<string>?, string>(
+                  v => JsonConvert.SerializeObject(v), // Convert to string for persistence
+           v => JsonConvert.DeserializeObject<List<string>>(v))); // Convert to List<String> for use
+            modelBuilder.Entity<Text>()
+
+               .Property(x => x.TargetLanguages)
+               .HasConversion(new ValueConverter<List<string>?, string>(
+                  v => JsonConvert.SerializeObject(v), // Convert to string for persistence
+           v => JsonConvert.DeserializeObject<List<string>>(v))); // Convert to List<String> for use
 
         }
 

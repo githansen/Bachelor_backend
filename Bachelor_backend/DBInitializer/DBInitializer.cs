@@ -61,7 +61,7 @@ namespace Bachelor_backend.DBInitializer
                     };
                 if(r.Next(0,2) == 1)
                 {
-                    text.TargetUser = new User() { Type="Target", AgeGroup = "18-28" };
+                    text.TargetGenders = new List<string> { "Mann", "Kvinne" };
                 }
                 _db.Texts.Add(text);
                 _db.SaveChanges();
