@@ -79,15 +79,52 @@ namespace Bachelor_backend.DAL.Repositories
             //Add text to db
             try
             {
-                var Target = await _db.TargetGroups
-                   .Where(t => t.Genders == text.TargetGroup.Genders
-                   &&
-              t.Languages == text.TargetGroup.Languages
-                   &&
-               t.Dialects == text.TargetGroup.Dialects
-                   &&
-               t.AgeGroups == text.TargetGroup.AgeGroups
-               ).FirstOrDefaultAsync();
+
+
+               //Check if TargetGroup already exists --START--
+                var genders = JsonConvert.SerializeObject(text.TargetGroup.Genders);
+                var languages = JsonConvert.SerializeObject(text.TargetGroup.Languages);
+                var dialects = JsonConvert.SerializeObject(text.TargetGroup.Dialects);
+                var agegroups = JsonConvert.SerializeObject(text.TargetGroup.AgeGroups);
+
+                string sql = "SELECT * FROM dbo.TargetGroups WHERE";
+                Debug.WriteLine($"{genders} {languages} {dialects} {agegroups}");
+                if (!genders.ToLower().Equals("null"))
+                {
+                    sql += " Genders= '" + genders + "' AND";
+                }
+                else
+                {
+                    sql += " Genders IS NULL AND";
+                }
+                if (!languages.ToLower().Equals("null"))
+                {
+                    sql += " Languages= '" + languages + "' AND";
+                }
+                else
+                {
+                    sql += " Languages IS NULL AND";
+                }
+                if (!dialects.ToLower().Equals("null"))
+                {
+                    sql += " Dialects= '" + dialects + "' AND";
+                }
+                else
+                {
+                    sql += " Dialects IS NULL AND";
+                }
+                if (!agegroups.ToLower().Equals("null"))
+                {
+                    sql += " AgeGroups= '" + agegroups + "'";
+                }
+                else
+                {
+                    sql += " AgeGroups IS NULL";
+                }
+                TargetGroup Target = await _db.TargetGroups.FromSqlRaw(sql).FirstOrDefaultAsync();
+                // --END
+
+                // If it exists, add to Text-object. If not, create it and then add to Text-object
                 if (Target != null)
                 {
                     text.TargetGroup = Target;
@@ -108,9 +145,6 @@ namespace Bachelor_backend.DAL.Repositories
             }
             catch (Exception e)
             {
-                Debug.Write(e + " Textfeil");
-                Console.Write(e + " Textfeil");
-
                 _logger.LogInformation(e.Message);
                 return false;
             }
@@ -438,9 +472,15 @@ namespace Bachelor_backend.DAL.Repositories
             try
             {
                 Tag TagFromDb = await _db.Tags.FindAsync(tag.TagId);
+                if(TagFromDb != null) { 
                 TagFromDb.TagText = tag.TagText;
                 await _db.SaveChangesAsync();
                 return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch
             {
