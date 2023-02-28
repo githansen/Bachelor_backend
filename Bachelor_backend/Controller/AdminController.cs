@@ -103,7 +103,11 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> CreateText([FromBody] Text text)
         {
-            
+                if(!ModelState.IsValid)
+                {
+                return BadRequest(false);
+
+                }
                 bool success = await _textRep.CreateText(text);
                 if(success)
                 {

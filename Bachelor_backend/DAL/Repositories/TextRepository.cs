@@ -376,8 +376,6 @@ namespace Bachelor_backend.DAL.Repositories
             }
             catch(Exception ex)
             {
-                Debug.WriteLine(ex);
-                Console.WriteLine(ex);
                 return false;
             }
         }
@@ -427,7 +425,6 @@ namespace Bachelor_backend.DAL.Repositories
             var agegroups = JsonConvert.SerializeObject(text.TargetGroup.AgeGroups);
 
             string sql = "SELECT * FROM dbo.TargetGroups WHERE";
-            Debug.WriteLine($"{genders} {languages} {dialects} {agegroups}");
             if (!genders.ToLower().Equals("null"))
             {
                 sql += " Genders= '" + genders + "' AND";

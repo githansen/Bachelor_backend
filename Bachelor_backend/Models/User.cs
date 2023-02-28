@@ -12,11 +12,13 @@ namespace Bachelor_backend.Models
         [RegularExpression("^([a-zA-ZæøåÆØÅ]{4,16})$")]
         public string? NativeLanguage { get; set; }
 
-        [RegularExpression("^(\\d){2,2}-(\\d){2,2}|(\\d){2,2}[+]$")]
+        [RegularExpression("^(\\d){2,2}-(\\d){2,2}|(\\d){2,2}[+]{1,1}$")]
         public string? AgeGroup { get; set; }
         
         [RegularExpression("^([a-zA-ZæøåÆØÅ]{4,16})$")]
         public string? Dialect { get; set; }
+
+        [RegularExpression("^(mann|kvinne|annet|Mann|Kvinne|Annet)$")]
         public string? Gender { get; set; }
     }
 }
