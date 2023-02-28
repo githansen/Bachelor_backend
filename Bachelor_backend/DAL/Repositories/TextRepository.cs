@@ -163,25 +163,37 @@ namespace Bachelor_backend.DAL.Repositories
             // Finds lists of texts with a target group that fits the user requesting text
             try
             {
-                var liste = await _db.Texts.Where(t =>
-                user.Gender != null && t.TargetUser.Genders.Contains(user.Gender) &&
-                user.NativeLanguage != null && t.TargetUser.Languages.Contains(user.NativeLanguage) &&
-                user.Dialect != null && t.TargetUser.Dialects.Contains(user.Dialect) &&
-                user.AgeGroup != null && t.TargetUser.AgeGroups.Contains(user.AgeGroup)
+               /* var liste = await _db.Texts.Where(t =>
+                t.TargetUser != null &&
+                (user.Gender == null || t.TargetUser.Genders.Contains(user.Gender)) &&
+                (user.NativeLanguage == null || t.TargetUser.Languages.Contains(user.NativeLanguage)) &&
+                (user.Dialect == null || t.TargetUser.Dialects.Contains(user.Dialect)) &&
+                (user.AgeGroup == null || t.TargetUser.AgeGroups.Contains(user.AgeGroup))
                 ).Select(t => new Text()
                 {
                     TextId = t.TextId,
                     TextText = t.TextText,
                     TargetUser = t.TargetUser
                 }).ToListAsync();
-                if (liste.Count > 0)
+               */
+                Debug.WriteLine($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetUsers WHERE dbo.Texts.TargetUserTargetid = dbo.TargetUsers.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%')");
+
+                var l = await _db.Texts.FromSqlRaw($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetUsers WHERE dbo.Texts.TargetUserTargetid = dbo.TargetUsers.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%')"
+                   ).Select(t => new Text()
+                   {
+                       TextId = t.TextId,
+                       TextText = t.TextText,
+                       TargetUser= t.TargetUser
+                   }).ToListAsync();
+                Debug.WriteLine(l.Count);
+                if (l.Count > 0)
                 {
-                    return GetRandom(liste);
+                    return GetRandom(l);
                 }
             }
-            catch
+            catch(Exception e)
             {
-                Debug.WriteLine("HER");
+                Debug.WriteLine(e);
                 return null;
             }
 
@@ -195,7 +207,6 @@ namespace Bachelor_backend.DAL.Repositories
                         TextText = t.TextText,
                         Active = t.Active,
                         TargetUser = t.TargetUser
-
                     }).ToListAsync();
 
                 return GetRandom(liste2);

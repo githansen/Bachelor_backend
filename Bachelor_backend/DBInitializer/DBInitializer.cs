@@ -25,6 +25,9 @@ namespace Bachelor_backend.DBInitializer
 
             }       
                if(_db.Texts.Count() > 0) { return; }
+
+
+
             string CurrentDirectory = Directory.GetCurrentDirectory();
             Console.Write(Directory.GetCurrentDirectory());
             StreamReader reader = null;

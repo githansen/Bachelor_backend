@@ -11,8 +11,6 @@ namespace Bachelor_backend.Models
         
         [RegularExpression("^([a-zA-ZæøåÆØÅ]{4,16})$")]
         public string? NativeLanguage { get; set; }
-        
-        [RegularExpression(@"^([1-5]{1})$")]
         public string? AgeGroup { get; set; }
         
         [RegularExpression("^([a-zA-ZæøåÆØÅ]{4,16})$")]
