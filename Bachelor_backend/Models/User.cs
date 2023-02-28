@@ -9,9 +9,6 @@ namespace Bachelor_backend.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
         
-        [RegularExpression("^()$")] //User is not allowed to change type
-        public string? Type { get; set; }//TargetUser and RealUser
-        
         [RegularExpression("^([a-zA-ZæøåÆØÅ]{4,16})$")]
         public string? NativeLanguage { get; set; }
         

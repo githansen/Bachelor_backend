@@ -159,24 +159,21 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<Text> GetText(User user)
         {
-            var NativeLanguage = user.NativeLanguage;
-            var AgeGroup = user.AgeGroup;
-            var Dialect = user.Dialect;
-            var target = "Target";
-            var userid = user.UserId;
+
             // Finds lists of texts with a target group that fits the user requesting text
             try
             {
-                var liste = await _db.Texts
-                    .FromSql(
-                    $"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetUsers WHERE Active=1 AND dbo.Texts.TargetUserTargetId = dbo.TargetUsers.TargetId AND dbo.Texts.TextId NOT IN(SELECT dbo.Audiofiles.TextId from dbo.Audiofiles WHERE dbo.Texts.TextId = dbo.Audiofiles.TextId AND dbo.Audiofiles.UserId ={userid}) AND (dbo.TargetUsers.Genders LIKE '%{user.Gender}%') AND (dbo.TargetUsers.Languages LIKE '%{user.NativeLanguage}%') AND (dbo.TargetUsers.Dialects={user.Dialect}) AND (dbo.TargetUsers.AgeGroups={user.AgeGroup}"
-                    )
-                    .Select(t => new Text
-                    {
-                        TextId = t.TextId,
-                        TextText = t.TextText,
-
-                    }).ToListAsync();
+                var liste = await _db.Texts.Where(t =>
+                user.Gender != null && t.TargetUser.Genders.Contains(user.Gender) &&
+                user.NativeLanguage != null && t.TargetUser.Languages.Contains(user.NativeLanguage) &&
+                user.Dialect != null && t.TargetUser.Dialects.Contains(user.Dialect) &&
+                user.AgeGroup != null && t.TargetUser.AgeGroups.Contains(user.AgeGroup)
+                ).Select(t => new Text()
+                {
+                    TextId = t.TextId,
+                    TextText = t.TextText,
+                    TargetUser = t.TargetUser
+                }).ToListAsync();
                 if (liste.Count > 0)
                 {
                     return GetRandom(liste);
@@ -184,17 +181,20 @@ namespace Bachelor_backend.DAL.Repositories
             }
             catch
             {
+                Debug.WriteLine("HER");
                 return null;
             }
 
             try
             {
                 // Gets all active texts
-                var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.Texts WHERE dbo.Texts.Active = 1 AND dbo.Texts.TextId NOT IN(SELECT dbo.Audiofiles.TextId from dbo.Audiofiles WHERE dbo.Texts.TextId = dbo.Audiofiles.TextId AND dbo.Audiofiles.UserId ={userid})").Select(t =>
+                var liste2 = await _db.Texts.Select(t => 
                     new Text
                     {
                         TextId = t.TextId,
                         TextText = t.TextText,
+                        Active = t.Active,
+                        TargetUser = t.TargetUser
 
                     }).ToListAsync();
 

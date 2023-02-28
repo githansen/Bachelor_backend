@@ -103,8 +103,7 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> CreateText([FromBody] Text text)
         {
-            if (ModelState.IsValid)
-            {
+            
                 bool success = await _textRep.CreateText(text);
                 if(success)
                 {
@@ -112,9 +111,9 @@ namespace Bachelor_backend.Controller
                 }
                 
                 return StatusCode(StatusCodes.Status500InternalServerError, false);
-              }
+              
 
-            return BadRequest("Fault in input");
+        
         }
 
 
