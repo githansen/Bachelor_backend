@@ -78,7 +78,6 @@ namespace Bachelor_backend.DBInitializer
                 var line = reader.ReadLine();
                 var user = new User()
                 {
-                    Type = "RealUser",
                     NativeLanguage= line.Split()[1],
                     AgeGroup = line.Split()[0],
                 };

@@ -218,7 +218,6 @@ namespace Bachelor_backend.DAL.Repositories
             var ageGroups = new List<string> { "18-29", "30-39", "40-49", "50-59", "60+" };
             
             user.AgeGroup = ageGroups[int.Parse(user.AgeGroup) - 1];
-            user.Type = "RealUser";
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
             return user;
@@ -301,7 +300,7 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                int total = await _db.Users.Where(u => u.Type != "Target").CountAsync();
+                int total = await _db.Users.CountAsync();
                 return total;
             }
             catch
@@ -335,7 +334,7 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                List<User> list = await _db.Users.Where(t => t.Type == "RealUser").ToListAsync();
+                List<User> list = await _db.Users.ToListAsync();
                 return list;
             }
             catch
