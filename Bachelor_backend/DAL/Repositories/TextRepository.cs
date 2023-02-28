@@ -163,18 +163,16 @@ namespace Bachelor_backend.DAL.Repositories
             // Finds lists of texts with a target group that fits the user requesting text
             try
             {
-
-                Debug.WriteLine($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetGroups WHERE dbo.Texts.TargetUserTargetid = dbo.TargetGroups.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%')");
-                var l = await _db.Texts.FromSqlRaw($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetGroups WHERE dbo.Texts.TargetGroupTargetid = dbo.TargetGroups.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%')"
+                var liste = await _db.Texts.FromSqlRaw($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetGroups WHERE dbo.Texts.TargetGroupTargetid = dbo.TargetGroups.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%') AND TextId NOT IN (SELECT TextId from dbo.Audiofiles WHERE UserId = {user.UserId})"
                    ).Select(t => new Text()
                    {
                        TextId = t.TextId,
                        TextText = t.TextText,
                        TargetGroup = t.TargetGroup
                    }).ToListAsync();
-                if (l.Count > 0)
+                if (liste.Count > 0)
                 {
-                    return GetRandom(l);
+                    return GetRandom(liste);
                 }
             }
             catch(Exception e)
