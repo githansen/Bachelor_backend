@@ -113,10 +113,7 @@ namespace Bachelor_backend.DAL.Repositories
                     TextText = t.TextText,
                     Tags = t.Tags.ToList(),
                     Active = t.Active,
-                    TargetGenders = t.TargetGenders,
-                    TargetAgeGroups = t.TargetAgeGroups,
-                    TargetDialects = t.TargetDialects,
-                    TargetLanguages = t.TargetLanguages
+                    TargetUser = t.TargetUser
                 }).ToListAsync();
 
                 return texts;
@@ -291,10 +288,7 @@ namespace Bachelor_backend.DAL.Repositories
                     Tags = t.Tags,
                     TextText = t.TextText,
                     Active = t.Active,
-                   TargetGenders = t.TargetGenders,
-                   TargetAgeGroups = t.TargetAgeGroups,
-                   TargetDialects = t.TargetDialects,
-                   TargetLanguages = t.TargetLanguages
+                    TargetUser = t.TargetUser
                 }).FirstOrDefault();
                 return text;
             }
@@ -335,10 +329,7 @@ namespace Bachelor_backend.DAL.Repositories
 
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
-                textInDB.TargetLanguages = text.TargetLanguages;
-                textInDB.TargetGenders = text.TargetGenders;
-                textInDB.TargetAgeGroups = text.TargetAgeGroups;
-                textInDB.TargetDialects = text.TargetDialects;
+                textInDB.TargetUser = text.TargetUser;
                 textInDB.TextText = text.TextText;
                 textInDB.Active= text.Active;
                 textInDB.Tags = new List<Tag>();

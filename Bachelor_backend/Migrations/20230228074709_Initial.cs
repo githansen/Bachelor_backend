@@ -25,21 +25,19 @@ namespace Bachelorbackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Texts",
+                name: "TargetUsers",
                 columns: table => new
                 {
-                    TextId = table.Column<int>(type: "int", nullable: false)
+                    Targetid = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TextText = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TargetGenders = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TargetLanguages = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TargetDialects = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TargetAgeGroups = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Active = table.Column<bool>(type: "bit", nullable: false)
+                    Genders = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Languages = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Dialects = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgeGroups = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Texts", x => x.TextId);
+                    table.PrimaryKey("PK_TargetUsers", x => x.Targetid);
                 });
 
             migrationBuilder.CreateTable(
@@ -60,27 +58,23 @@ namespace Bachelorbackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TagsForTexts",
+                name: "Texts",
                 columns: table => new
                 {
-                    TagsTagId = table.Column<int>(type: "int", nullable: false),
-                    TextsTextId = table.Column<int>(type: "int", nullable: false)
+                    TextId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TextText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TargetUserTargetid = table.Column<int>(type: "int", nullable: true),
+                    Active = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TagsForTexts", x => new { x.TagsTagId, x.TextsTextId });
+                    table.PrimaryKey("PK_Texts", x => x.TextId);
                     table.ForeignKey(
-                        name: "FK_TagsForTexts_Tags_TagsTagId",
-                        column: x => x.TagsTagId,
-                        principalTable: "Tags",
-                        principalColumn: "TagId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_TagsForTexts_Texts_TextsTextId",
-                        column: x => x.TextsTextId,
-                        principalTable: "Texts",
-                        principalColumn: "TextId",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Texts_TargetUsers_TargetUserTargetid",
+                        column: x => x.TargetUserTargetid,
+                        principalTable: "TargetUsers",
+                        principalColumn: "Targetid");
                 });
 
             migrationBuilder.CreateTable(
@@ -107,6 +101,30 @@ namespace Bachelorbackend.Migrations
                         principalColumn: "UserId");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TagsForTexts",
+                columns: table => new
+                {
+                    TagsTagId = table.Column<int>(type: "int", nullable: false),
+                    TextsTextId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TagsForTexts", x => new { x.TagsTagId, x.TextsTextId });
+                    table.ForeignKey(
+                        name: "FK_TagsForTexts_Tags_TagsTagId",
+                        column: x => x.TagsTagId,
+                        principalTable: "Tags",
+                        principalColumn: "TagId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TagsForTexts_Texts_TextsTextId",
+                        column: x => x.TextsTextId,
+                        principalTable: "Texts",
+                        principalColumn: "TextId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Audiofiles_TextId",
                 table: "Audiofiles",
@@ -121,6 +139,11 @@ namespace Bachelorbackend.Migrations
                 name: "IX_TagsForTexts_TextsTextId",
                 table: "TagsForTexts",
                 column: "TextsTextId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Texts_TargetUserTargetid",
+                table: "Texts",
+                column: "TargetUserTargetid");
         }
 
         /// <inheritdoc />
@@ -140,6 +163,9 @@ namespace Bachelorbackend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Texts");
+
+            migrationBuilder.DropTable(
+                name: "TargetUsers");
         }
     }
 }

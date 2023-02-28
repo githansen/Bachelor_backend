@@ -44,7 +44,11 @@ namespace Bachelor_backend.DBInitializer
                 _db.Tags.Add(tag);
                 _db.SaveChanges();
             }
-
+            TargetUser t = new TargetUser()
+            {
+                Genders = new List<string> { "Mann", "Kvinne" },
+                AgeGroups = new List<string> { "18-29", "29-38"}
+            };
             string filepathTexts = System.IO.Path.Combine(CurrentDirectory, @"TestData\Texts.txt"); ;
             
             reader = new StreamReader(filepathTexts);
@@ -61,7 +65,7 @@ namespace Bachelor_backend.DBInitializer
                     };
                 if(r.Next(0,2) == 1)
                 {
-                    text.TargetGenders = new List<string> { "Mann", "Kvinne" };
+                    text.TargetUser = t;
                 }
                 _db.Texts.Add(text);
                 _db.SaveChanges();

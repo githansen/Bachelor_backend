@@ -13,10 +13,7 @@ namespace Bachelor_backend.Models
         public string TextText { get; set; }
         public virtual List<Tag> Tags { get; set; }
 
-        public virtual List<string>? TargetGenders { get; set; }
-        public virtual List<string>? TargetLanguages { get; set; }
-        public virtual List<string>? TargetDialects { get; set; }
-        public virtual List<string>? TargetAgeGroups { get; set; }
+        public TargetUser? TargetUser { get; set; }
         public bool Active { get; set; }
     }
 }

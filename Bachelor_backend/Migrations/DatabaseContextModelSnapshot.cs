@@ -63,6 +63,31 @@ namespace Bachelorbackend.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("Bachelor_backend.Models.TargetUser", b =>
+                {
+                    b.Property<int>("Targetid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Targetid"));
+
+                    b.Property<string>("AgeGroups")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dialects")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Genders")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Languages")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Targetid");
+
+                    b.ToTable("TargetUsers");
+                });
+
             modelBuilder.Entity("Bachelor_backend.Models.Text", b =>
                 {
                     b.Property<int>("TextId")
@@ -74,23 +99,16 @@ namespace Bachelorbackend.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
-                    b.Property<string>("TargetAgeGroups")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TargetDialects")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TargetGenders")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TargetLanguages")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("TargetUserTargetid")
+                        .HasColumnType("int");
 
                     b.Property<string>("TextText")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("TextId");
+
+                    b.HasIndex("TargetUserTargetid");
 
                     b.ToTable("Texts");
                 });
@@ -151,6 +169,15 @@ namespace Bachelorbackend.Migrations
                     b.Navigation("Text");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bachelor_backend.Models.Text", b =>
+                {
+                    b.HasOne("Bachelor_backend.Models.TargetUser", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserTargetid");
+
+                    b.Navigation("TargetUser");
                 });
 
             modelBuilder.Entity("TagText", b =>
