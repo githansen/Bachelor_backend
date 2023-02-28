@@ -6,6 +6,7 @@ using Bachelor_backend.Models.BlobModels;
 
 namespace Bachelor_backend.DAL.Repositories
 {
+
     public class AzureStorage : IAzureStorage
     {
         private readonly string _storageConnectionString;

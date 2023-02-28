@@ -2,6 +2,7 @@
 
 namespace Bachelor_backend.DAL.Repositories
 {
+
     public interface IAzureStorage
     {
         Task<BlobResponseDto> UploadAsync(IFormFile file, string newFileName);
