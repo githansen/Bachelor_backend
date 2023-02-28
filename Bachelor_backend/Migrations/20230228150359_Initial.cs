@@ -25,12 +25,27 @@ namespace Bachelorbackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TargetGroups",
+                columns: table => new
+                {
+                    Targetid = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Genders = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Languages = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Dialects = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgeGroups = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TargetGroups", x => x.Targetid);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NativeLanguage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AgeGroup = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Dialect = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -48,17 +63,17 @@ namespace Bachelorbackend.Migrations
                     TextId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TextText = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true),
+                    TargetGroupTargetid = table.Column<int>(type: "int", nullable: true),
                     Active = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Texts", x => x.TextId);
                     table.ForeignKey(
-                        name: "FK_Texts_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "UserId");
+                        name: "FK_Texts_TargetGroups_TargetGroupTargetid",
+                        column: x => x.TargetGroupTargetid,
+                        principalTable: "TargetGroups",
+                        principalColumn: "Targetid");
                 });
 
             migrationBuilder.CreateTable(
@@ -125,9 +140,9 @@ namespace Bachelorbackend.Migrations
                 column: "TextsTextId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Texts_UserId",
+                name: "IX_Texts_TargetGroupTargetid",
                 table: "Texts",
-                column: "UserId");
+                column: "TargetGroupTargetid");
         }
 
         /// <inheritdoc />
@@ -140,13 +155,16 @@ namespace Bachelorbackend.Migrations
                 name: "TagsForTexts");
 
             migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
                 name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "Texts");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "TargetGroups");
         }
     }
 }

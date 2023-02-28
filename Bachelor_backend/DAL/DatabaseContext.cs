@@ -1,5 +1,7 @@
 ﻿using Bachelor_backend.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json;
 
 namespace Bachelor_backend.DAL
 {
@@ -14,7 +16,7 @@ namespace Bachelor_backend.DAL
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Text> Texts { get; set; }
         public DbSet<Audiofile> Audiofiles { get; set; }
-
+        public DbSet<TargetGroup> TargetGroups { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -22,6 +24,31 @@ namespace Bachelor_backend.DAL
                  .HasMany(t => t.Tags)
                  .WithMany(t => t.Texts)
                  .UsingEntity(t => t.ToTable("TagsForTexts"));
+
+
+            modelBuilder.Entity<TargetGroup>()
+                .Property(x => x.Genders)
+                .HasConversion(new ValueConverter<List<string>?, string>(
+                   v => JsonConvert.SerializeObject(v), // Convert to string for persistence
+            v => JsonConvert.DeserializeObject<List<string>>(v))); // Convert to List<String> for use
+
+            modelBuilder.Entity<TargetGroup>()
+               .Property(x => x.AgeGroups)
+               .HasConversion(new ValueConverter<List<string>?, string>(
+                  v => JsonConvert.SerializeObject(v), // Convert to string for persistence
+           v => JsonConvert.DeserializeObject<List<string>>(v))); // Convert to List<String> for use
+            modelBuilder.Entity<TargetGroup>()
+               .Property(x => x.Dialects)
+               .HasConversion(new ValueConverter<List<string>?, string>(
+                  v => JsonConvert.SerializeObject(v), // Convert to string for persistence
+           v => JsonConvert.DeserializeObject<List<string>>(v))); // Convert to List<String> for use
+           
+            
+            modelBuilder.Entity<TargetGroup>()
+               .Property(x => x.Languages)
+               .HasConversion(new ValueConverter<List<string>?, string>(
+                  v => JsonConvert.SerializeObject(v), // Convert to string for persistence
+           v => JsonConvert.DeserializeObject<List<string>>(v))); // Convert to List<String> for use
 
         }
 

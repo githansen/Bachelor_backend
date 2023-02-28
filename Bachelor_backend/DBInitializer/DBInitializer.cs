@@ -25,6 +25,9 @@ namespace Bachelor_backend.DBInitializer
 
             }       
                if(_db.Texts.Count() > 0) { return; }
+
+
+
             string CurrentDirectory = Directory.GetCurrentDirectory();
             Console.Write(Directory.GetCurrentDirectory());
             StreamReader reader = null;
@@ -44,7 +47,11 @@ namespace Bachelor_backend.DBInitializer
                 _db.Tags.Add(tag);
                 _db.SaveChanges();
             }
-
+            TargetGroup t = new TargetGroup()
+            {
+                Genders = new List<string> { "Mann", "Kvinne" },
+                AgeGroups = new List<string> { "18-29", "29-38"}
+            };
             string filepathTexts = System.IO.Path.Combine(CurrentDirectory, @"TestData\Texts.txt"); ;
             
             reader = new StreamReader(filepathTexts);
@@ -61,7 +68,7 @@ namespace Bachelor_backend.DBInitializer
                     };
                 if(r.Next(0,2) == 1)
                 {
-                    text.TargetUser = new User() { Type="Target", AgeGroup = "18-28" };
+                    text.TargetGroup = t;
                 }
                 _db.Texts.Add(text);
                 _db.SaveChanges();
@@ -74,7 +81,6 @@ namespace Bachelor_backend.DBInitializer
                 var line = reader.ReadLine();
                 var user = new User()
                 {
-                    Type = "RealUser",
                     NativeLanguage= line.Split()[1],
                     AgeGroup = line.Split()[0],
                 };

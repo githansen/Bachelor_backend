@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Data;
+using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Bachelor_backend.DAL.Repositories
 {
@@ -39,6 +41,7 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<bool> CreateText(Text text)
         {
+          
             try
             {
                 //Creates tags if they don't exist
@@ -55,31 +58,63 @@ namespace Bachelor_backend.DAL.Repositories
                         {
                             tagList[i] = tagInDb;
                         }
+                        else
+                        {
+                            _db.Tags.Add(tagList[i]);
+                            await _db.SaveChangesAsync();
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
                 _logger.LogInformation(e.Message);
+                Debug.Write(e + " TagFeil");
+                Console.Write(e + " TagFeil");
+
                 return false;
             }
 
+           
             //Add text to db
             try
             {
-                var user = text.TargetUser;
-                user.Type = "TargetUser";
-                await _db.Users.AddAsync(user);
+                var Target = await _db.TargetGroups
+                   .Where(t => t.Genders == text.TargetGroup.Genders
+                   &&
+              t.Languages == text.TargetGroup.Languages
+                   &&
+               t.Dialects == text.TargetGroup.Dialects
+                   &&
+               t.AgeGroups == text.TargetGroup.AgeGroups
+               ).FirstOrDefaultAsync();
+                if (Target != null)
+                {
+                    text.TargetGroup = Target;
+                }
+                else
+                {
+                    text.TargetGroup = new TargetGroup()
+                    {
+                        Genders = text.TargetGroup.Genders,
+                        Languages = text.TargetGroup.Languages,
+                        Dialects = text.TargetGroup.Dialects,
+                        AgeGroups = text.TargetGroup.AgeGroups
+                    };
+                }
                 await _db.Texts.AddAsync(text);
-
                 await _db.SaveChangesAsync();
                 return true;
             }
             catch (Exception e)
             {
+                Debug.Write(e + " Textfeil");
+                Console.Write(e + " Textfeil");
+
                 _logger.LogInformation(e.Message);
                 return false;
             }
+          
         }
 
         public async Task<List<Tag>> GetAllTags()
@@ -110,7 +145,7 @@ namespace Bachelor_backend.DAL.Repositories
                     TextText = t.TextText,
                     Tags = t.Tags.ToList(),
                     Active = t.Active,
-                    TargetUser = t.TargetUser
+                    TargetGroup = t.TargetGroup
                 }).ToListAsync();
 
                 return texts;
@@ -124,42 +159,38 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<Text> GetText(User user)
         {
-            var NativeLanguage = user.NativeLanguage;
-            var AgeGroup = user.AgeGroup;
-            var Dialect = user.Dialect;
-            var target = "Target";
-            var userid = user.UserId;
+
             // Finds lists of texts with a target group that fits the user requesting text
             try
             {
-                var liste = await _db.Texts
-                    .FromSql(
-                        $"SELECT dbo.Texts.* FROM dbo.Users, dbo.Texts WHERE dbo.Texts.Active=1 AND dbo.Users.UserId = dbo.Texts.UserId AND dbo.Texts.UserId is not NULL AND dbo.Users.Type ={target} AND (dbo.Users.NativeLanguage is NULL or dbo.Users.NativeLanguage={NativeLanguage}) AND (dbo.Users.AgeGroup is NULL or dbo.Users.AgeGroup={AgeGroup}) AND (dbo.Users.Dialect is NULL or dbo.Users.Dialect={Dialect}) AND dbo.Texts.TextId NOT IN(SELECT dbo.Audiofiles.TextId from dbo.Audiofiles WHERE dbo.Audiofiles.UserId ={userid})")
-                    .Select(t => new Text
-                    {
-                        TextId = t.TextId,
-                        TextText = t.TextText,
-
-                    }).ToListAsync();
+                var liste = await _db.Texts.FromSqlRaw($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetGroups WHERE dbo.Texts.TargetGroupTargetid = dbo.TargetGroups.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%') AND TextId NOT IN (SELECT TextId from dbo.Audiofiles WHERE UserId = {user.UserId})"
+                   ).Select(t => new Text()
+                   {
+                       TextId = t.TextId,
+                       TextText = t.TextText,
+                       TargetGroup = t.TargetGroup
+                   }).ToListAsync();
                 if (liste.Count > 0)
                 {
                     return GetRandom(liste);
                 }
             }
-            catch
+            catch(Exception e)
             {
+                Debug.WriteLine(e);
                 return null;
             }
 
             try
             {
                 // Gets all active texts
-                var liste2 = await _db.Texts.FromSql($"SELECT * FROM dbo.Texts WHERE dbo.Texts.Active = 1 AND dbo.Texts.TextId NOT IN(SELECT dbo.Audiofiles.TextId from dbo.Audiofiles WHERE dbo.Texts.TextId = dbo.Audiofiles.TextId AND dbo.Audiofiles.UserId ={userid})").Select(t =>
+                var liste2 = await _db.Texts.Select(t => 
                     new Text
                     {
                         TextId = t.TextId,
                         TextText = t.TextText,
-
+                        Active = t.Active,
+                        TargetGroup = t.TargetGroup
                     }).ToListAsync();
 
                 return GetRandom(liste2);
@@ -178,11 +209,6 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<User> RegisterUserInfo(User user)
         {
-            //List of age groups
-            var ageGroups = new List<string> { "18-29", "30-39", "40-49", "50-59", "60+" };
-            
-            user.AgeGroup = ageGroups[int.Parse(user.AgeGroup) - 1];
-            user.Type = "RealUser";
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
             return user;
@@ -265,7 +291,7 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                int total = await _db.Users.Where(u => u.Type != "Target").CountAsync();
+                int total = await _db.Users.CountAsync();
                 return total;
             }
             catch
@@ -284,9 +310,8 @@ namespace Bachelor_backend.DAL.Repositories
                     TextId= t.TextId,
                     Tags = t.Tags,
                     TextText = t.TextText,
-                    TargetUser = t.TargetUser,
                     Active = t.Active,
-                    UserId = t.UserId
+                    TargetGroup = t.TargetGroup
                 }).FirstOrDefault();
                 return text;
             }
@@ -300,7 +325,7 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                List<User> list = await _db.Users.Where(t => t.Type == "RealUser").ToListAsync();
+                List<User> list = await _db.Users.ToListAsync();
                 return list;
             }
             catch
@@ -327,9 +352,32 @@ namespace Bachelor_backend.DAL.Repositories
 
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
+
+                var Target = await _db.TargetGroups
+                    .Where(t => t.Genders == text.TargetGroup.Genders
+                    &&
+               t.Languages == text.TargetGroup.Languages
+                    &&
+                t.Dialects == text.TargetGroup.Dialects
+                    &&
+                t.AgeGroups == text.TargetGroup.AgeGroups
+                ).FirstOrDefaultAsync();
+
+                if (Target != null)
+                {
+                    textInDB.TargetGroup = Target;
+                }
+                else
+                {
+                    textInDB.TargetGroup = new TargetGroup()
+                    {
+                        Genders = text.TargetGroup.Genders,
+                        Languages = text.TargetGroup.Languages,
+                        Dialects = text.TargetGroup.Dialects,
+                        AgeGroups = text.TargetGroup.AgeGroups
+                    };
+                }
                 textInDB.TextText = text.TextText;
-                textInDB.TargetUser = text.TargetUser;
-                textInDB.TargetUser.Type = "Target";
                 textInDB.Active= text.Active;
                 textInDB.Tags = new List<Tag>();
                 string sql = "DELETE FROM dbo.TagsForTexts WHERE TextsTextId="+text.TextId;
