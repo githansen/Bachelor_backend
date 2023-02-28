@@ -47,7 +47,7 @@ namespace Bachelor_backend.DBInitializer
                 _db.Tags.Add(tag);
                 _db.SaveChanges();
             }
-            TargetUser t = new TargetUser()
+            TargetGroup t = new TargetGroup()
             {
                 Genders = new List<string> { "Mann", "Kvinne" },
                 AgeGroups = new List<string> { "18-29", "29-38"}
@@ -68,7 +68,7 @@ namespace Bachelor_backend.DBInitializer
                     };
                 if(r.Next(0,2) == 1)
                 {
-                    text.TargetUser = t;
+                    text.TargetGroup = t;
                 }
                 _db.Texts.Add(text);
                 _db.SaveChanges();

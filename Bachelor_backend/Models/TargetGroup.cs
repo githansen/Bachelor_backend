@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bachelor_backend.Models
 {
-    public class TargetUser
+    public class TargetGroup
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bachelorbackend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230228074709_Initial")]
+    [Migration("20230228150359_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -66,7 +66,7 @@ namespace Bachelorbackend.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("Bachelor_backend.Models.TargetUser", b =>
+            modelBuilder.Entity("Bachelor_backend.Models.TargetGroup", b =>
                 {
                     b.Property<int>("Targetid")
                         .ValueGeneratedOnAdd()
@@ -88,7 +88,7 @@ namespace Bachelorbackend.Migrations
 
                     b.HasKey("Targetid");
 
-                    b.ToTable("TargetUsers");
+                    b.ToTable("TargetGroups");
                 });
 
             modelBuilder.Entity("Bachelor_backend.Models.Text", b =>
@@ -102,7 +102,7 @@ namespace Bachelorbackend.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("TargetUserTargetid")
+                    b.Property<int?>("TargetGroupTargetid")
                         .HasColumnType("int");
 
                     b.Property<string>("TextText")
@@ -111,7 +111,7 @@ namespace Bachelorbackend.Migrations
 
                     b.HasKey("TextId");
 
-                    b.HasIndex("TargetUserTargetid");
+                    b.HasIndex("TargetGroupTargetid");
 
                     b.ToTable("Texts");
                 });
@@ -134,9 +134,6 @@ namespace Bachelorbackend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NativeLanguage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId");
@@ -176,11 +173,11 @@ namespace Bachelorbackend.Migrations
 
             modelBuilder.Entity("Bachelor_backend.Models.Text", b =>
                 {
-                    b.HasOne("Bachelor_backend.Models.TargetUser", "TargetUser")
+                    b.HasOne("Bachelor_backend.Models.TargetGroup", "TargetGroup")
                         .WithMany()
-                        .HasForeignKey("TargetUserTargetid");
+                        .HasForeignKey("TargetGroupTargetid");
 
-                    b.Navigation("TargetUser");
+                    b.Navigation("TargetGroup");
                 });
 
             modelBuilder.Entity("TagText", b =>

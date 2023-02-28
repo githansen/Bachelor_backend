@@ -79,27 +79,27 @@ namespace Bachelor_backend.DAL.Repositories
             //Add text to db
             try
             {
-                var Target = await _db.TargetUsers
-                   .Where(t => t.Genders == text.TargetUser.Genders
+                var Target = await _db.TargetGroups
+                   .Where(t => t.Genders == text.TargetGroup.Genders
                    &&
-              t.Languages == text.TargetUser.Languages
+              t.Languages == text.TargetGroup.Languages
                    &&
-               t.Dialects == text.TargetUser.Dialects
+               t.Dialects == text.TargetGroup.Dialects
                    &&
-               t.AgeGroups == text.TargetUser.AgeGroups
+               t.AgeGroups == text.TargetGroup.AgeGroups
                ).FirstOrDefaultAsync();
                 if (Target != null)
                 {
-                    text.TargetUser = Target;
+                    text.TargetGroup = Target;
                 }
                 else
                 {
-                    text.TargetUser = new TargetUser()
+                    text.TargetGroup = new TargetGroup()
                     {
-                        Genders = text.TargetUser.Genders,
-                        Languages = text.TargetUser.Languages,
-                        Dialects = text.TargetUser.Dialects,
-                        AgeGroups = text.TargetUser.AgeGroups
+                        Genders = text.TargetGroup.Genders,
+                        Languages = text.TargetGroup.Languages,
+                        Dialects = text.TargetGroup.Dialects,
+                        AgeGroups = text.TargetGroup.AgeGroups
                     };
                 }
                 await _db.Texts.AddAsync(text);
@@ -145,7 +145,7 @@ namespace Bachelor_backend.DAL.Repositories
                     TextText = t.TextText,
                     Tags = t.Tags.ToList(),
                     Active = t.Active,
-                    TargetUser = t.TargetUser
+                    TargetGroup = t.TargetGroup
                 }).ToListAsync();
 
                 return texts;
@@ -163,29 +163,15 @@ namespace Bachelor_backend.DAL.Repositories
             // Finds lists of texts with a target group that fits the user requesting text
             try
             {
-               /* var liste = await _db.Texts.Where(t =>
-                t.TargetUser != null &&
-                (user.Gender == null || t.TargetUser.Genders.Contains(user.Gender)) &&
-                (user.NativeLanguage == null || t.TargetUser.Languages.Contains(user.NativeLanguage)) &&
-                (user.Dialect == null || t.TargetUser.Dialects.Contains(user.Dialect)) &&
-                (user.AgeGroup == null || t.TargetUser.AgeGroups.Contains(user.AgeGroup))
-                ).Select(t => new Text()
-                {
-                    TextId = t.TextId,
-                    TextText = t.TextText,
-                    TargetUser = t.TargetUser
-                }).ToListAsync();
-               */
-                Debug.WriteLine($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetUsers WHERE dbo.Texts.TargetUserTargetid = dbo.TargetUsers.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%')");
 
-                var l = await _db.Texts.FromSqlRaw($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetUsers WHERE dbo.Texts.TargetUserTargetid = dbo.TargetUsers.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%')"
+                Debug.WriteLine($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetGroups WHERE dbo.Texts.TargetUserTargetid = dbo.TargetGroups.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%')");
+                var l = await _db.Texts.FromSqlRaw($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetGroups WHERE dbo.Texts.TargetGroupTargetid = dbo.TargetGroups.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%')"
                    ).Select(t => new Text()
                    {
                        TextId = t.TextId,
                        TextText = t.TextText,
-                       TargetUser= t.TargetUser
+                       TargetGroup = t.TargetGroup
                    }).ToListAsync();
-                Debug.WriteLine(l.Count);
                 if (l.Count > 0)
                 {
                     return GetRandom(l);
@@ -206,7 +192,7 @@ namespace Bachelor_backend.DAL.Repositories
                         TextId = t.TextId,
                         TextText = t.TextText,
                         Active = t.Active,
-                        TargetUser = t.TargetUser
+                        TargetGroup = t.TargetGroup
                     }).ToListAsync();
 
                 return GetRandom(liste2);
@@ -225,10 +211,6 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<User> RegisterUserInfo(User user)
         {
-            //List of age groups
-            var ageGroups = new List<string> { "18-29", "30-39", "40-49", "50-59", "60+" };
-            
-            user.AgeGroup = ageGroups[int.Parse(user.AgeGroup) - 1];
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
             return user;
@@ -331,7 +313,7 @@ namespace Bachelor_backend.DAL.Repositories
                     Tags = t.Tags,
                     TextText = t.TextText,
                     Active = t.Active,
-                    TargetUser = t.TargetUser
+                    TargetGroup = t.TargetGroup
                 }).FirstOrDefault();
                 return text;
             }
@@ -373,28 +355,28 @@ namespace Bachelor_backend.DAL.Repositories
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
 
-                var Target = await _db.TargetUsers
-                    .Where(t => t.Genders == text.TargetUser.Genders
+                var Target = await _db.TargetGroups
+                    .Where(t => t.Genders == text.TargetGroup.Genders
                     &&
-               t.Languages == text.TargetUser.Languages
+               t.Languages == text.TargetGroup.Languages
                     &&
-                t.Dialects == text.TargetUser.Dialects
+                t.Dialects == text.TargetGroup.Dialects
                     &&
-                t.AgeGroups == text.TargetUser.AgeGroups
+                t.AgeGroups == text.TargetGroup.AgeGroups
                 ).FirstOrDefaultAsync();
 
                 if (Target != null)
                 {
-                    textInDB.TargetUser = Target;
+                    textInDB.TargetGroup = Target;
                 }
                 else
                 {
-                    textInDB.TargetUser = new TargetUser()
+                    textInDB.TargetGroup = new TargetGroup()
                     {
-                        Genders = text.TargetUser.Genders,
-                        Languages = text.TargetUser.Languages,
-                        Dialects = text.TargetUser.Dialects,
-                        AgeGroups = text.TargetUser.AgeGroups
+                        Genders = text.TargetGroup.Genders,
+                        Languages = text.TargetGroup.Languages,
+                        Dialects = text.TargetGroup.Dialects,
+                        AgeGroups = text.TargetGroup.AgeGroups
                     };
                 }
                 textInDB.TextText = text.TextText;
