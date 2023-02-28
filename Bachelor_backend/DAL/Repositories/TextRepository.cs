@@ -352,8 +352,15 @@ namespace Bachelor_backend.DAL.Repositories
 
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
+                Debug.WriteLine($"SELECT * FROM dbo.TargetGroups WHERE Genders = '{JsonConvert.SerializeObject(text.TargetGroup.Genders)}' AND Languages='{JsonConvert.SerializeObject(text.TargetGroup.Languages)}' AND Dialects='{JsonConvert.SerializeObject(text.TargetGroup.Dialects)}' AND AgeGroups='{JsonConvert.SerializeObject(text.TargetGroup.AgeGroups)}'");
+                TargetGroup target = await _db.TargetGroups.Where(t => t.Targetid == 1).FirstOrDefaultAsync();
 
-        
+                if(target != null )
+                {
+                    textInDB.TargetGroup = target;
+                }
+                else
+                {
                     textInDB.TargetGroup = new TargetGroup()
                     {
                         Genders = text.TargetGroup.Genders,
@@ -361,7 +368,7 @@ namespace Bachelor_backend.DAL.Repositories
                         Dialects = text.TargetGroup.Dialects,
                         AgeGroups = text.TargetGroup.AgeGroups
                     };
-                
+                }
                 textInDB.TextText = text.TextText;
                 textInDB.Active= text.Active;
                 textInDB.Tags = new List<Tag>();
