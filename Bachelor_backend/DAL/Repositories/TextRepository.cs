@@ -353,22 +353,7 @@ namespace Bachelor_backend.DAL.Repositories
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
 
-                var Target = await _db.TargetGroups
-                    .Where(t => t.Genders == text.TargetGroup.Genders
-                    &&
-               t.Languages == text.TargetGroup.Languages
-                    &&
-                t.Dialects == text.TargetGroup.Dialects
-                    &&
-                t.AgeGroups == text.TargetGroup.AgeGroups
-                ).FirstOrDefaultAsync();
-
-                if (Target != null)
-                {
-                    textInDB.TargetGroup = Target;
-                }
-                else
-                {
+        
                     textInDB.TargetGroup = new TargetGroup()
                     {
                         Genders = text.TargetGroup.Genders,
@@ -376,7 +361,7 @@ namespace Bachelor_backend.DAL.Repositories
                         Dialects = text.TargetGroup.Dialects,
                         AgeGroups = text.TargetGroup.AgeGroups
                     };
-                }
+                
                 textInDB.TextText = text.TextText;
                 textInDB.Active= text.Active;
                 textInDB.Tags = new List<Tag>();
