@@ -252,8 +252,7 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                int total = _db.Tags.FromSql($"SELECT * FROM dbo.Tags WHERE TagId={TagId} AND TagId IN (SELECT TagsTagId FROM dbo.TagsForTexts)").Count();
-                Debug.WriteLine(total);
+                int total =  await _db.Tags.FromSql($"SELECT * FROM dbo.Tags WHERE TagId={TagId} AND TagId IN (SELECT TagsTagId FROM dbo.TagsForTexts)").CountAsync();
                 if(total > 0) 
                 {
                     return false;
@@ -394,7 +393,6 @@ namespace Bachelor_backend.DAL.Repositories
                 }
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
-                Debug.WriteLine(sql);
                 TargetGroup target = await _db.TargetGroups.FromSqlRaw(sql).FirstOrDefaultAsync();
                 if(target != null )
                 {
@@ -410,6 +408,7 @@ namespace Bachelor_backend.DAL.Repositories
                         AgeGroups = text.TargetGroup.AgeGroups
                     };
                 }
+
                 textInDB.TextText = text.TextText;
                 textInDB.Active= text.Active;
                 textInDB.Tags = new List<Tag>();
