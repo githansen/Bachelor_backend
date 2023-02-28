@@ -244,7 +244,7 @@ namespace Bachelor_backend.Controller
             }
             else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, null);
+                return BadRequest(null);
             }
 
         }
