@@ -349,12 +349,50 @@ namespace Bachelor_backend.DAL.Repositories
                 {
                     Tags = t.Tags,
                 }).FirstOrDefault();
+                
+                var genders = JsonConvert.SerializeObject(text.TargetGroup.Genders);
+                var languages = JsonConvert.SerializeObject(text.TargetGroup.Languages);
+                var dialects = JsonConvert.SerializeObject(text.TargetGroup.Dialects);
+                var agegroups = JsonConvert.SerializeObject(text.TargetGroup.AgeGroups);
 
+                string sql = "SELECT * FROM dbo.TargetGroups WHERE";
+                Debug.WriteLine($"{genders} {languages} {dialects} {agegroups}");
+                if(!genders.ToLower().Equals("null"))
+                {
+                    sql += " Genders= '" + genders + "' AND";
+                }
+                else
+                {
+                    sql += " Genders IS NULL AND";
+                }
+                if(!languages.ToLower().Equals("null"))
+                {
+                    sql += " Languages= '" + languages + "' AND";
+                }
+                else
+                {
+                    sql += " Languages IS NULL AND";
+                }
+                if(!dialects.ToLower().Equals("null"))
+                {
+                    sql += " Dialects= '" + dialects + "' AND";
+                }
+                else
+                {
+                    sql += " Dialects IS NULL AND";
+                }
+                if(!agegroups.ToLower().Equals("null"))
+                {
+                    sql += " AgeGroups= '" + agegroups + "'";
+                }
+                else
+                {
+                    sql += " AgeGroups IS NULL";
+                }
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
-                Debug.WriteLine($"SELECT * FROM dbo.TargetGroups WHERE Genders = '{JsonConvert.SerializeObject(text.TargetGroup.Genders)}' AND Languages='{JsonConvert.SerializeObject(text.TargetGroup.Languages)}' AND Dialects='{JsonConvert.SerializeObject(text.TargetGroup.Dialects)}' AND AgeGroups='{JsonConvert.SerializeObject(text.TargetGroup.AgeGroups)}'");
-                TargetGroup target = await _db.TargetGroups.Where(t => t.Targetid == 1).FirstOrDefaultAsync();
-
+                Debug.WriteLine(sql);
+                TargetGroup target = await _db.TargetGroups.FromSqlRaw(sql).FirstOrDefaultAsync();
                 if(target != null )
                 {
                     textInDB.TargetGroup = target;
@@ -372,7 +410,7 @@ namespace Bachelor_backend.DAL.Repositories
                 textInDB.TextText = text.TextText;
                 textInDB.Active= text.Active;
                 textInDB.Tags = new List<Tag>();
-                string sql = "DELETE FROM dbo.TagsForTexts WHERE TextsTextId="+text.TextId;
+                sql = "DELETE FROM dbo.TagsForTexts WHERE TextsTextId="+text.TextId;
                 _db.Database.ExecuteSqlRaw(sql);
                 if (text.Tags != null)
                 {
