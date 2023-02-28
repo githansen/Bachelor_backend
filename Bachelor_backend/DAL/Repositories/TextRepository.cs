@@ -58,6 +58,7 @@ namespace Bachelor_backend.DAL.Repositories
                         {
                             tagList[i] = tagInDb;
                         }
+                        // Creates the Tag if not
                         else
                         {
                             _db.Tags.Add(tagList[i]);
@@ -69,9 +70,6 @@ namespace Bachelor_backend.DAL.Repositories
             catch (Exception e)
             {
                 _logger.LogInformation(e.Message);
-                Debug.Write(e + " TagFeil");
-                Console.Write(e + " TagFeil");
-
                 return false;
             }
 
@@ -79,48 +77,7 @@ namespace Bachelor_backend.DAL.Repositories
             //Add text to db
             try
             {
-
-
-               //Check if TargetGroup already exists --START--
-                var genders = JsonConvert.SerializeObject(text.TargetGroup.Genders);
-                var languages = JsonConvert.SerializeObject(text.TargetGroup.Languages);
-                var dialects = JsonConvert.SerializeObject(text.TargetGroup.Dialects);
-                var agegroups = JsonConvert.SerializeObject(text.TargetGroup.AgeGroups);
-
-                string sql = "SELECT * FROM dbo.TargetGroups WHERE";
-                Debug.WriteLine($"{genders} {languages} {dialects} {agegroups}");
-                if (!genders.ToLower().Equals("null"))
-                {
-                    sql += " Genders= '" + genders + "' AND";
-                }
-                else
-                {
-                    sql += " Genders IS NULL AND";
-                }
-                if (!languages.ToLower().Equals("null"))
-                {
-                    sql += " Languages= '" + languages + "' AND";
-                }
-                else
-                {
-                    sql += " Languages IS NULL AND";
-                }
-                if (!dialects.ToLower().Equals("null"))
-                {
-                    sql += " Dialects= '" + dialects + "' AND";
-                }
-                else
-                {
-                    sql += " Dialects IS NULL AND";
-                }
-                if (!agegroups.ToLower().Equals("null"))
-                {
-                    sql += " AgeGroups= '" + agegroups + "'";
-                }
-                else
-                {
-                    sql += " AgeGroups IS NULL";
-                }
+                string sql = GenerateSql(text);
                 TargetGroup Target = await _db.TargetGroups.FromSqlRaw(sql).FirstOrDefaultAsync();
                 // --END
 
@@ -203,6 +160,8 @@ namespace Bachelor_backend.DAL.Repositories
                        TextId = t.TextId,
                        TextText = t.TextText,
                    }).ToListAsync();
+
+                //If text(s) were found, returns a random one from that list
                 if (liste.Count > 0)
                 {
                     return GetRandom(liste);
@@ -210,20 +169,19 @@ namespace Bachelor_backend.DAL.Repositories
             }
             catch(Exception e)
             {
-                Debug.WriteLine(e);
                 return null;
             }
 
             try
             {
-                // Gets all active texts
+                // Gets all active texts 
                 var liste2 = await _db.Texts.Select(t => 
                     new Text
                     {
                         TextId = t.TextId,
                         TextText = t.TextText,
                     }).ToListAsync();
-
+                // Returns random from list
                 return GetRandom(liste2);
             }
             catch
@@ -232,12 +190,7 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-        public Text GetRandom(List<Text> list)
-        {
-            Random r = new Random();
-            return list[r.Next(0, list.Count)];
-        }
-
+      
         public async Task<User> RegisterUserInfo(User user)
         {
             await _db.Users.AddAsync(user);
@@ -265,7 +218,7 @@ namespace Bachelor_backend.DAL.Repositories
             try
             {
                 int total = _db.Audiofiles
-                .Where(t => t.User.UserId == TextId).Count();
+                .Where(t => t.Text.TextId == TextId).Count();
                 if (total > 0)
                 {
                     return false;
@@ -385,46 +338,8 @@ namespace Bachelor_backend.DAL.Repositories
                 {
                     Tags = t.Tags,
                 }).FirstOrDefault();
-                
-                var genders = JsonConvert.SerializeObject(text.TargetGroup.Genders);
-                var languages = JsonConvert.SerializeObject(text.TargetGroup.Languages);
-                var dialects = JsonConvert.SerializeObject(text.TargetGroup.Dialects);
-                var agegroups = JsonConvert.SerializeObject(text.TargetGroup.AgeGroups);
 
-                string sql = "SELECT * FROM dbo.TargetGroups WHERE";
-                Debug.WriteLine($"{genders} {languages} {dialects} {agegroups}");
-                if(!genders.ToLower().Equals("null"))
-                {
-                    sql += " Genders= '" + genders + "' AND";
-                }
-                else
-                {
-                    sql += " Genders IS NULL AND";
-                }
-                if(!languages.ToLower().Equals("null"))
-                {
-                    sql += " Languages= '" + languages + "' AND";
-                }
-                else
-                {
-                    sql += " Languages IS NULL AND";
-                }
-                if(!dialects.ToLower().Equals("null"))
-                {
-                    sql += " Dialects= '" + dialects + "' AND";
-                }
-                else
-                {
-                    sql += " Dialects IS NULL AND";
-                }
-                if(!agegroups.ToLower().Equals("null"))
-                {
-                    sql += " AgeGroups= '" + agegroups + "'";
-                }
-                else
-                {
-                    sql += " AgeGroups IS NULL";
-                }
+                string sql = GenerateSql(text);
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
                 TargetGroup target = await _db.TargetGroups.FromSqlRaw(sql).FirstOrDefaultAsync();
@@ -487,5 +402,67 @@ namespace Bachelor_backend.DAL.Repositories
                 return false;
             }
         }
+
+
+
+
+
+
+
+
+
+
+      //Help methods
+        public Text GetRandom(List<Text> list)
+        {
+            Random r = new Random();
+            return list[r.Next(0, list.Count)];
+        }
+        public string GenerateSql(Text text)
+        {
+            //Check if TargetGroup already exists --START--
+            var genders = JsonConvert.SerializeObject(text.TargetGroup.Genders);
+            var languages = JsonConvert.SerializeObject(text.TargetGroup.Languages);
+            var dialects = JsonConvert.SerializeObject(text.TargetGroup.Dialects);
+            var agegroups = JsonConvert.SerializeObject(text.TargetGroup.AgeGroups);
+
+            string sql = "SELECT * FROM dbo.TargetGroups WHERE";
+            Debug.WriteLine($"{genders} {languages} {dialects} {agegroups}");
+            if (!genders.ToLower().Equals("null"))
+            {
+                sql += " Genders= '" + genders + "' AND";
+            }
+            else
+            {
+                sql += " Genders IS NULL AND";
+            }
+            if (!languages.ToLower().Equals("null"))
+            {
+                sql += " Languages= '" + languages + "' AND";
+            }
+            else
+            {
+                sql += " Languages IS NULL AND";
+            }
+            if (!dialects.ToLower().Equals("null"))
+            {
+                sql += " Dialects= '" + dialects + "' AND";
+            }
+            else
+            {
+                sql += " Dialects IS NULL AND";
+            }
+            if (!agegroups.ToLower().Equals("null"))
+            {
+                sql += " AgeGroups= '" + agegroups + "'";
+            }
+            else
+            {
+                sql += " AgeGroups IS NULL";
+            }
+
+            return sql;
+        }
+
     }
 }
