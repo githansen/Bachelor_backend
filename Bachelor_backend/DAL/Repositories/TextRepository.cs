@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Data;
+using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Bachelor_backend.DAL.Repositories
 {
@@ -39,8 +41,7 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<bool> CreateText(Text text)
         {
-            return true;
-          /*
+          
             try
             {
                 //Creates tags if they don't exist
@@ -57,32 +58,63 @@ namespace Bachelor_backend.DAL.Repositories
                         {
                             tagList[i] = tagInDb;
                         }
+                        else
+                        {
+                            _db.Tags.Add(tagList[i]);
+                            await _db.SaveChangesAsync();
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
                 _logger.LogInformation(e.Message);
+                Debug.Write(e + " TagFeil");
+                Console.Write(e + " TagFeil");
+
                 return false;
             }
 
+           
             //Add text to db
             try
             {
-                var user = text.TargetUser;
-                user.Type = "TargetUser";
-                await _db.Users.AddAsync(user);
+                var Target = await _db.TargetUsers
+                   .Where(t => t.Genders == text.TargetUser.Genders
+                   &&
+              t.Languages == text.TargetUser.Languages
+                   &&
+               t.Dialects == text.TargetUser.Dialects
+                   &&
+               t.AgeGroups == text.TargetUser.AgeGroups
+               ).FirstOrDefaultAsync();
+                if (Target != null)
+                {
+                    text.TargetUser = Target;
+                }
+                else
+                {
+                    text.TargetUser = new TargetUser()
+                    {
+                        Genders = text.TargetUser.Genders,
+                        Languages = text.TargetUser.Languages,
+                        Dialects = text.TargetUser.Dialects,
+                        AgeGroups = text.TargetUser.AgeGroups
+                    };
+                }
                 await _db.Texts.AddAsync(text);
-
                 await _db.SaveChangesAsync();
                 return true;
             }
             catch (Exception e)
             {
+                Debug.Write(e + " Textfeil");
+                Console.Write(e + " Textfeil");
+
                 _logger.LogInformation(e.Message);
                 return false;
             }
-          */
+          
         }
 
         public async Task<List<Tag>> GetAllTags()
@@ -137,7 +169,8 @@ namespace Bachelor_backend.DAL.Repositories
             {
                 var liste = await _db.Texts
                     .FromSql(
-                        $"SELECT dbo.Texts.* FROM dbo.Users, dbo.Texts WHERE dbo.Texts.Active=1 AND dbo.Users.UserId = dbo.Texts.UserId AND dbo.Texts.UserId is not NULL AND dbo.Users.Type ={target} AND (dbo.Users.NativeLanguage is NULL or dbo.Users.NativeLanguage={NativeLanguage}) AND (dbo.Users.AgeGroup is NULL or dbo.Users.AgeGroup={AgeGroup}) AND (dbo.Users.Dialect is NULL or dbo.Users.Dialect={Dialect}) AND dbo.Texts.TextId NOT IN(SELECT dbo.Audiofiles.TextId from dbo.Audiofiles WHERE dbo.Audiofiles.UserId ={userid})")
+                    $"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetUsers WHERE Active=1 AND dbo.Texts.TargetUserTargetId = dbo.TargetUsers.TargetId AND dbo.Texts.TextId NOT IN(SELECT dbo.Audiofiles.TextId from dbo.Audiofiles WHERE dbo.Texts.TextId = dbo.Audiofiles.TextId AND dbo.Audiofiles.UserId ={userid}) AND (dbo.TargetUsers.Genders LIKE '%{user.Gender}%') AND (dbo.TargetUsers.Languages LIKE '%{user.NativeLanguage}%') AND (dbo.TargetUsers.Dialects={user.Dialect}) AND (dbo.TargetUsers.AgeGroups={user.AgeGroup}"
+                    )
                     .Select(t => new Text
                     {
                         TextId = t.TextId,
@@ -329,7 +362,31 @@ namespace Bachelor_backend.DAL.Repositories
 
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
-                textInDB.TargetUser = text.TargetUser;
+
+                var Target = await _db.TargetUsers
+                    .Where(t => t.Genders == text.TargetUser.Genders
+                    &&
+               t.Languages == text.TargetUser.Languages
+                    &&
+                t.Dialects == text.TargetUser.Dialects
+                    &&
+                t.AgeGroups == text.TargetUser.AgeGroups
+                ).FirstOrDefaultAsync();
+
+                if (Target != null)
+                {
+                    textInDB.TargetUser = Target;
+                }
+                else
+                {
+                    textInDB.TargetUser = new TargetUser()
+                    {
+                        Genders = text.TargetUser.Genders,
+                        Languages = text.TargetUser.Languages,
+                        Dialects = text.TargetUser.Dialects,
+                        AgeGroups = text.TargetUser.AgeGroups
+                    };
+                }
                 textInDB.TextText = text.TextText;
                 textInDB.Active= text.Active;
                 textInDB.Tags = new List<Tag>();

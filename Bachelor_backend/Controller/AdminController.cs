@@ -112,7 +112,7 @@ namespace Bachelor_backend.Controller
                 }
                 
                 return StatusCode(StatusCodes.Status500InternalServerError, false);
-                }
+              }
 
             return BadRequest("Fault in input");
         }
@@ -313,6 +313,7 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> EditText([FromBody]Text text)
         {
+            
             bool success = await _textRep.EditText(text);
             if (success)
             {
