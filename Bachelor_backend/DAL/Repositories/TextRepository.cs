@@ -168,7 +168,6 @@ namespace Bachelor_backend.DAL.Repositories
                    {
                        TextId = t.TextId,
                        TextText = t.TextText,
-                       TargetGroup = t.TargetGroup
                    }).ToListAsync();
                 if (liste.Count > 0)
                 {
@@ -189,8 +188,6 @@ namespace Bachelor_backend.DAL.Repositories
                     {
                         TextId = t.TextId,
                         TextText = t.TextText,
-                        Active = t.Active,
-                        TargetGroup = t.TargetGroup
                     }).ToListAsync();
 
                 return GetRandom(liste2);
@@ -230,15 +227,15 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<bool> DeleteText(int TextId)
         {
-            var textInAudioFile = _db.Audiofiles
-                .FromSql($"SELECT * from dbo.Audiofiles WHERE dbo.Audiofiles.UserId ={TextId}").ToList();
-            if (textInAudioFile.Count > 0)
-            {
-                return false;
-            }
 
             try
             {
+                int total = _db.Audiofiles
+                .Where(t => t.User.UserId == TextId).Count();
+                if (total > 0)
+                {
+                    return false;
+                }
                 Text text = await _db.Texts.FindAsync(TextId);
                 _db.Texts.Remove(text);
                 await _db.SaveChangesAsync();
@@ -255,6 +252,12 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
+                int total = _db.Tags.FromSql($"SELECT * FROM dbo.Tags WHERE TagId={TagId} AND TagId IN (SELECT TagsTagId FROM dbo.TagsForTexts)").Count();
+                Debug.WriteLine(total);
+                if(total > 0) 
+                {
+                    return false;
+                }
                 var x = await GetAllTags();
                 Tag tag = x.Where(i => i.TagId == TagId).FirstOrDefault();
                 if (tag == null || tag.Texts.Count > 0)
