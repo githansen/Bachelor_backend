@@ -1,5 +1,6 @@
 ﻿using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,6 +10,8 @@ using System.Xml.Schema;
 
 namespace Bachelor_backend.Controller
 {
+    [EnableCors("_myAllowSpecificOrigins")]
+
     [Route("[controller]/[action]")]
     public class AdminController : ControllerBase
     {

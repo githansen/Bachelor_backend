@@ -8,9 +8,11 @@ using System.Net;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Cors;
 
 namespace Bachelor_backend.Controller
 {
+    [EnableCors("_myAllowSpecificOrigins")]
     [Route("[controller]/[action]")]
     public class UserController : ControllerBase
     {
