@@ -238,6 +238,7 @@ namespace xUnitBackendTest
 
             mockSession[_loggedIn] = user.UserId;
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            mockHttpContext.Setup(s => s.Response.Cookies.Append("userid", user.UserId.ToString(), It.IsAny<CookieOptions>()));
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
             
             //Act
@@ -245,7 +246,7 @@ namespace xUnitBackendTest
 
             //Assert
             Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal(true, result.Value);
+            Assert.True(result.Value.ToString().Contains("loggedIn: true"));
         }
         [Fact]
         public async Task RegisterUserInfoNull()
@@ -263,6 +264,7 @@ namespace xUnitBackendTest
 
             mockSession[_loggedIn] = user.UserId;
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            mockHttpContext.Setup(s => s.Response.Cookies.Append("userid", user.UserId.ToString(), It.IsAny<CookieOptions>()));
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
             
             //Act
@@ -270,7 +272,41 @@ namespace xUnitBackendTest
 
             //Assert
             Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal(true, result.Value);
+            Assert.True(result.Value.ToString().Contains("loggedIn: true"));
+        }
+        [Fact]
+        public void SetCookieOk()
+        {
+            //Arrange
+            mockSession[_loggedIn] = "1";
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            mockHttpContext.Setup(s => s.Response.Cookies.Append("userid", "1", It.IsAny<CookieOptions>()));
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
+            
+            var result = _userController.SetCookie();
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.OK, (int) result.StatusCode);
+            //Assert.Equal("Cookie set", result.Value);
+        }
+        
+        [Fact]
+        public void SetCookieNotSetSession()
+        {
+            //Arrange
+            mockSession[_loggedIn] = _notLoggedIn;
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            mockHttpContext.Setup(s => s.Response.Cookies.Append(null, null, It.IsAny<CookieOptions>()));
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
+
+            var result = _userController.SetCookie();
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.Unauthorized, (int) result.StatusCode);
         }
     }
 }
