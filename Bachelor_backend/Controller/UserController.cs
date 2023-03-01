@@ -203,7 +203,6 @@ namespace Bachelor_backend.Controller
             var cookie = new CookieOptions();
             cookie.Expires = DateTimeOffset.Now.AddMonths(1); //Expires in 1 month
             cookie.Path = "/";
-            
             HttpContext.Response.Cookies.Append("userid", sessionString, cookie);
             return response;
         }
