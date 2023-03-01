@@ -118,6 +118,7 @@ namespace Bachelor_backend.Controller
             int userId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
             var user = await _textRep.GetUser(userId);
             
+            var watch2 = Stopwatch.StartNew();
             var text = await _textRep.GetText(user);
 
             if (text != null)
@@ -175,17 +176,15 @@ namespace Bachelor_backend.Controller
         {
             string sessionString = HttpContext.Session.GetString(_loggedIn);
             var cookie = Request.Cookies["userid"];
-            Debug.WriteLine(cookie);
             if (string.IsNullOrEmpty(cookie))
             {
                 return false;
             }
-           /* if(string.IsNullOrEmpty(sessionString))
+            if(string.IsNullOrEmpty(sessionString))
             {
                 //Sets session string if cookie exists
                 HttpContext.Session.SetString(_loggedIn, cookie);
             }
-           */
             return true;
         }
 
