@@ -10,7 +10,6 @@ using System.Xml.Schema;
 
 namespace Bachelor_backend.Controller
 {
-    [EnableCors("_myAllowSpecificOrigins")]
 
     [Route("[controller]/[action]")]
     public class AdminController : ControllerBase

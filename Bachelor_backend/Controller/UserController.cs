@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Cors;
 
 namespace Bachelor_backend.Controller
 {
-    [EnableCors("_myAllowSpecificOrigins")]
     [Route("[controller]/[action]")]
     public class UserController : ControllerBase
     {
