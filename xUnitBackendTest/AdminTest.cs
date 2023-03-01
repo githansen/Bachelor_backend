@@ -118,4 +118,88 @@ public class AdminTest
         Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
         Assert.Equal(false, result.Value);
     }
+
+    [Fact]
+    public async Task DeleteTextOk()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.DeleteText(It.IsAny<int>())).ReturnsAsync(true);
+        
+        //Act
+        var result = await _adminController.DeleteText(1) as OkObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(true, result.Value);
+    }
+    
+    [Fact]
+    public async Task DeleteTextFault()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.DeleteText(It.IsAny<int>())).ReturnsAsync(false);
+        
+        //Act
+        var result = await _adminController.DeleteText(1) as BadRequestObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.Equal(false, result.Value);
+    }
+    
+    [Fact]
+    public async Task DeleteTagOk()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.DeleteTag(It.IsAny<int>())).ReturnsAsync(true);
+        
+        //Act
+        var result = await _adminController.DeleteTag(1) as OkObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(true, result.Value);
+    }
+    
+    [Fact]
+    public async Task DeleteTagFault()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.DeleteTag(It.IsAny<int>())).ReturnsAsync(false);
+        
+        //Act
+        var result = await _adminController.DeleteTag(1) as BadRequestObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.Equal(false, result.Value);
+    }
+
+    [Fact]
+    public async Task GetNumberOfTextsOk()
+    {
+       //Arrange
+         mockTextRep.Setup(x => x.GetNumberOfTexts()).ReturnsAsync(10);
+         
+         //Act
+         var result = await _adminController.GetNumberOfTexts() as OkObjectResult;
+         
+         //Assert
+         Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+         Assert.Equal(10, result.Value);
+    }
+    
+    [Fact]
+    public async Task GetNumberOfTextsFault()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.GetNumberOfTexts()).ReturnsAsync(-5);
+         
+        //Act
+        var result = await _adminController.GetNumberOfTexts() as ObjectResult;
+         
+        //Assert
+        Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
+        Assert.Equal(-1, result.Value);
+    }
 }

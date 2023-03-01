@@ -175,12 +175,9 @@ namespace Bachelor_backend.Controller
             {
                 return Ok(total);
             }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, -1);
-
+            
+            return StatusCode(StatusCodes.Status500InternalServerError, -1);
             }
-        }
         /// <summary>
         /// 
         /// </summary>

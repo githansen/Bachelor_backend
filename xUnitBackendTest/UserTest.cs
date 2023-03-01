@@ -126,7 +126,7 @@ namespace xUnitBackendTest
         public async Task DeleteFileOk()
         {
             //Arrange
-            //mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(true);
+            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync("Audiofile deleted");
             
             //Act
             var result = await _userController.DeleteFile(It.IsAny<string>()) as OkObjectResult;
@@ -140,14 +140,28 @@ namespace xUnitBackendTest
         public async Task DeleteFileFault()
         {
             //Arrange
-            //mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync(false);
+            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync("Audiofile not deleted");
             
             //Act
-            var result = await _userController.DeleteFile(It.IsAny<string>()) as BadRequestObjectResult;
+            var result = await _userController.DeleteFile(It.IsAny<string>()) as ObjectResult;
 
             //Assert
-            Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.Equal("Voice recording is not deleted", result.Value);
+            Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
+            Assert.Null(result.Value);
+        }
+        
+        [Fact]
+        public async Task DeleteFileNotFound()
+        {
+            //Arrange
+            mockVoiceRep.Setup(x => x.DeleteFile(It.IsAny<string>())).ReturnsAsync("Audiofile not found");
+            
+            //Act
+            var result = await _userController.DeleteFile(It.IsAny<string>()) as NotFoundObjectResult;
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.NotFound, result.StatusCode);
+            Assert.Equal("Voice recording is not found", result.Value);
         }
 
         [Fact]
