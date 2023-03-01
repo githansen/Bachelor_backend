@@ -202,4 +202,32 @@ public class AdminTest
         Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
         Assert.Equal(-1, result.Value);
     }
+    
+    [Fact]
+    public async Task GetNumberOfUsersOk()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.GetNumberOfUsers()).ReturnsAsync(10);
+         
+        //Act
+        var result = await _adminController.GetNumberOfUsers() as OkObjectResult;
+         
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(10, result.Value);
+    }
+    
+    [Fact]
+    public async Task GetNumberOfUsersFault()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.GetNumberOfUsers()).ReturnsAsync(-5);
+         
+        //Act
+        var result = await _adminController.GetNumberOfUsers() as ObjectResult;
+         
+        //Assert
+        Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
+        Assert.Equal(-1, result.Value);
+    }
 }
