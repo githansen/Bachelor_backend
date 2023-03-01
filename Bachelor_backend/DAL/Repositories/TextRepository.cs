@@ -150,7 +150,8 @@ namespace Bachelor_backend.DAL.Repositories
 
         public async Task<Text> GetText(User user)
         {
-
+            return await _db.Texts.FindAsync(55);
+            /*
             // Finds lists of texts with a target group that fits the user requesting text
             try
             {
@@ -188,6 +189,7 @@ namespace Bachelor_backend.DAL.Repositories
             {
                 return null;
             }
+            */
         }
 
       
