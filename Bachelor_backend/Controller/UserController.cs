@@ -176,14 +176,16 @@ namespace Bachelor_backend.Controller
         {
             string sessionString = HttpContext.Session.GetString(_loggedIn);
             var cookie = Request.Cookies["userid"];
-            if (string.IsNullOrEmpty(cookie))
+            /*if (string.IsNullOrEmpty(cookie))
             {
                 return false;
             }
+            */
             if(string.IsNullOrEmpty(sessionString))
             {
                 //Sets session string if cookie exists
                 HttpContext.Session.SetString(_loggedIn, cookie);
+                return false;
             }
             return true;
         }
