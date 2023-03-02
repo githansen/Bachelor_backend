@@ -18,7 +18,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.AllowAnyMethod()
-            .AllowAnyHeader().AllowAnyOrigin();
+            .AllowAnyHeader().WithOrigins("https://gidinstemme-front-test.azurewebsites.net/");
         });
 });
 
