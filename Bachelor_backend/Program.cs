@@ -18,8 +18,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowAnyOrigin();
+            .AllowAnyHeader().AllowCredentials().WithOrigins("https://gidinstemme-front-test.azurewebsites.net/");
         });
 });
 
@@ -49,6 +48,8 @@ builder.Services.AddSession(options =>
     options.Cookie.Name = ".AdventureWorks.Session";
     options.IdleTimeout = TimeSpan.FromSeconds(1800); //30 Minutes session
     options.Cookie.IsEssential = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.None;
 });
 builder.Services.AddScoped<DBInitializer, DBInitializer>();
 builder.Services.AddSession(options =>
@@ -56,6 +57,9 @@ builder.Services.AddSession(options =>
     options.Cookie.Name = ".AdventureWorks.Session";
     options.IdleTimeout = TimeSpan.FromSeconds(1800); //30 Minutes session
     options.Cookie.IsEssential = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.None;
+
 });
 builder.Services.AddSwaggerGen(c =>
 {

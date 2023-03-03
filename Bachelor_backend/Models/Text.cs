@@ -1,5 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Bachelor_backend.Models
 {
@@ -14,5 +17,11 @@ namespace Bachelor_backend.Models
 
         public TargetGroup? TargetGroup { get; set; }
         public bool Active { get; set; }
+
+
+      
     }
+
+    // Regex for the targetgroup
+   
 }
