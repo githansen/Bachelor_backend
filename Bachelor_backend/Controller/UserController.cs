@@ -204,7 +204,7 @@ namespace Bachelor_backend.Controller
             var response = new HttpResponseMessage();
 
             var cookie = new CookieOptions();
-            cookie.Expires = DateTimeOffset.Now.AddMonths(1); //Expires in 1 month
+            cookie.Expires = DateTimeOffset.Now.AddDays(5); //Expires in 1 month
             cookie.Path = "/";
             cookie.Secure = true;
             cookie.SameSite = SameSiteMode.None;
