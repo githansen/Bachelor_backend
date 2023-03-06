@@ -16,10 +16,13 @@ namespace Bachelor_backend.Controller
     {
         private readonly ITextRepository _textRep;
         private readonly IVoiceRepository _voicerep;
-        public AdminController(ITextRepository textrep, IVoiceRepository voicerep)
+        private readonly ILogger<AdminController> _logger;
+        
+        public AdminController(ITextRepository textrep,IVoiceRepository voicerep, ILogger<AdminController> logger)
         {
             _textRep = textrep;
             _voicerep = voicerep;
+            _logger = logger;
         }
 
         /// <summary>
@@ -46,17 +49,12 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> CreateTag([FromQuery]string text)
         {
-            var regex = new Regex("^([a-zA-ZæøåÆØÅ]{2,20})$");
-            if (!regex.IsMatch(text))
-            {
-                return BadRequest("Fault in input");
-            }
-            
             bool success = await _textRep.CreateTag(text);
             if (success)
             {
                 return Ok(true);
             }
+            _logger.LogInformation("Fault in creating tag");
             return BadRequest(false);
         }
         
@@ -117,12 +115,8 @@ namespace Bachelor_backend.Controller
                 }
                 
                 return StatusCode(StatusCodes.Status500InternalServerError, false);
-              
-
-        
         }
-
-
+        
         /// <summary>
         /// Get all texts
         /// </summary>
@@ -149,12 +143,10 @@ namespace Bachelor_backend.Controller
         public async Task<ActionResult> DeleteText(int TextId)
         {
             bool success = await _textRep.DeleteText(TextId);
-            
             if (success)
             {
                 return Ok(true);
             }
-            
             return BadRequest(false);
             }
         
@@ -189,12 +181,9 @@ namespace Bachelor_backend.Controller
             {
                 return Ok(total);
             }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, -1);
-
+            
+            return StatusCode(StatusCodes.Status500InternalServerError, -1);
             }
-        }
         /// <summary>
         /// 
         /// </summary>
@@ -224,11 +213,7 @@ namespace Bachelor_backend.Controller
             if(total > -1) {
                 return Ok(total);
             }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, -1);
-
-            }
+            return StatusCode(StatusCodes.Status500InternalServerError, -1);
         }
         /// <summary>
         /// 

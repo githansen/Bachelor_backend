@@ -195,7 +195,7 @@ namespace Bachelor_backend.Controller
         {
             //Get user id from session
             string sessionString = HttpContext.Session.GetString(_loggedIn);
-            if(sessionString == null)
+            if(sessionString.IsNullOrEmpty())
             {
                 return new HttpResponseMessage (HttpStatusCode.Unauthorized);
             }
