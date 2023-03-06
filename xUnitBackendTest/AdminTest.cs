@@ -230,4 +230,76 @@ public class AdminTest
         Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
         Assert.Equal(-1, result.Value);
     }
+    
+    [Fact]
+    public async Task GetOneTextOk()
+    {
+        //Arrange
+        var text = new Text()
+        {
+            Active = true,
+            TextId = 1,
+            TextText = "test",
+            Tags = new List<Tag>()
+            {
+                new()
+                {
+                    TagId = 1,
+                    TagText = "test"
+                }
+            }
+        };
+        mockTextRep.Setup(x => x.GetOneText(It.IsAny<int>())).ReturnsAsync(text);
+        
+        //Act
+        var result = await _adminController.GetOneText(1) as OkObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(text, result.Value);
+    }
+    
+    [Fact]
+    public async Task GetOneTextFault()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.GetOneText(It.IsAny<int>())).ReturnsAsync((Text) null);
+        
+        //Act
+        var result = await _adminController.GetOneText(1) as ObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
+        Assert.Equal(null, result.Value);
+    }
+
+    [Fact]
+    public async Task GetOneRecordingOk()
+    {
+        //Arrange
+        var file = new FormFile(new MemoryStream(), 0, 0, "Data", "12345-12345-12345-12345.m4a");
+        
+        mockVoiceRep.Setup(x => x.GetOneRecording(It.IsAny<string>())).ReturnsAsync(file);
+        
+        //Act
+        var result = await _adminController.GetOneRecording("12345-12345-12345-12345") as OkObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(file, result.Value);
+    }   
+    [Fact]
+    public async Task GetOneRecordingFault()
+    {
+        //Arrange
+        
+        mockVoiceRep.Setup(x => x.GetOneRecording(It.IsAny<string>())).ReturnsAsync((FormFile) null);
+        
+        //Act
+        var result = await _adminController.GetOneRecording("12345-12345-12345-12345") as BadRequestObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.Equal("Recording not found",result.Value);
+    }   
 }
