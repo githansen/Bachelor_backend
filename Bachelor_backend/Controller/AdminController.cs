@@ -280,7 +280,7 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetAllUsers()
         {
-            List<User> list = await _textRep.GetAllUsers();
+            var list = await _textRep.GetAllUsers();
             if(list != null)
             {
                 return Ok(list);
@@ -304,10 +304,7 @@ namespace Bachelor_backend.Controller
             {
                 return Ok(true);
             }
-            else
-            {
-                return BadRequest(false);
-            }
+            return BadRequest(false);
         }
         [HttpPost]
         public async Task<ActionResult> EditTag([FromBody] Tag tag) 
