@@ -46,9 +46,11 @@ namespace Bachelor_backend.Controller
             {
                 return Unauthorized();
             }
+
             //TODO: Check textId number
-            string uuid = await _voiceRep.SaveFile(recording, textId, int.Parse(Regex.Match(sessionString, @"\d+").Value));
-            
+            string uuid =
+                await _voiceRep.SaveFile(recording, textId, int.Parse(Regex.Match(sessionString, @"\d+").Value));
+
             if (uuid.IsNullOrEmpty())
             {
                 _logger.LogInformation("Fault in saving voice recording");
@@ -66,9 +68,11 @@ namespace Bachelor_backend.Controller
                 _logger.LogInformation("Audiofile is too big");
                 return BadRequest("Audiofile is too big");
             }
+
             return Ok(uuid);
 
         }
+
         /// <summary>
         /// Deletes recording
         /// </summary>
@@ -120,7 +124,7 @@ namespace Bachelor_backend.Controller
 
             int userId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
             var user = await _textRep.GetUser(userId);
-            
+
             var watch2 = Stopwatch.StartNew();
             var text = await _textRep.GetText(user);
 
@@ -166,6 +170,7 @@ namespace Bachelor_backend.Controller
                     res.Content.Headers.Add("loggedIn", "true");
                     return Ok(res);
                 }
+
                 _logger.LogInformation("User not created");
                 return StatusCode(StatusCodes.Status500InternalServerError, "User not created");
             }
@@ -173,6 +178,7 @@ namespace Bachelor_backend.Controller
             _logger.LogInformation("Fault in input");
             return BadRequest("Fault in input");
         }
+
         [ApiExplorerSettings(IgnoreApi = true)]
 
         public bool IsLoggedIn()
@@ -183,11 +189,13 @@ namespace Bachelor_backend.Controller
             {
                 return false;
             }
-            if(string.IsNullOrEmpty(sessionString))
+
+            if (string.IsNullOrEmpty(sessionString))
             {
                 //Sets session string if cookie exists
                 HttpContext.Session.SetString(_loggedIn, cookie);
             }
+
             return true;
         }
 
@@ -196,10 +204,11 @@ namespace Bachelor_backend.Controller
         {
             //Get user id from session
             string sessionString = HttpContext.Session.GetString(_loggedIn);
-            if(sessionString.IsNullOrEmpty())
+            if (sessionString.IsNullOrEmpty())
             {
-                return new HttpResponseMessage (HttpStatusCode.Unauthorized);
+                return new HttpResponseMessage(HttpStatusCode.Unauthorized);
             }
+
             //Create cookie
             var response = new HttpResponseMessage();
 
@@ -212,6 +221,6 @@ namespace Bachelor_backend.Controller
             return response;
         }
         //TODO: Use crypto to encrypt cookie or set cookie as user parameters
-        
+
     }
 }

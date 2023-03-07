@@ -229,25 +229,29 @@ namespace Bachelor_backend.Controller
             {
                 return Ok(text);
             }
-            else
-            {
-                return BadRequest(null);
-            }
+            return StatusCode(StatusCodes.Status500InternalServerError, null);
 
         }
+
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         [HttpGet]
-        public async Task<ActionResult> GetNumberOfDeletedRecordings() { throw new NotImplementedException(); }
+        public async Task<ActionResult> GetNumberOfDeletedRecordings()
+        {
+            throw new NotImplementedException();
+        }
+        
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult> GetAllRecordings() {
+        public async Task<ActionResult> GetAllRecordings()
+        {
+            throw new NotImplementedException();
             List<Audiofile> list = await _voicerep.GetAllRecordings();
             if(list != null)
             {
@@ -271,10 +275,7 @@ namespace Bachelor_backend.Controller
             {
                 return Ok(file);
             }
-            else
-            {
-                return BadRequest(null);
-            }
+            return BadRequest("Recording not found");
         }
 
         /// <summary>
@@ -285,7 +286,7 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetAllUsers()
         {
-            List<User> list = await _textRep.GetAllUsers();
+            var list = await _textRep.GetAllUsers();
             if(list != null)
             {
                 return Ok(list);
@@ -309,10 +310,7 @@ namespace Bachelor_backend.Controller
             {
                 return Ok(true);
             }
-            else
-            {
-                return BadRequest(false);
-            }
+            return BadRequest(false);
         }
         [HttpPost]
         public async Task<ActionResult> EditTag([FromBody] Tag tag) 

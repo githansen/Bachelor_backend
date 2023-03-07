@@ -230,4 +230,179 @@ public class AdminTest
         Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
         Assert.Equal(-1, result.Value);
     }
+    
+    [Fact]
+    public async Task GetOneTextOk()
+    {
+        //Arrange
+        var text = new Text()
+        {
+            Active = true,
+            TextId = 1,
+            TextText = "test",
+            Tags = new List<Tag>()
+            {
+                new()
+                {
+                    TagId = 1,
+                    TagText = "test"
+                }
+            }
+        };
+        mockTextRep.Setup(x => x.GetOneText(It.IsAny<int>())).ReturnsAsync(text);
+        
+        //Act
+        var result = await _adminController.GetOneText(1) as OkObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(text, result.Value);
+    }
+    
+    [Fact]
+    public async Task GetOneTextFault()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.GetOneText(It.IsAny<int>())).ReturnsAsync((Text) null);
+        
+        //Act
+        var result = await _adminController.GetOneText(1) as ObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
+        Assert.Equal(null, result.Value);
+    }
+
+    [Fact]
+    public async Task GetOneRecordingOk()
+    {
+        //Arrange
+        var file = new FormFile(new MemoryStream(), 0, 0, "Data", "12345-12345-12345-12345.m4a");
+        
+        mockVoiceRep.Setup(x => x.GetOneRecording(It.IsAny<string>())).ReturnsAsync(file);
+        
+        //Act
+        var result = await _adminController.GetOneRecording("12345-12345-12345-12345") as OkObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(file, result.Value);
+    }   
+    [Fact]
+    public async Task GetOneRecordingFault()
+    {
+        //Arrange
+        
+        mockVoiceRep.Setup(x => x.GetOneRecording(It.IsAny<string>())).ReturnsAsync((FormFile) null);
+        
+        //Act
+        var result = await _adminController.GetOneRecording("12345-12345-12345-12345") as BadRequestObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.Equal("Recording not found",result.Value);
+    }
+
+    [Fact]
+    public async Task GetAllUsersOk()
+    {
+        //Arrange
+        var users = new List<User>()
+        {
+            new()
+            {
+                UserId = 1,
+                AgeGroup = "18-29",
+                Dialect = "Østlandsk",
+                Gender = "Kvinne",
+                NativeLanguage = "Norsk"
+            },
+            new()
+            {
+                UserId = 2,
+                AgeGroup = "30-39",
+                Dialect = "Trøndersk",
+                Gender = "Mann",
+                NativeLanguage = "Norsk"
+            }
+        };
+        
+        mockTextRep.Setup(x => x.GetAllUsers()).ReturnsAsync(users);
+        //Act
+        var result = await _adminController.GetAllUsers() as OkObjectResult;
+
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(users, result.Value);
+    }
+    
+    [Fact]
+    public async Task GetAllUsersFault()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.GetAllUsers()).ReturnsAsync((List<User>) null);
+        
+        //Act
+        var result = await _adminController.GetAllUsers() as ObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
+        Assert.Equal(null, result.Value);
+    }
+
+    [Fact]
+    public async Task EditTextOk()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.EditText(It.IsAny<Text>())).ReturnsAsync(true);
+        
+        //Act
+        var result = await _adminController.EditText(new Text()) as OkObjectResult;
+
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(true, result.Value);
+    }
+
+    [Fact]
+    public async Task EditTextFault()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.EditText(It.IsAny<Text>())).ReturnsAsync(false);
+        
+        //Act
+        var result = await _adminController.EditText(new Text()) as BadRequestObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.Equal(false, result.Value);
+    }
+
+    [Fact]
+    public async Task EditTagOk()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.EditTag(It.IsAny<Tag>())).ReturnsAsync(true);
+        
+        //Act
+        var result = await _adminController.EditTag(new Tag()) as OkObjectResult;
+
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(true, result.Value);
+    }
+    
+    [Fact]
+    public async Task EditTagFault()
+    {
+        //Arrange
+        mockTextRep.Setup(x => x.EditTag(It.IsAny<Tag>())).ReturnsAsync(false);
+        
+        //Act
+        var result = await _adminController.EditTag(new Tag()) as BadRequestObjectResult;
+
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.Equal(false, result.Value);
+    }
 }

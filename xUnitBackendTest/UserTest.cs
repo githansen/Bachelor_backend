@@ -223,6 +223,33 @@ namespace xUnitBackendTest
         }
 
         [Fact]
+        public async Task GetTextFault()
+        {
+            //Arrange
+            var user = new User()
+            {
+                UserId = 1,
+                AgeGroup = "18-29",
+                Dialect = "Østlandsk",
+                Gender = "Kvinne",
+                NativeLanguage = "Norsk"
+            };
+
+            mockSession[_loggedIn] = "1";
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            mockTextRep.Setup(x => x.GetUser(It.IsAny<int>())).ReturnsAsync(user);
+            mockTextRep.Setup(x => x.GetText(user)).ReturnsAsync((Text) null);
+            
+            //Act
+            var result = await _userController.GetText() as ObjectResult;
+            
+            //Assert
+            Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
+            Assert.Null(null);
+        }
+
+        [Fact]
         public async Task RegisterUserInfoOk()
         {
             //Arrange
