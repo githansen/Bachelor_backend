@@ -273,7 +273,7 @@ namespace xUnitBackendTest
 
             //Assert
             Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-            Assert.True(result.Value.ToString().Contains("loggedIn: true"));
+            Assert.Contains("loggedIn: true", result.Value.ToString());
         }
         [Fact]
         public async Task RegisterUserInfoNull()
@@ -301,10 +301,50 @@ namespace xUnitBackendTest
             Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Value.ToString().Contains("loggedIn: true"));
         }
+        
+        [Fact]
+        public async Task RegisterUserInfoFault()
+        {
+            //Arrange
+            var user = new User()
+            {
+                UserId = 1,
+                NativeLanguage = "Norwegian",
+                AgeGroup = "18-20",
+                Dialect = "Østlandsk"
+            };
+            
+            mockTextRep.Setup(x => x.RegisterUserInfo(It.IsAny<User>())).ReturnsAsync((User) null);
+
+            //Act
+            var result = await _userController.RegisterUserInfo(It.IsAny<User>()) as ObjectResult;
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
+            Assert.Equal("User not created", result.Value);
+        }
+        
+        [Fact]
+        public async Task RegisterUserInfoFaultInput()
+        {
+            //Arrange
+            _userController.ModelState.AddModelError("AgeGroup", "Fault in input");
+            mockTextRep.Setup(x => x.RegisterUserInfo(It.IsAny<User>())).ReturnsAsync((User)(null));
+            
+            //Act
+            var result = await _userController.RegisterUserInfo(It.IsAny<User>()) as BadRequestObjectResult;
+
+            //Assert
+            Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.Equal("Fault in input", result.Value);
+        }
+        
         [Fact]
         public void SetCookieOk()
         {
             //Arrange
+            
+            
             mockSession[_loggedIn] = "1";
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
             mockHttpContext.Setup(s => s.Response.Cookies.Append("userid", "1", It.IsAny<CookieOptions>()));
@@ -334,6 +374,54 @@ namespace xUnitBackendTest
 
             //Assert
             Assert.Equal((int) HttpStatusCode.Unauthorized, (int) result.StatusCode);
+        }
+
+        [Fact]
+        public void IsLoggedInSessionIsSet()
+        {
+            //Arrange
+            mockSession[_loggedIn] = "1";
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            mockHttpContext.Setup(s => s.Request.Cookies["userid"]).Returns((String) null);
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            
+            //Act
+            var result = _userController.IsLoggedIn();
+            
+            //Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void IsLoggedInCookieIsSet()
+        {
+            //Arrange
+            mockSession[_loggedIn] = _notLoggedIn;
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            mockHttpContext.Setup(s => s.Request.Cookies["userid"]).Returns("1");
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
+            var result = _userController.IsLoggedIn();
+            
+            //Assert
+            Assert.True(result);
+        }
+        [Fact]
+        public void IsLoggedInFault()
+        {
+            //Arrange
+            mockSession[_loggedIn] = _notLoggedIn;
+            mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+            mockHttpContext.Setup(s => s.Request.Cookies["userid"]).Returns((String) null);
+            _userController.ControllerContext.HttpContext = mockHttpContext.Object;
+            
+            //Act
+            var result = _userController.IsLoggedIn();
+            
+            //Assert
+            Assert.False(result);
         }
     }
 }

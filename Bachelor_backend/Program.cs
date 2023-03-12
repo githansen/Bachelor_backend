@@ -86,7 +86,7 @@ app.UseCors(MyAllowSpecificOrigins);
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
-SeedDatabase();
+//SeedDatabase();
 
 app.UseSwagger(options =>
 {
