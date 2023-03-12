@@ -28,8 +28,8 @@ namespace Bachelor_backend.Controller
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        [HttpGet]
-        public async Task<ActionResult> LogIn()
+        [HttpPost]
+        public async Task<ActionResult> LogIn(AdminUser user)
         {
             //bool success = await _textRep.login();
             throw new NotImplementedException();
