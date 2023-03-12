@@ -175,14 +175,15 @@ namespace Bachelor_backend.Controller
             _logger.LogInformation("Fault in input");
             return BadRequest("Fault in input");
         }
-
+        
         [ApiExplorerSettings(IgnoreApi = true)]
 
         public bool IsLoggedIn()
         {
             string sessionString = HttpContext.Session.GetString(_loggedIn);
             var cookie = Request.Cookies["userid"];
-            if (string.IsNullOrEmpty(cookie))
+            
+            if (string.IsNullOrEmpty(cookie) && sessionString.IsNullOrEmpty())
             {
                 return false;
             }
@@ -192,8 +193,8 @@ namespace Bachelor_backend.Controller
                 //Sets session string if cookie exists
                 HttpContext.Session.SetString(_loggedIn, cookie);
             }
-
             return true;
+            
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
