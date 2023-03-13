@@ -11,6 +11,6 @@ namespace Bachelor_backend.Models
         
         [RegularExpression("^([a-zA-ZæøåÆØÅ]{2,20})$")]
         public string TagText { get; set; }
-        public virtual List<Text> Texts { get; set; }
+        public virtual List<Text>? Texts { get; set; }
     }
 }

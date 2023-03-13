@@ -8,9 +8,12 @@ using System.Net;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Cors;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Bachelor_backend.Controller
 {
+
     [Route("[controller]/[action]")]
     public class UserController : ControllerBase
     {
@@ -213,7 +216,8 @@ namespace Bachelor_backend.Controller
             var cookie = new CookieOptions();
             cookie.Expires = DateTimeOffset.Now.AddMonths(1); //Expires in 1 month
             cookie.Path = "/";
-            
+            cookie.Secure = true;
+            cookie.SameSite = SameSiteMode.None;
             HttpContext.Response.Cookies.Append("userid", sessionString, cookie);
             return response;
         }
