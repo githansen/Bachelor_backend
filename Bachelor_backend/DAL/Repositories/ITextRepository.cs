@@ -1,5 +1,4 @@
 ﻿using Bachelor_backend.Models;
-using Bachelor_backend.Models.APIModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bachelor_backend.DAL.Repositories

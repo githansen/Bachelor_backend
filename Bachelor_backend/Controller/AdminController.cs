@@ -233,16 +233,7 @@ namespace Bachelor_backend.Controller
 
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        [HttpGet]
-        public async Task<ActionResult> GetNumberOfDeletedRecordings()
-        {
-            throw new NotImplementedException();
-        }
+ 
         
         /// <summary>
         /// 
@@ -251,7 +242,6 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetAllRecordings()
         {
-            throw new NotImplementedException();
             List<Audiofile> list = await _voicerep.GetAllRecordings();
             if(list != null)
             {

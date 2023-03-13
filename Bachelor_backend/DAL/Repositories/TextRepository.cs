@@ -170,6 +170,7 @@ namespace Bachelor_backend.DAL.Repositories
             }
             catch(Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return null;
             }
 
@@ -185,8 +186,9 @@ namespace Bachelor_backend.DAL.Repositories
                 // Returns random from list
                 return GetRandom(liste2);
             }
-            catch
+            catch(Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return null;
             }
             
@@ -226,7 +228,10 @@ namespace Bachelor_backend.DAL.Repositories
                     return false;
                 }
                 Text text = await _db.Texts.FindAsync(TextId);
-                _db.Texts.Remove(text);
+                if (text != null)
+                {
+                    _db.Texts.Remove(text);
+                }
                 await _db.SaveChangesAsync();
                 return true;
             }
@@ -285,8 +290,9 @@ namespace Bachelor_backend.DAL.Repositories
                 int total = await _db.Users.CountAsync();
                 return total;
             }
-            catch
+            catch(Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return -1;
             }
         }
@@ -296,18 +302,19 @@ namespace Bachelor_backend.DAL.Repositories
             try
             {
                 
-                Text text = _db.Texts.Where(t => t.TextId == id).Select(t => new Text
+                Text text = await _db.Texts.Where(t => t.TextId == id).Select(t => new Text
                 {
                     TextId= t.TextId,
                     Tags = t.Tags,
                     TextText = t.TextText,
                     Active = t.Active,
                     TargetGroup = t.TargetGroup
-                }).FirstOrDefault();
+                }).FirstOrDefaultAsync();
                 return text;
             }
-            catch
+            catch(Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return null;
             }
         }
@@ -376,8 +383,9 @@ namespace Bachelor_backend.DAL.Repositories
                 await _db.SaveChangesAsync();
                 return true;
             }
-            catch(Exception ex)
+            catch(Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return false;
             }
         }
@@ -397,8 +405,9 @@ namespace Bachelor_backend.DAL.Repositories
                     return false;
                 }
             }
-            catch
+            catch(Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return false;
             }
         }

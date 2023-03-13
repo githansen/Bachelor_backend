@@ -34,6 +34,7 @@ namespace Bachelor_backend.Controller
         /// Saves recording to database
         /// </summary>
         /// <param name="recording"></param>
+        /// <param name="textId"></param>
         /// <returns></returns>
         /// <response code="401">Not authorized</response>"
         /// <response code="200">Successfully saved file</response>

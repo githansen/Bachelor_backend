@@ -8,6 +8,7 @@ namespace Bachelor_backend.DBInitializer
     public class DBInitializer : IDBInitializer
     {
         private readonly DatabaseContext _db;
+
         public DBInitializer(DatabaseContext db) {
             _db = db;
         }
@@ -20,11 +21,12 @@ namespace Bachelor_backend.DBInitializer
                     _db.Database.Migrate();
                 }
             }
-            catch(Exception ex)
+            catch
             {
+                return;
+            }
 
-            }       
-               if(_db.Texts.Count() > 0) { return; }
+            if (_db.Texts.Count() > 0) { return; }
 
 
 
@@ -39,6 +41,7 @@ namespace Bachelor_backend.DBInitializer
             while (!reader.EndOfStream)
             {
                 var line = reader.ReadLine();
+                
                 var tag = new Tag()
                 {
                     TagText = line
@@ -58,7 +61,6 @@ namespace Bachelor_backend.DBInitializer
             while (!reader.EndOfStream)
                 {
                     Random r = new Random();
-                
                     var line = reader.ReadLine();
                 var text = new Text()
                 {
