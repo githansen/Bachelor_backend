@@ -7,9 +7,9 @@ namespace Bachelor_backend.DAL
 {
     public class AdminUsers
     {
-        public string username { get; set; }
-        public byte[] password { get; set; }
-        public byte[] salt { get; set; }
+        public string Username { get; set; }
+        public byte[] Password { get; set; }
+        public byte[] Salt { get; set; }
     }    
 
 

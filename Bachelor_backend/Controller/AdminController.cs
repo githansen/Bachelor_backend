@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Xml.Schema;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Bachelor_backend.Controller
 {
@@ -14,12 +15,17 @@ namespace Bachelor_backend.Controller
     {
         private readonly ITextRepository _textRep;
         private readonly IVoiceRepository _voicerep;
+        private readonly ISecurityRepository _security;
         private readonly ILogger<AdminController> _logger;
         
-        public AdminController(ITextRepository textrep,IVoiceRepository voicerep, ILogger<AdminController> logger)
+        private const string _loggedIn = "User";
+        private const string _notLoggedIn = "";
+        
+        public AdminController(ITextRepository textrep,IVoiceRepository voicerep, ISecurityRepository security, ILogger<AdminController> logger)
         {
             _textRep = textrep;
             _voicerep = voicerep;
+            _security = security;
             _logger = logger;
         }
 
@@ -31,8 +37,40 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> LogIn(AdminUser user)
         {
-            //bool success = await _textRep.login();
-            throw new NotImplementedException();
+            var success = await _security.Login(user);
+
+            if (success)
+            {
+                HttpContext.Session.SetString("UserSession", user.Username);
+                return Ok(true);
+            }
+            return Unauthorized("Wrong username or password");
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult> LogOut()
+        {
+            HttpContext.Session.SetString("UserSession", _notLoggedIn);
+            return Ok(true);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> RegisterAdmin(AdminUser user)
+        {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            var success = await _security.Register(user);
+            if (success)
+            {
+                return Ok(true);
+            }
+            _logger.LogInformation("Fault in registering admin");
+            return BadRequest("Failed to register new admin");
         }
 
         /// <summary>
