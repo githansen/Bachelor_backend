@@ -2,6 +2,7 @@
 using Bachelor_backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Bachelor_backend.DAL.Repositories;
 
 namespace Bachelor_backend.DBInitializer
 {
@@ -96,6 +97,17 @@ namespace Bachelor_backend.DBInitializer
                 _db.Users.Add(user);
                 _db.SaveChanges();
             }
+
+            var salt = SecurityRepository.CreateSalt();
+            var hash = SecurityRepository.HashPassword("admin", salt);
+            var admin = new AdminUsers()
+            {
+                Username = "Admin",
+                Password = hash,
+                Salt = salt
+            };
+            
+            _db.Admins.Add(admin);
             _db.SaveChanges();
         }
     }
