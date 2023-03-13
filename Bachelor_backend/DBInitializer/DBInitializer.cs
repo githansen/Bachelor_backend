@@ -25,6 +25,20 @@ namespace Bachelor_backend.DBInitializer
             {
 
             }       
+            
+            //Add admin user
+            var salt = SecurityRepository.CreateSalt();
+            var hash = SecurityRepository.HashPassword("admin", salt);
+            var admin = new AdminUsers()
+            {
+                Username = "Admin",
+                Password = hash,
+                Salt = salt
+            };
+            
+            _db.Admins.Add(admin);
+            _db.SaveChanges();
+            
                if(_db.Texts.Count() > 0) { return; }
 
 
@@ -98,17 +112,6 @@ namespace Bachelor_backend.DBInitializer
                 _db.SaveChanges();
             }
 
-            var salt = SecurityRepository.CreateSalt();
-            var hash = SecurityRepository.HashPassword("admin", salt);
-            var admin = new AdminUsers()
-            {
-                Username = "Admin",
-                Password = hash,
-                Salt = salt
-            };
-            
-            _db.Admins.Add(admin);
-            _db.SaveChanges();
         }
     }
 }
