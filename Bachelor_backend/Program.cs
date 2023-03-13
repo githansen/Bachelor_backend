@@ -34,6 +34,7 @@ builder.Logging.AddSerilog(logger);
 builder.Services.AddControllers();
 builder.Services.AddScoped<IVoiceRepository, VoiceRepository>();
 builder.Services.AddScoped<ITextRepository, TextRepository>();
+builder.Services.AddScoped<ISecurityRepository, SecurityRepository>();
 builder.Services.AddTransient<IAzureStorage, AzureStorage>();
 
 builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));

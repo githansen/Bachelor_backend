@@ -15,7 +15,9 @@ public class AdminTest
     private static readonly Mock<IVoiceRepository> mockVoiceRep = new();
     private static readonly Mock<ISecurityRepository> mockSecurity = new();
     private static readonly Mock<ILogger<AdminController>> _logger = new();
-    private readonly AdminController _adminController = new(mockTextRep.Object, mockVoiceRep.Object, mockSecurity.Object,  _logger.Object);
+
+    private readonly AdminController _adminController = new(mockTextRep.Object, mockVoiceRep.Object, mockSecurity.Object, _logger.Object);
+
 
 
     [Fact]
