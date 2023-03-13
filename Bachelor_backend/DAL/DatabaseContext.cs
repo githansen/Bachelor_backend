@@ -2,11 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bachelor_backend.DAL
 {
     public class AdminUsers
     {
+        [Key]
         public string Username { get; set; }
         public byte[] Password { get; set; }
         public byte[] Salt { get; set; }
