@@ -84,7 +84,6 @@ namespace Bachelor_backend.Controller
         /// <param name="text"></param>
         /// <response code="200">OK - creation successful</response>
         /// <response code="400">Error while creating tag</response>
-        [HttpPost]get
         public async Task<ActionResult> CreateTag([FromQuery]string text)
         {
             bool success = await _textRep.CreateTag(text);
