@@ -20,7 +20,7 @@ namespace Bachelor_backend.Controller
         private readonly ISecurityRepository _security;
         private readonly ILogger<AdminController> _logger;
         
-        private const string _loggedIn = "User";
+        private const string _loggedIn = "AdminSession";
         private const string _notLoggedIn = "";
         
         public AdminController(ITextRepository textrep,IVoiceRepository voicerep, ISecurityRepository security, ILogger<AdminController> logger)
@@ -52,7 +52,7 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> LogOut()
         {
-            HttpContext.Session.SetString("UserSession", _notLoggedIn);
+            HttpContext.Session.SetString(_loggedIn, _notLoggedIn);
             return Ok(true);
         }
 
@@ -62,13 +62,6 @@ namespace Bachelor_backend.Controller
             var sessionString = HttpContext.Session.GetString(_loggedIn);
 
             if (sessionString.IsNullOrEmpty())
-            {
-                return Unauthorized();
-            }
-            
-            var adminFound = await _security.FindAdmin(sessionString);
-
-            if (!adminFound)
             {
                 return Unauthorized();
             }
@@ -99,14 +92,7 @@ namespace Bachelor_backend.Controller
             {
                 return Unauthorized();
             }
-            
-            var adminFound = await _security.FindAdmin(sessionString);
 
-            if (!adminFound)
-            {
-                return Unauthorized();
-            }
-            
             bool success = await _textRep.CreateTag(text);
             if (success)
             {
@@ -130,14 +116,7 @@ namespace Bachelor_backend.Controller
             {
                 return Unauthorized();
             }
-            
-            var adminFound = await _security.FindAdmin(sessionString);
 
-            if (!adminFound)
-            {
-                return Unauthorized();
-            }
-            
             var list = await _textRep.GetAllTags();
             return Ok(list);
         }
@@ -180,12 +159,6 @@ namespace Bachelor_backend.Controller
                 return Unauthorized();
             }
             
-            var adminFound = await _security.FindAdmin(sessionString);
-
-            if (!adminFound)
-            {
-                return Unauthorized();
-            }
             if(!ModelState.IsValid)
             {
                 return BadRequest(false);
@@ -213,14 +186,7 @@ namespace Bachelor_backend.Controller
             {
                 return Unauthorized();
             }
-            
-            var adminFound = await _security.FindAdmin(sessionString);
 
-            if (!adminFound)
-            {
-                return Unauthorized();
-            }
-            
             var list = await _textRep.GetAllTexts();
             if(list != null)
             {
@@ -239,13 +205,6 @@ namespace Bachelor_backend.Controller
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
             if (sessionString.IsNullOrEmpty())
-            {
-                return Unauthorized();
-            }
-            
-            var adminFound = await _security.FindAdmin(sessionString);
-
-            if (!adminFound)
             {
                 return Unauthorized();
             }
@@ -272,14 +231,7 @@ namespace Bachelor_backend.Controller
             {
                 return Unauthorized();
             }
-            
-            var adminFound = await _security.FindAdmin(sessionString);
 
-            if (!adminFound)
-            {
-                return Unauthorized();
-            }
-            
             bool success = await _textRep.DeleteTag(TagId);
             if (success)
             {
@@ -301,14 +253,7 @@ namespace Bachelor_backend.Controller
             {
                 return Unauthorized();
             }
-            
-            var adminFound = await _security.FindAdmin(sessionString);
 
-            if (!adminFound)
-            {
-                return Unauthorized();
-            }
-            
             int total = await _textRep.GetNumberOfTexts();
             if(total > -1)
             {
@@ -327,13 +272,6 @@ namespace Bachelor_backend.Controller
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
             if (sessionString.IsNullOrEmpty())
-            {
-                return Unauthorized();
-            }
-            
-            var adminFound = await _security.FindAdmin(sessionString);
-
-            if (!adminFound)
             {
                 return Unauthorized();
             }
@@ -360,13 +298,6 @@ namespace Bachelor_backend.Controller
                 return Unauthorized();
             }
             
-            var adminFound = await _security.FindAdmin(sessionString);
-
-            if (!adminFound)
-            {
-                return Unauthorized();
-            }
-            
             int total = await _textRep.GetNumberOfUsers();
             if(total > -1) {
                 return Ok(total);
@@ -384,13 +315,6 @@ namespace Bachelor_backend.Controller
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
             if (sessionString.IsNullOrEmpty())
-            {
-                return Unauthorized();
-            }
-            
-            var adminFound = await _security.FindAdmin(sessionString);
-
-            if (!adminFound)
             {
                 return Unauthorized();
             }
@@ -440,7 +364,14 @@ namespace Bachelor_backend.Controller
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         [HttpGet]
-        public async Task<ActionResult> GetOneRecording(string uuid) {
+        public async Task<ActionResult> GetOneRecording(string uuid) 
+        {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+
             IFormFile file = await _voicerep.GetOneRecording(uuid);
             if(file != null)
             {
@@ -457,15 +388,19 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetAllUsers()
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
             var list = await _textRep.GetAllUsers();
             if(list != null)
             {
                 return Ok(list);
             }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, null);
-            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError, null);
         }
         /// <summary>
         /// 
@@ -475,7 +410,12 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> EditText([FromBody]Text text)
         {
-            
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+
             bool success = await _textRep.EditText(text);
             if (success)
             {
@@ -486,15 +426,19 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> EditTag([FromBody] Tag tag) 
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
             bool success = await _textRep.EditTag(tag);
             if (success)
             {
                 return Ok(true);
             }
-            else
-            {
-                return BadRequest(false);
-            }
+            
+            return BadRequest(false);
         }
     }
 }

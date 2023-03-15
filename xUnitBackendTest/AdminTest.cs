@@ -11,7 +11,7 @@ namespace xUnitBackendTest;
 
 public class AdminTest
 {
-    private const string _loggedIn = "User";
+    private const string _loggedIn = "AdminSession";
     private const string _notLoggedIn = "";
     
     private static readonly Mock<ITextRepository> mockTextRep = new();
@@ -35,7 +35,6 @@ public class AdminTest
         mockHttpContext.Setup(s => s.Session).Returns(mockSession);
         _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
         
-        mockSecurity.Setup(x => x.FindAdmin(It.IsAny<string>())).ReturnsAsync(true);
         mockTextRep.Setup(x => x.CreateTag(It.IsAny<string>())).ReturnsAsync(true);
 
         //Act
@@ -45,23 +44,7 @@ public class AdminTest
         Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
         Assert.Equal(true, result.Value);
     }
-    [Fact]
-    public async Task CreateTagNotAdmin()
-    {
-        //Arrange
-        
-        mockSession[_loggedIn] = "1";
-        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
-        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
-        
-        mockSecurity.Setup(x => x.FindAdmin(It.IsAny<string>())).ReturnsAsync(false);
-
-        //Act
-        var result = await _adminController.CreateTag("test") as UnauthorizedResult;
-        
-        //Assert
-        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
-    }
+    
     [Fact]
     public async Task CreateTagNotLoggedIn()
     {
@@ -88,7 +71,6 @@ public class AdminTest
         mockHttpContext.Setup(s => s.Session).Returns(mockSession);
         _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
         
-        mockSecurity.Setup(x => x.FindAdmin(It.IsAny<string>())).ReturnsAsync(true);
         mockTextRep.Setup(x => x.CreateTag(It.IsAny<string>())).ReturnsAsync(false);
 
         //Act
@@ -122,7 +104,6 @@ public class AdminTest
         mockHttpContext.Setup(s => s.Session).Returns(mockSession);
         _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
         
-        mockSecurity.Setup(x => x.FindAdmin(It.IsAny<string>())).ReturnsAsync(true);
         mockTextRep.Setup(x => x.GetAllTags()).ReturnsAsync(tags);
 
         //Act
@@ -132,39 +113,7 @@ public class AdminTest
         Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
         Assert.Equal(tags, result.Value);
     }
-    
-    [Fact]
-    public async Task GetTagNotAdmin()
-    {
-        //Arrange
-        
-        var tags = new List<Tag>
-        {
-            new()
-            {
-                TagId = 1,
-                TagText= "test"
-            },
-            new()
-            {
-                TagId = 2,
-                TagText= "test2"
-            }
-        };
 
-        mockSession[_loggedIn] = "1";
-        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
-        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
-        
-        mockSecurity.Setup(x => x.FindAdmin(It.IsAny<string>())).ReturnsAsync(false);
-
-        //Act
-        var result = await _adminController.GetTags() as UnauthorizedResult;
-
-        //Assert
-        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-    }
-    
     [Fact]
     public async Task GetTagNotLoggedIn()
     {
@@ -189,7 +138,6 @@ public class AdminTest
         mockHttpContext.Setup(s => s.Session).Returns(mockSession);
         _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
         
-        mockSecurity.Setup(x => x.FindAdmin(It.IsAny<string>())).ReturnsAsync(true);
         mockTextRep.Setup(x => x.GetAllTags()).ReturnsAsync((List<Tag>) null);
 
         //Act
@@ -224,7 +172,6 @@ public class AdminTest
         mockHttpContext.Setup(s => s.Session).Returns(mockSession);
         _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
         
-        mockSecurity.Setup(x => x.FindAdmin(It.IsAny<string>())).ReturnsAsync(true);
         mockTextRep.Setup(x => x.CreateText(It.IsAny<Text>())).ReturnsAsync(true);
         
         //Act
@@ -233,39 +180,6 @@ public class AdminTest
         //Assert
         Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
         Assert.Equal(true, result.Value);
-    }
-    
-    [Fact]
-    public async Task CreateTextNotAdmin()
-    {
-        //Arrange
-        var text = new Text()
-        {
-            Active = true,
-            TextId = 1,
-            TextText = "test",
-            Tags = new List<Tag>()
-            {
-                new()
-                {
-                    TagId = 1,
-                    TagText = "test"
-                }
-            }
-        };
-        
-        mockSession[_loggedIn] = "1";
-        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
-        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
-        
-        mockSecurity.Setup(x => x.FindAdmin(It.IsAny<string>())).ReturnsAsync(false);
-        mockTextRep.Setup(x => x.CreateText(It.IsAny<Text>())).ReturnsAsync(true);
-        
-        //Act
-        var result = await _adminController.CreateText(text) as UnauthorizedResult;
-        
-        //Assert
-        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
     }
     
     [Fact]
@@ -309,7 +223,6 @@ public class AdminTest
         mockHttpContext.Setup(s => s.Session).Returns(mockSession);
         _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
         
-        mockSecurity.Setup(x => x.FindAdmin(It.IsAny<string>())).ReturnsAsync(true);
         mockTextRep.Setup(x => x.CreateText(It.IsAny<Text>())).ReturnsAsync(false);
         
         //Act
