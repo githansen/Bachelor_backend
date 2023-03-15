@@ -237,6 +237,10 @@ public class AdminTest
     public async Task DeleteTextOk()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.DeleteText(It.IsAny<int>())).ReturnsAsync(true);
         
         //Act
@@ -248,9 +252,30 @@ public class AdminTest
     }
     
     [Fact]
+    public async Task DeleteTextNotLoggedIn()
+    {
+        //Arrange
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        mockTextRep.Setup(x => x.DeleteText(It.IsAny<int>())).ReturnsAsync(true);
+        
+        //Act
+        var result = await _adminController.DeleteText(1) as UnauthorizedResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
+    }
+    
+    [Fact]
     public async Task DeleteTextFault()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.DeleteText(It.IsAny<int>())).ReturnsAsync(false);
         
         //Act
@@ -265,6 +290,10 @@ public class AdminTest
     public async Task DeleteTagOk()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.DeleteTag(It.IsAny<int>())).ReturnsAsync(true);
         
         //Act
@@ -279,6 +308,10 @@ public class AdminTest
     public async Task DeleteTagFault()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.DeleteTag(It.IsAny<int>())).ReturnsAsync(false);
         
         //Act
@@ -291,22 +324,30 @@ public class AdminTest
 
     [Fact]
     public async Task GetNumberOfTextsOk()
-    {
-       //Arrange
-         mockTextRep.Setup(x => x.GetNumberOfTexts()).ReturnsAsync(10);
+    { 
+        //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+       
+        mockTextRep.Setup(x => x.GetNumberOfTexts()).ReturnsAsync(10);
          
-         //Act
-         var result = await _adminController.GetNumberOfTexts() as OkObjectResult;
+        //Act
+        var result = await _adminController.GetNumberOfTexts() as OkObjectResult;
          
-         //Assert
-         Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-         Assert.Equal(10, result.Value);
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(10, result.Value);
     }
     
     [Fact]
     public async Task GetNumberOfTextsFault()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.GetNumberOfTexts()).ReturnsAsync(-5);
          
         //Act
@@ -321,6 +362,10 @@ public class AdminTest
     public async Task GetNumberOfUsersOk()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.GetNumberOfUsers()).ReturnsAsync(10);
          
         //Act
@@ -335,6 +380,10 @@ public class AdminTest
     public async Task GetNumberOfUsersFault()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.GetNumberOfUsers()).ReturnsAsync(-5);
          
         //Act
@@ -363,6 +412,11 @@ public class AdminTest
                 }
             }
         };
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.GetOneText(It.IsAny<int>())).ReturnsAsync(text);
         
         //Act
@@ -377,6 +431,10 @@ public class AdminTest
     public async Task GetOneTextFault()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.GetOneText(It.IsAny<int>())).ReturnsAsync((Text) null);
         
         //Act
@@ -393,6 +451,10 @@ public class AdminTest
         //Arrange
         var file = new FormFile(new MemoryStream(), 0, 0, "Data", "12345-12345-12345-12345.m4a");
         
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockVoiceRep.Setup(x => x.GetOneRecording(It.IsAny<string>())).ReturnsAsync(file);
         
         //Act
@@ -406,6 +468,9 @@ public class AdminTest
     public async Task GetOneRecordingFault()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
         
         mockVoiceRep.Setup(x => x.GetOneRecording(It.IsAny<string>())).ReturnsAsync((FormFile) null);
         
@@ -441,6 +506,10 @@ public class AdminTest
             }
         };
         
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.GetAllUsers()).ReturnsAsync(users);
         //Act
         var result = await _adminController.GetAllUsers() as OkObjectResult;
@@ -454,6 +523,10 @@ public class AdminTest
     public async Task GetAllUsersFault()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.GetAllUsers()).ReturnsAsync((List<User>) null);
         
         //Act
@@ -468,6 +541,10 @@ public class AdminTest
     public async Task EditTextOk()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.EditText(It.IsAny<Text>())).ReturnsAsync(true);
         
         //Act
@@ -482,6 +559,10 @@ public class AdminTest
     public async Task EditTextFault()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.EditText(It.IsAny<Text>())).ReturnsAsync(false);
         
         //Act
@@ -496,6 +577,10 @@ public class AdminTest
     public async Task EditTagOk()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.EditTag(It.IsAny<Tag>())).ReturnsAsync(true);
         
         //Act
@@ -510,6 +595,10 @@ public class AdminTest
     public async Task EditTagFault()
     {
         //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
         mockTextRep.Setup(x => x.EditTag(It.IsAny<Tag>())).ReturnsAsync(false);
         
         //Act
