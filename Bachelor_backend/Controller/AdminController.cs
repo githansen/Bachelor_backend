@@ -43,7 +43,7 @@ namespace Bachelor_backend.Controller
 
             if (success)
             {
-                HttpContext.Session.SetString("UserSession", user.Username);
+                HttpContext.Session.SetString(_loggedIn, user.Username);
                 return Ok(true);
             }
             return Unauthorized("Wrong username or password");
@@ -66,6 +66,13 @@ namespace Bachelor_backend.Controller
                 return Unauthorized();
             }
             
+            var adminFound = await _security.FindAdmin(sessionString);
+
+            if (!adminFound)
+            {
+                return Unauthorized();
+            }
+            
             var success = await _security.Register(user);
             if (success)
             {
@@ -84,8 +91,22 @@ namespace Bachelor_backend.Controller
         /// <param name="text"></param>
         /// <response code="200">OK - creation successful</response>
         /// <response code="400">Error while creating tag</response>
+        [HttpPost]
         public async Task<ActionResult> CreateTag([FromQuery]string text)
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            var adminFound = await _security.FindAdmin(sessionString);
+
+            if (!adminFound)
+            {
+                return Unauthorized();
+            }
+            
             bool success = await _textRep.CreateTag(text);
             if (success)
             {
@@ -104,6 +125,19 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetTags()
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            var adminFound = await _security.FindAdmin(sessionString);
+
+            if (!adminFound)
+            {
+                return Unauthorized();
+            }
+            
             var list = await _textRep.GetAllTags();
             return Ok(list);
         }
@@ -140,18 +174,29 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> CreateText([FromBody] Text text)
         {
-                if(!ModelState.IsValid)
-                {
-                return BadRequest(false);
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            var adminFound = await _security.FindAdmin(sessionString);
 
-                }
-                bool success = await _textRep.CreateText(text);
-                if(success)
-                {
-                    return Ok(true);
-                }
+            if (!adminFound)
+            {
+                return Unauthorized();
+            }
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(false);
+            }
+            bool success = await _textRep.CreateText(text);
+            if(success)
+            {
+                return Ok(true);
+            }
                 
-                return StatusCode(StatusCodes.Status500InternalServerError, false);
+            return StatusCode(StatusCodes.Status500InternalServerError, false);
         }
         
         /// <summary>
@@ -163,6 +208,19 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetAllTexts()
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            var adminFound = await _security.FindAdmin(sessionString);
+
+            if (!adminFound)
+            {
+                return Unauthorized();
+            }
+            
             var list = await _textRep.GetAllTexts();
             if(list != null)
             {
@@ -179,6 +237,19 @@ namespace Bachelor_backend.Controller
         [HttpDelete]
         public async Task<ActionResult> DeleteText(int TextId)
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            var adminFound = await _security.FindAdmin(sessionString);
+
+            if (!adminFound)
+            {
+                return Unauthorized();
+            }
+            
             bool success = await _textRep.DeleteText(TextId);
             if (success)
             {
@@ -196,6 +267,18 @@ namespace Bachelor_backend.Controller
         [HttpDelete]
         public async Task<ActionResult> DeleteTag(int TagId)
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            var adminFound = await _security.FindAdmin(sessionString);
+
+            if (!adminFound)
+            {
+                return Unauthorized();
+            }
             
             bool success = await _textRep.DeleteTag(TagId);
             if (success)
@@ -213,6 +296,19 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetNumberOfTexts()
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            var adminFound = await _security.FindAdmin(sessionString);
+
+            if (!adminFound)
+            {
+                return Unauthorized();
+            }
+            
             int total = await _textRep.GetNumberOfTexts();
             if(total > -1)
             {
@@ -227,16 +323,28 @@ namespace Bachelor_backend.Controller
         /// <returns></returns>
 
         [HttpGet]
-        public async Task<ActionResult> GetNumberOfRecordings(){
+        public async Task<ActionResult> GetNumberOfRecordings()
+        {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            var adminFound = await _security.FindAdmin(sessionString);
+
+            if (!adminFound)
+            {
+                return Unauthorized();
+            }
+            
             int total = await _voicerep.GetNumberOfRecordings();
             if (total > -1)
             {
                 return Ok(total);
             }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, -1);
-            }
+            
+            return StatusCode(StatusCodes.Status500InternalServerError, -1);
         }
         /// <summary>
         /// 
@@ -246,6 +354,19 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetNumberOfUsers()
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            var adminFound = await _security.FindAdmin(sessionString);
+
+            if (!adminFound)
+            {
+                return Unauthorized();
+            }
+            
             int total = await _textRep.GetNumberOfUsers();
             if(total > -1) {
                 return Ok(total);
@@ -261,6 +382,19 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetOneText(int id) 
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            var adminFound = await _security.FindAdmin(sessionString);
+
+            if (!adminFound)
+            {
+                return Unauthorized();
+            }
+            
             Text text = await _textRep.GetOneText(id);
             if(text != null)
             {

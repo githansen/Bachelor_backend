@@ -30,6 +30,27 @@ namespace Bachelor_backend.DAL.Repositories
             }
             return false;
         }
+
+        public async Task<bool> FindAdmin(string username)
+        {
+            try
+            {
+                var admin = await _db.Admins.FindAsync(username);
+                
+                if (admin == null)
+                {
+                    _logger.LogInformation("Admin not found");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation(e.Message);
+                return false;
+            }
+        }
         
         public async Task<bool> Register(AdminUser user)
         {
