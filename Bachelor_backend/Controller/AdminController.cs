@@ -11,7 +11,6 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Bachelor_backend.Controller
 {
-
     [Route("[controller]/[action]")]
     public class AdminController : ControllerBase
     {
