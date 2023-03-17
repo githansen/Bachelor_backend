@@ -64,15 +64,15 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> RegisterAdmin(AdminUser user)
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
             if (ModelState.IsValid)
             {
-                var sessionString = HttpContext.Session.GetString(_loggedIn);
-
-                if (sessionString.IsNullOrEmpty())
-                {
-                    return Unauthorized();
-                }
-
                 var success = await _security.Register(user);
                 if (success)
                 {
@@ -170,17 +170,18 @@ namespace Bachelor_backend.Controller
                 return Unauthorized();
             }
             
-            if(!ModelState.IsValid)
+            if(ModelState.IsValid)
             {
-                return BadRequest(false);
+                bool success = await _textRep.CreateText(text);
+                if(success)
+                {
+                    return Ok(true);
+                }
+                _logger.LogInformation("Error in creating text");
+                return StatusCode(StatusCodes.Status500InternalServerError, false);
             }
-            bool success = await _textRep.CreateText(text);
-            if(success)
-            {
-                return Ok(true);
-            }
-                
-            return StatusCode(StatusCodes.Status500InternalServerError, false);
+            _logger.LogInformation("Fault in input");
+            return BadRequest("Fault in input");
         }
         
         /// <summary>

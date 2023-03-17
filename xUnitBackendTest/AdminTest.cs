@@ -95,11 +95,101 @@ public class AdminTest
         Assert.True((bool) result!.Value!);
         Assert.Equal("", mockSession[_loggedIn]);
     }
-    
 
+    [Fact]
+    public async Task RegisterLoggedInOk()
+    {
+        //Arrange
+        var user = new AdminUser()
+        {
+            Username = "person",
+            Password = "password"
+        };
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        mockSecurity.Setup(x => x.Register(It.IsAny<AdminUser>())).ReturnsAsync(true);
+        
+        //Act
+        var result = await _adminController.RegisterAdmin(user) as OkObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.True((bool) result!.Value!);
+    }
     
+    [Fact]
+    public async Task RegisterLoggedInFailed()
+    {
+        //Arrange
+        var user = new AdminUser()
+        {
+            Username = "person",
+            Password = "password"
+        };
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        mockSecurity.Setup(x => x.Register(It.IsAny<AdminUser>())).ReturnsAsync(false);
+        
+        //Act
+        var result = await _adminController.RegisterAdmin(user) as BadRequestObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result!.StatusCode);
+        Assert.Equal("Failed to register new admin" , result!.Value!);
+    }
     
+    [Fact]
+    public async Task RegisterLoggedInInputFault()
+    {
+        //Arrange
+        var user = new AdminUser()
+        {
+            Username = "1234",
+            Password = "1234"
+        };
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        _adminController.ModelState.AddModelError("Username", "Fault in input");
+        mockSecurity.Setup(x => x.Register(It.IsAny<AdminUser>())).ReturnsAsync(false);
+        
+        //Act
+        var result = await _adminController.RegisterAdmin(user) as BadRequestObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result!.StatusCode);
+        Assert.Equal("Fault in input" , result!.Value!);
+    }
     
+    [Fact]
+    public async Task RegisterNotLoggedIn()
+    {
+        //Arrange
+        var user = new AdminUser()
+        {
+            Username = "person",
+            Password = "password"
+        };
+        
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        //Act
+        var result = await _adminController.RegisterAdmin(user) as UnauthorizedResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result!.StatusCode);
+    }
+
     [Fact]
     public async Task CreateTagOk()
     {
@@ -301,8 +391,30 @@ public class AdminTest
         var result = await _adminController.CreateText(text) as ObjectResult;
         
         //Assert
-        Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
-        Assert.Equal(false, result.Value);
+        Assert.Equal((int) HttpStatusCode.InternalServerError, result!.StatusCode);
+        Assert.False((bool) result!.Value);
+    }
+    
+    [Fact]
+    public async Task CreateTextInputFault()
+    {
+        //Arrange
+        var text = new Text();
+
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        _adminController.ModelState.AddModelError("Text", "Fault in input");
+        mockTextRep.Setup(x => x.CreateText(It.IsAny<Text>())).ReturnsAsync(false);
+        
+        //Act
+        var result = await _adminController.CreateText(text) as BadRequestObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result!.StatusCode);
+        Assert.Equal("Fault in input", result.Value);
     }
 
     [Fact]
