@@ -27,10 +27,83 @@ public class AdminTest
 
 
     [Fact]
+    public async Task LogInOk()
+    {
+        //Arrange
+        var user = new AdminUser()
+        {
+            Username = "admin",
+            Password = "admin"
+        };
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        mockSecurity.Setup(x => x.Login(It.IsAny<AdminUser>())).ReturnsAsync(true);
+        
+        //Act
+        var result = await _adminController.LogIn(user) as OkObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.True((bool) result!.Value!);
+    }
+    
+    [Fact]
+    public async Task LogInFailed()
+    {
+        //Arrange
+        mockSecurity.Setup(x => x.Login(It.IsAny<AdminUser>())).ReturnsAsync(false);
+        
+        //Act
+        var result = await _adminController.LogIn(It.IsAny<AdminUser>()) as UnauthorizedObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result!.StatusCode);
+        Assert.Equal("Wrong username or password" , result!.Value!);
+    }
+    
+    [Fact]
+    public async Task LogInInputFault()
+    {
+        //Arrange
+        _adminController.ModelState.AddModelError("Username", "Fault in input");
+      
+        //Act
+        var result = await _adminController.LogIn(It.IsAny<AdminUser>()) as BadRequestObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result!.StatusCode);
+        Assert.Equal("Fault in input" , result!.Value!);
+    }
+
+    [Fact]
+    public async Task LogOutOk()
+    {
+        //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        
+        //Act
+        var result = await _adminController.LogOut() as OkObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.True((bool) result!.Value!);
+        Assert.Equal("", mockSession[_loggedIn]);
+    }
+    
+
+    
+    
+    
+    [Fact]
     public async Task CreateTagOk()
     {
         //Arrange
-        
         mockSession[_loggedIn] = "admin";
         mockHttpContext.Setup(s => s.Session).Returns(mockSession);
         _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
@@ -41,8 +114,8 @@ public class AdminTest
         var result = await _adminController.CreateTag("test") as OkObjectResult;
         
         //Assert
-        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-        Assert.Equal(true, result.Value);
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.True((bool) result.Value!);
     }
     
     [Fact]
@@ -59,7 +132,7 @@ public class AdminTest
         var result = await _adminController.CreateTag("test") as UnauthorizedResult;
         
         //Assert
-        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result!.StatusCode);
     }
     
     [Fact]
@@ -77,8 +150,8 @@ public class AdminTest
         var result = await _adminController.CreateTag("test") as BadRequestObjectResult;
         
         //Assert
-        Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
-        Assert.Equal(false, result.Value);
+        Assert.Equal((int) HttpStatusCode.BadRequest, result!.StatusCode);
+        Assert.False((bool) result.Value!);
     }
 
     [Fact]
@@ -110,7 +183,7 @@ public class AdminTest
         var result = await _adminController.GetTags() as OkObjectResult;
 
         //Assert
-        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
         Assert.Equal(tags, result.Value);
     }
 
@@ -127,7 +200,7 @@ public class AdminTest
         var result = await _adminController.GetTags() as UnauthorizedResult;
 
         //Assert
-        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
     }
     
     [Fact]
@@ -147,7 +220,6 @@ public class AdminTest
         Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
         Assert.Null(result.Value);
     }
-    
 
     [Fact]
     public async Task CreateTextOk()
@@ -178,8 +250,8 @@ public class AdminTest
         var result = await _adminController.CreateText(text) as OkObjectResult;
         
         //Assert
-        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-        Assert.Equal(true, result.Value);
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.True((bool) result.Value!);
     }
     
     [Fact]
@@ -247,8 +319,8 @@ public class AdminTest
         var result = await _adminController.DeleteText(1) as OkObjectResult;
         
         //Assert
-        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-        Assert.Equal(true, result.Value);
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.True((bool) result.Value!);
     }
     
     [Fact]
@@ -258,8 +330,6 @@ public class AdminTest
         mockSession[_loggedIn] = _notLoggedIn;
         mockHttpContext.Setup(s => s.Session).Returns(mockSession);
         _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
-        
-        mockTextRep.Setup(x => x.DeleteText(It.IsAny<int>())).ReturnsAsync(true);
         
         //Act
         var result = await _adminController.DeleteText(1) as UnauthorizedResult;
@@ -301,7 +371,22 @@ public class AdminTest
         
         //Assert
         Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-        Assert.Equal(true, result.Value);
+        Assert.True((bool) result.Value!);
+    }
+    
+    [Fact]
+    public async Task DeleteNotLoggedIn()
+    {
+        //Arrange
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        //Act
+        var result = await _adminController.DeleteTag(1) as UnauthorizedResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
     }
     
     [Fact]
@@ -341,6 +426,21 @@ public class AdminTest
     }
     
     [Fact]
+    public async Task GetNumberOfTextsNotLoggedIn()
+    { 
+        //Arrange
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        //Act
+        var result = await _adminController.GetNumberOfTexts() as UnauthorizedResult;
+         
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
+    }
+    
+    [Fact]
     public async Task GetNumberOfTextsFault()
     {
         //Arrange
@@ -374,6 +474,21 @@ public class AdminTest
         //Assert
         Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
         Assert.Equal(10, result.Value);
+    }
+    
+    [Fact]
+    public async Task GetNumberOfUsersNotLoggedIn()
+    {
+        //Arrange
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        //Act
+        var result = await _adminController.GetNumberOfUsers() as UnauthorizedResult;
+         
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
     }
     
     [Fact]
@@ -428,6 +543,22 @@ public class AdminTest
     }
     
     [Fact]
+    public async Task GetOneTextNotLoggedIn()
+    {
+        //Arrange
+
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        //Act
+        var result = await _adminController.GetOneText(1) as UnauthorizedResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
+    }
+    
+    [Fact]
     public async Task GetOneTextFault()
     {
         //Arrange
@@ -442,7 +573,7 @@ public class AdminTest
         
         //Assert
         Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
-        Assert.Equal(null, result.Value);
+        Assert.Null(result.Value);
     }
 
     [Fact]
@@ -463,7 +594,23 @@ public class AdminTest
         //Assert
         Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
         Assert.Equal(file, result.Value);
-    }   
+    }
+    
+    [Fact]
+    public async Task GetOneRecordingNotLoggedIn()
+    {
+        //Arrange
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        //Act
+        var result = await _adminController.GetOneRecording("12345-12345-12345-12345") as UnauthorizedResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
+    }
+    
     [Fact]
     public async Task GetOneRecordingFault()
     {
@@ -520,6 +667,21 @@ public class AdminTest
     }
     
     [Fact]
+    public async Task GetAllUsersNotLoggedIn()
+    {
+        //Arrange
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        //Act
+        var result = await _adminController.GetAllUsers() as UnauthorizedResult;
+
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
+    }
+    
+    [Fact]
     public async Task GetAllUsersFault()
     {
         //Arrange
@@ -534,7 +696,7 @@ public class AdminTest
         
         //Assert
         Assert.Equal((int) HttpStatusCode.InternalServerError, result.StatusCode);
-        Assert.Equal(null, result.Value);
+        Assert.Null(result.Value);
     }
 
     [Fact]
@@ -548,11 +710,26 @@ public class AdminTest
         mockTextRep.Setup(x => x.EditText(It.IsAny<Text>())).ReturnsAsync(true);
         
         //Act
-        var result = await _adminController.EditText(new Text()) as OkObjectResult;
+        var result = await _adminController.EditText(It.IsAny<Text>()) as OkObjectResult;
 
         //Assert
-        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-        Assert.Equal(true, result.Value);
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.True((bool) result.Value!);
+    }
+    
+    [Fact]
+    public async Task EditTextNotLoggedIn()
+    {
+        //Arrange
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        //Act
+        var result = await _adminController.EditText(new Text()) as UnauthorizedResult;
+
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
     }
 
     [Fact]
@@ -584,11 +761,26 @@ public class AdminTest
         mockTextRep.Setup(x => x.EditTag(It.IsAny<Tag>())).ReturnsAsync(true);
         
         //Act
-        var result = await _adminController.EditTag(new Tag()) as OkObjectResult;
+        var result = await _adminController.EditTag(It.IsAny<Tag>()) as OkObjectResult;
 
         //Assert
-        Assert.Equal((int) HttpStatusCode.OK, result.StatusCode);
-        Assert.Equal(true, result.Value);
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.True((bool) result.Value!);
+    }
+    
+    [Fact]
+    public async Task EditTagNotLoggedIn()
+    {
+        //Arrange
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        //Act
+        var result = await _adminController.EditTag(It.IsAny<Tag>()) as UnauthorizedResult;
+
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result.StatusCode);
     }
     
     [Fact]
@@ -602,7 +794,7 @@ public class AdminTest
         mockTextRep.Setup(x => x.EditTag(It.IsAny<Tag>())).ReturnsAsync(false);
         
         //Act
-        var result = await _adminController.EditTag(new Tag()) as BadRequestObjectResult;
+        var result = await _adminController.EditTag(It.IsAny<Tag>()) as BadRequestObjectResult;
 
         //Assert
         Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);

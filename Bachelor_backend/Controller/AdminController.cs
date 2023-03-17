@@ -38,14 +38,20 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> LogIn(AdminUser user)
         {
-            var success = await _security.Login(user);
-
-            if (success)
+            if (ModelState.IsValid)
             {
-                HttpContext.Session.SetString(_loggedIn, user.Username);
-                return Ok(true);
+                var success = await _security.Login(user);
+
+                if (success)
+                {
+                    HttpContext.Session.SetString(_loggedIn, user.Username);
+                    return Ok(true);
+                }
+                return Unauthorized("Wrong username or password");
             }
-            return Unauthorized("Wrong username or password");
+            _logger.LogInformation("Fault in input");
+            return BadRequest("Fault in input");
+
         }
         
         [HttpGet]
@@ -58,20 +64,26 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> RegisterAdmin(AdminUser user)
         {
-            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (ModelState.IsValid)
+            {
+                var sessionString = HttpContext.Session.GetString(_loggedIn);
 
-            if (sessionString.IsNullOrEmpty())
-            {
-                return Unauthorized();
+                if (sessionString.IsNullOrEmpty())
+                {
+                    return Unauthorized();
+                }
+
+                var success = await _security.Register(user);
+                if (success)
+                {
+                    return Ok(true);
+                }
+
+                _logger.LogInformation("Fault in registering admin");
+                return BadRequest("Failed to register new admin");
             }
-            
-            var success = await _security.Register(user);
-            if (success)
-            {
-                return Ok(true);
-            }
-            _logger.LogInformation("Fault in registering admin");
-            return BadRequest("Failed to register new admin");
+            _logger.LogInformation("Fault in input");
+            return BadRequest("Fault in input");
         }
 
         /// <summary>
