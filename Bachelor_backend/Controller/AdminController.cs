@@ -7,21 +7,26 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Xml.Schema;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Bachelor_backend.Controller
 {
-
     [Route("[controller]/[action]")]
     public class AdminController : ControllerBase
     {
         private readonly ITextRepository _textRep;
         private readonly IVoiceRepository _voicerep;
+        private readonly ISecurityRepository _security;
         private readonly ILogger<AdminController> _logger;
         
-        public AdminController(ITextRepository textrep,IVoiceRepository voicerep, ILogger<AdminController> logger)
+        private const string _loggedIn = "AdminSession";
+        private const string _notLoggedIn = "";
+        
+        public AdminController(ITextRepository textrep,IVoiceRepository voicerep, ISecurityRepository security, ILogger<AdminController> logger)
         {
             _textRep = textrep;
             _voicerep = voicerep;
+            _security = security;
             _logger = logger;
         }
 
@@ -30,11 +35,55 @@ namespace Bachelor_backend.Controller
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        [HttpGet]
-        public async Task<ActionResult> LogIn()
+        [HttpPost]
+        public async Task<ActionResult> LogIn(AdminUser user)
         {
-            //bool success = await _textRep.login();
-            throw new NotImplementedException();
+            if (ModelState.IsValid)
+            {
+                var success = await _security.Login(user);
+
+                if (success)
+                {
+                    HttpContext.Session.SetString(_loggedIn, user.Username);
+                    return Ok(true);
+                }
+                return Unauthorized("Wrong username or password");
+            }
+            _logger.LogInformation("Fault in input");
+            return BadRequest("Fault in input");
+
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult> LogOut()
+        {
+            HttpContext.Session.SetString(_loggedIn, _notLoggedIn);
+            return Ok(true);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> RegisterAdmin(AdminUser user)
+        {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            if (ModelState.IsValid)
+            {
+                var success = await _security.Register(user);
+                if (success)
+                {
+                    return Ok(true);
+                }
+
+                _logger.LogInformation("Fault in registering admin");
+                return BadRequest("Failed to register new admin");
+            }
+            _logger.LogInformation("Fault in input");
+            return BadRequest("Fault in input");
         }
 
         /// <summary>
@@ -49,6 +98,12 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> CreateTag([FromQuery]string text)
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+
             bool success = await _textRep.CreateTag(text);
             if (success)
             {
@@ -67,6 +122,12 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetTags()
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+
             var list = await _textRep.GetAllTags();
             return Ok(list);
         }
@@ -103,18 +164,24 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> CreateText([FromBody] Text text)
         {
-                if(!ModelState.IsValid)
-                {
-                return BadRequest(false);
-
-                }
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
+            if(ModelState.IsValid)
+            {
                 bool success = await _textRep.CreateText(text);
                 if(success)
                 {
                     return Ok(true);
                 }
-                
+                _logger.LogInformation("Error in creating text");
                 return StatusCode(StatusCodes.Status500InternalServerError, false);
+            }
+            _logger.LogInformation("Fault in input");
+            return BadRequest("Fault in input");
         }
         
         /// <summary>
@@ -126,6 +193,12 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetAllTexts()
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+
             var list = await _textRep.GetAllTexts();
             if(list != null)
             {
@@ -142,6 +215,12 @@ namespace Bachelor_backend.Controller
         [HttpDelete]
         public async Task<ActionResult> DeleteText(int TextId)
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
             bool success = await _textRep.DeleteText(TextId);
             if (success)
             {
@@ -159,7 +238,12 @@ namespace Bachelor_backend.Controller
         [HttpDelete]
         public async Task<ActionResult> DeleteTag(int TagId)
         {
-            
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+
             bool success = await _textRep.DeleteTag(TagId);
             if (success)
             {
@@ -176,6 +260,12 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetNumberOfTexts()
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+
             int total = await _textRep.GetNumberOfTexts();
             if(total > -1)
             {
@@ -190,16 +280,21 @@ namespace Bachelor_backend.Controller
         /// <returns></returns>
 
         [HttpGet]
-        public async Task<ActionResult> GetNumberOfRecordings(){
+        public async Task<ActionResult> GetNumberOfRecordings()
+        {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
             int total = await _voicerep.GetNumberOfRecordings();
             if (total > -1)
             {
                 return Ok(total);
             }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, -1);
-            }
+            
+            return StatusCode(StatusCodes.Status500InternalServerError, -1);
         }
         /// <summary>
         /// 
@@ -209,6 +304,12 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetNumberOfUsers()
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
             int total = await _textRep.GetNumberOfUsers();
             if(total > -1) {
                 return Ok(total);
@@ -224,6 +325,12 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetOneText(int id) 
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
             Text text = await _textRep.GetOneText(id);
             if(text != null)
             {
@@ -259,7 +366,14 @@ namespace Bachelor_backend.Controller
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         [HttpGet]
-        public async Task<ActionResult> GetOneRecording(string uuid) {
+        public async Task<ActionResult> GetOneRecording(string uuid) 
+        {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+
             IFormFile file = await _voicerep.GetOneRecording(uuid);
             if(file != null)
             {
@@ -276,15 +390,19 @@ namespace Bachelor_backend.Controller
         [HttpGet]
         public async Task<ActionResult> GetAllUsers()
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
             var list = await _textRep.GetAllUsers();
             if(list != null)
             {
                 return Ok(list);
             }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, null);
-            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError, null);
         }
         /// <summary>
         /// 
@@ -294,7 +412,12 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> EditText([FromBody]Text text)
         {
-            
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+
             bool success = await _textRep.EditText(text);
             if (success)
             {
@@ -305,15 +428,19 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> EditTag([FromBody] Tag tag) 
         {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+            
             bool success = await _textRep.EditTag(tag);
             if (success)
             {
                 return Ok(true);
             }
-            else
-            {
-                return BadRequest(false);
-            }
+            
+            return BadRequest(false);
         }
     }
 }

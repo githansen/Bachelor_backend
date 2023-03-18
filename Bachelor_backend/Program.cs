@@ -34,6 +34,7 @@ builder.Logging.AddSerilog(logger);
 builder.Services.AddControllers();
 builder.Services.AddScoped<IVoiceRepository, VoiceRepository>();
 builder.Services.AddScoped<ITextRepository, TextRepository>();
+builder.Services.AddScoped<ISecurityRepository, SecurityRepository>();
 builder.Services.AddTransient<IAzureStorage, AzureStorage>();
 
 builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
@@ -49,18 +50,9 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromSeconds(1800); //30 Minutes session
     options.Cookie.IsEssential = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.SameSite = SameSiteMode.None;
+    //options.Cookie.SameSite = SameSiteMode.None;
 });
 builder.Services.AddScoped<DBInitializer, DBInitializer>();
-builder.Services.AddSession(options =>
-{
-    options.Cookie.Name = ".AdventureWorks.Session";
-    options.IdleTimeout = TimeSpan.FromSeconds(1800); //30 Minutes session
-    options.Cookie.IsEssential = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.SameSite = SameSiteMode.None;
-
-});
 builder.Services.AddSwaggerGen(c =>
 {
     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,

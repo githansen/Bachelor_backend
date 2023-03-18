@@ -2,6 +2,7 @@
 using Bachelor_backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Bachelor_backend.DAL.Repositories;
 
 namespace Bachelor_backend.DBInitializer
 {
@@ -26,7 +27,23 @@ namespace Bachelor_backend.DBInitializer
                 return;
             }
 
-            if (_db.Texts.Count() > 0) { return; }
+            }       
+            
+            //Add admin user
+            /*
+            var salt = SecurityRepository.CreateSalt();
+            var hash = SecurityRepository.HashPassword("admin", salt);
+            var admin = new AdminUsers()
+            {
+                Username = "Admin",
+                Password = hash,
+                Salt = salt
+            };
+            
+            _db.Admins.Add(admin);
+            _db.SaveChanges();
+            */
+               if(_db.Texts.Count() > 0) { return; }
 
 
 
@@ -98,7 +115,7 @@ namespace Bachelor_backend.DBInitializer
                 _db.Users.Add(user);
                 _db.SaveChanges();
             }
-            _db.SaveChanges();
+
         }
     }
 }

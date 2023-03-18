@@ -2,14 +2,21 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bachelor_backend.DAL
 {
+    public class AdminUsers
+    {
+        [Key]
+        public string Username { get; set; }
+        public byte[] Password { get; set; }
+        public byte[] Salt { get; set; }
+    }    
 
 
     public class DatabaseContext : DbContext
     {
-      
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
@@ -17,6 +24,7 @@ namespace Bachelor_backend.DAL
         public DbSet<Text> Texts { get; set; }
         public DbSet<Audiofile> Audiofiles { get; set; }
         public DbSet<TargetGroup> TargetGroups { get; set; }
+        public DbSet<AdminUsers> Admins { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
