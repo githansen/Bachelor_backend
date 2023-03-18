@@ -30,7 +30,7 @@ namespace Bachelor_backend.DAL.Repositories
             }
             return false;
         }
-        
+
         public async Task<bool> Register(AdminUser user)
         {
             try
