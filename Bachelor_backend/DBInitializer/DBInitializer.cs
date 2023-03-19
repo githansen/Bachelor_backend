@@ -27,7 +27,7 @@ namespace Bachelor_backend.DBInitializer
                 return;
             }
 
-            }       
+                 
             
             //Add admin user
             /*
