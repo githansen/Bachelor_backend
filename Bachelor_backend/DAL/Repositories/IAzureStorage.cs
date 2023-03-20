@@ -5,8 +5,8 @@ namespace Bachelor_backend.DAL.Repositories
 
     public interface IAzureStorage
     {
-        Task<BlobResponseDto> UploadAsync(IFormFile file, string newFileName);
+        Task<BlobResponse> UploadAsync(IFormFile file, string newFileName);
 
-        Task<BlobResponseDto> DeleteAsync(string filename);
+        Task<BlobResponse> DeleteAsync(string filename);
     }
 }

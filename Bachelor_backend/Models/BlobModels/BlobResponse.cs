@@ -1,14 +1,14 @@
 ﻿namespace Bachelor_backend.Models.BlobModels
 {
-    public class BlobResponseDto
+    public class BlobResponse
     {
         public string? Status { get; set; }
         public bool Error { get; set; }
-        public BlobDto Blob { get; set; }
+        public Blob Blob { get; set; }
 
-        public BlobResponseDto()
+        public BlobResponse()
         {
-            Blob = new BlobDto();
+            Blob = new Blob();
         }
     }
 }

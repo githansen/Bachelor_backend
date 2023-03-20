@@ -245,7 +245,7 @@ public class AdminTest
     }
 
     [Fact]
-    public async Task GetTagOk()
+    public async Task GetTagsOk()
     {
         //Arrange
         
@@ -278,7 +278,7 @@ public class AdminTest
     }
 
     [Fact]
-    public async Task GetTagNotLoggedIn()
+    public async Task GetTagsNotLoggedIn()
     {
         //Arrange
 
@@ -294,7 +294,7 @@ public class AdminTest
     }
     
     [Fact]
-    public async Task GetTagFault()
+    public async Task GetTagsFault()
     {
         //Arrange
         mockSession[_loggedIn] = "admin";

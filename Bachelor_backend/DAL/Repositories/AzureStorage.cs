@@ -20,9 +20,9 @@ namespace Bachelor_backend.DAL.Repositories
             _logger = logger;
         }
 
-        public async Task<BlobResponseDto> UploadAsync(IFormFile file, string newFileName)
+        public async Task<BlobResponse> UploadAsync(IFormFile file, string newFileName)
         {
-            BlobResponseDto response = new();
+            BlobResponse response = new();
 
             BlobContainerClient container = new BlobContainerClient(_storageConnectionString, _storageContainerName);
 
@@ -61,10 +61,10 @@ namespace Bachelor_backend.DAL.Repositories
             return response;
         }
 
-        public async Task<BlobResponseDto> DeleteAsync(string filename)
+        public async Task<BlobResponse> DeleteAsync(string filename)
         {
             
-            BlobResponseDto response = new();
+            BlobResponse response = new();
             // Get a reference to a container
             BlobContainerClient container = new BlobContainerClient(_storageConnectionString, _storageContainerName);
             
