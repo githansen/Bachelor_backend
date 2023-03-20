@@ -36,7 +36,7 @@ namespace Bachelor_backend.Controller
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         [HttpPost]
-        public async Task<ActionResult> LogIn(AdminUser user)
+        public async Task<ActionResult> LogIn([FromBody] AdminUser user)
         {
             if (ModelState.IsValid)
             {
