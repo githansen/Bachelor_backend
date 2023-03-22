@@ -24,6 +24,15 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
+                //Check if tag exists in db
+                var tagInDb = await _db.Tags.Where(x => x.TagText.Equals(text)).FirstOrDefaultAsync();
+
+                if (tagInDb != null)
+                { 
+                    _logger.LogInformation("Tag already exists");
+                    return false;
+                }
+
                 var NewTag = new Tag
                 {
                     TagText = text,
@@ -242,13 +251,17 @@ namespace Bachelor_backend.DAL.Repositories
             try
             {
                 int total =  await _db.Tags.FromSql($"SELECT * FROM dbo.Tags WHERE TagId={TagId} AND TagId IN (SELECT TagsTagId FROM dbo.TagsForTexts)").CountAsync();
+
                 if(total > 0) 
                 {
                     return false;
                 }
+                
+                //TODO: Noe forskjell på disse
+                //var tag = await _db.Tags.FindAsync(TagId);
                 var x = await GetAllTags();
-                Tag tag = x.Where(i => i.TagId == TagId).FirstOrDefault();
-                if (tag == null || tag.Texts.Count > 0)
+                Tag tag = x.Where(x => x.TagId == TagId).FirstOrDefault();
+                if (tag == null || tag?.Texts?.Count > 0)
                 {
                     return false;
                 }
@@ -261,6 +274,8 @@ namespace Bachelor_backend.DAL.Repositories
             catch (Exception e)
             {
                 _logger.LogInformation(e.Message);
+                Console.WriteLine(e);
+                Console.WriteLine(e.Message);
                 return false;
             }
         }
@@ -269,7 +284,7 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                int total = await _db.Users.CountAsync();
+                int total = await _db.Texts.CountAsync();
                 return total;
             }
             catch

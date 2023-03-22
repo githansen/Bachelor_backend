@@ -27,12 +27,13 @@ namespace Bachelor_backend.Models
 
             if (target.AgeGroups != null)
             {
-                var regexAgeGroup = new Regex("^(\\d){2,2}-(\\d){2,2}|(\\d){2,2}[+]{1,1}$");
+                var regexAgeGroup = new Regex(@"^(\d){2}-(\d){2}|(\d){2}\+$");
                 foreach (var Agegroup in target.AgeGroups)
                 {
-                    Debug.WriteLine(Agegroup);
+                    Console.WriteLine(Agegroup);
                     if (!regexAgeGroup.IsMatch(Agegroup))
                     {
+                        Console.WriteLine("Agegroup failed");
                         return false;
                     }
                 }
@@ -45,6 +46,7 @@ namespace Bachelor_backend.Models
                 {
                     if (!regexLanguage.IsMatch(lang))
                     {
+                        Console.WriteLine("Language failed");
                         return false;
                     }
                 }
@@ -54,11 +56,12 @@ namespace Bachelor_backend.Models
             {
 
 
-                var regexDialect = new Regex("\"^([a-zA-ZæøåÆØÅ]{4,16})$\"");
+                var regexDialect = new Regex("^([a-zA-ZæøåÆØÅ]{4,16})$");
                 foreach (var dialect in target.Dialects)
                 {
                     if (!regexDialect.IsMatch(dialect))
                     {
+                        Console.WriteLine("Dialect failed");
                         return false;
                     }
                 }
@@ -70,6 +73,7 @@ namespace Bachelor_backend.Models
                 {
                     if (!regexGenders.IsMatch(gender))
                     {
+                        Console.WriteLine("Gender failed");
                         return false;
                     }
                 }

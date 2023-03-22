@@ -62,7 +62,7 @@ namespace Bachelor_backend.Controller
         }
 
         [HttpPost]
-        public async Task<ActionResult> RegisterAdmin(AdminUser user)
+        public async Task<ActionResult> RegisterAdmin([FromBody] AdminUser user)
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
 
@@ -96,7 +96,7 @@ namespace Bachelor_backend.Controller
         /// <response code="200">OK - creation successful</response>
         /// <response code="400">Error while creating tag</response>
         [HttpPost]
-        public async Task<ActionResult> CreateTag([FromQuery]string text)
+        public async Task<ActionResult> CreateTag([FromBody]string text)
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
             if (sessionString.IsNullOrEmpty())
