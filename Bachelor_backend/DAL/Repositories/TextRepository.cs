@@ -380,9 +380,9 @@ namespace Bachelor_backend.DAL.Repositories
                 textInDB.Tags = new List<Tag>();
                 sql = "DELETE FROM dbo.TagsForTexts WHERE TextsTextId="+text.TextId;
                 _db.Database.ExecuteSqlRaw(sql);
-                if (text.Tags != null)
+                if (text?.Tags != null)
                 {
-                    foreach (Tag t in text.Tags)
+                    foreach (var t in text.Tags)
                     {
                         sql = "INSERT INTO dbo.TagsForTexts (TagsTagId, TextsTextId) VALUES (" + t.TagId + ", + " + text.TextId + ")";
                         _db.Database.ExecuteSqlRaw(sql);
@@ -391,8 +391,10 @@ namespace Bachelor_backend.DAL.Repositories
                 await _db.SaveChangesAsync();
                 return true;
             }
-            catch(Exception ex)
+            catch(Exception e)
             {
+                _logger.LogInformation(e.Message);
+                Console.WriteLine(e);
                 return false;
             }
         }
@@ -401,19 +403,19 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                Tag TagFromDb = await _db.Tags.FindAsync(tag.TagId);
-                if(TagFromDb != null) { 
-                TagFromDb.TagText = tag.TagText;
-                await _db.SaveChangesAsync();
-                return true;
+                var tagFromDb = await _db.Tags.FindAsync(tag.TagId);
+                if(tagFromDb != null) 
+                { 
+                    tagFromDb.TagText = tag.TagText;
+                    await _db.SaveChangesAsync();
+                    return true;
                 }
-                else
-                {
-                    return false;
-                }
+                _logger.LogInformation("Failed to edit tag");
+                return false;
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return false;
             }
         }
@@ -436,10 +438,10 @@ namespace Bachelor_backend.DAL.Repositories
         public string GenerateSql(Text text)
         {
             //Check if TargetGroup already exists --START--
-            var genders = JsonConvert.SerializeObject(text.TargetGroup.Genders);
-            var languages = JsonConvert.SerializeObject(text.TargetGroup.Languages);
-            var dialects = JsonConvert.SerializeObject(text.TargetGroup.Dialects);
-            var agegroups = JsonConvert.SerializeObject(text.TargetGroup.AgeGroups);
+            var genders = JsonConvert.SerializeObject(text.TargetGroup?.Genders);
+            var languages = JsonConvert.SerializeObject(text.TargetGroup?.Languages);
+            var dialects = JsonConvert.SerializeObject(text.TargetGroup?.Dialects);
+            var agegroups = JsonConvert.SerializeObject(text.TargetGroup?.AgeGroups);
 
             string sql = "SELECT * FROM dbo.TargetGroups WHERE";
             if (!genders.ToLower().Equals("null"))

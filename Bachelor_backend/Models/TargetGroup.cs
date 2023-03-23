@@ -25,34 +25,31 @@ namespace Bachelor_backend.Models
         {
             var target = (TargetGroup)targetgroup;
 
-            if (target.AgeGroups != null)
+            if (target?.AgeGroups != null)
             {
                 var regexAgeGroup = new Regex(@"^(\d){2}-(\d){2}|(\d){2}\+$");
                 foreach (var Agegroup in target.AgeGroups)
                 {
-                    Console.WriteLine(Agegroup);
                     if (!regexAgeGroup.IsMatch(Agegroup))
                     {
-                        Console.WriteLine("Agegroup failed");
                         return false;
                     }
                 }
             }
 
-            if (target.Languages != null)
+            if (target?.Languages != null)
             {
                 var regexLanguage = new Regex("^([a-zA-ZæøåÆØÅ]{4,16})$");
                 foreach (var lang in target.Languages)
                 {
                     if (!regexLanguage.IsMatch(lang))
                     {
-                        Console.WriteLine("Language failed");
                         return false;
                     }
                 }
             }
 
-            if (target.Dialects != null)
+            if (target?.Dialects != null)
             {
 
 
@@ -61,19 +58,17 @@ namespace Bachelor_backend.Models
                 {
                     if (!regexDialect.IsMatch(dialect))
                     {
-                        Console.WriteLine("Dialect failed");
                         return false;
                     }
                 }
             }
-            if(target.Genders != null)
+            if(target?.Genders != null)
             {
                 var regexGenders = new Regex("^(mann|kvinne|annet|Mann|Kvinne|Annet)$");
                 foreach(var gender in target.Genders)
                 {
                     if (!regexGenders.IsMatch(gender))
                     {
-                        Console.WriteLine("Gender failed");
                         return false;
                     }
                 }

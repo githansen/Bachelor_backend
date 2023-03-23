@@ -277,19 +277,29 @@ namespace Bachelor_backend.Controller
         [HttpPost]
         public async Task<ActionResult> EditTag([FromBody] Tag tag) 
         {
-            var sessionString = HttpContext.Session.GetString(_loggedIn);
-            if (sessionString.IsNullOrEmpty())
+            if (ModelState.IsValid)
             {
-                return Unauthorized();
-            }
             
-            bool success = await _textRep.EditTag(tag);
-            if (success)
-            {
-                return Ok(true);
+                var sessionString = HttpContext.Session.GetString(_loggedIn);
+                if (sessionString.IsNullOrEmpty())
+                {
+                    return Unauthorized();
+                }
+                
+                var success = await _textRep.EditTag(tag);
+                if (success)
+                {
+                    return Ok(true);
+                }
+                
+                
+                _logger.LogInformation("Error in editing tag");
+                return BadRequest(false);
             }
-            
-            return BadRequest(false);
+
+            _logger.LogInformation("Fault in input");
+            return BadRequest("Fault in input");
+
         }
 
         /// <summary>
