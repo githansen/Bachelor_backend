@@ -70,6 +70,13 @@ namespace Bachelor_backend.Controller
             {
                 return Unauthorized();
             }
+
+            var regexPassword = new Regex(@"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$");
+
+            if (regexPassword.IsMatch(user.Password))
+            {
+                return BadRequest("Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character");
+            }
             
             if (ModelState.IsValid)
             {
