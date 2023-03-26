@@ -366,13 +366,16 @@ namespace Bachelor_backend.DAL.Repositories
                 }
                 else
                 {
-                    textInDB.TargetGroup = new TargetGroup()
+                    if (textInDB != null)
                     {
-                        Genders = text.TargetGroup.Genders,
-                        Languages = text.TargetGroup.Languages,
-                        Dialects = text.TargetGroup.Dialects,
-                        AgeGroups = text.TargetGroup.AgeGroups
-                    };
+                        textInDB.TargetGroup = new TargetGroup()
+                        {
+                            Genders = text?.TargetGroup?.Genders,
+                            Languages = text?.TargetGroup?.Languages,
+                            Dialects = text?.TargetGroup?.Dialects,
+                            AgeGroups = text?.TargetGroup?.AgeGroups
+                        };
+                    }
                 }
 
                 textInDB.TextText = text.TextText;
