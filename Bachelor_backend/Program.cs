@@ -37,7 +37,10 @@ builder.Services.AddScoped<ITextRepository, TextRepository>();
 builder.Services.AddScoped<ISecurityRepository, SecurityRepository>();
 builder.Services.AddTransient<IAzureStorage, AzureStorage>();
 
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
+//Temporary for initializing db on command
+builder.Services.AddScoped <InitDB>();
+
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Henrik")));
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
@@ -52,7 +55,7 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     //options.Cookie.SameSite = SameSiteMode.None;
 });
-builder.Services.AddScoped<DBInitializer, DBInitializer>();
+builder.Services.AddScoped<IDBInitializer, DBInitializer>();
 builder.Services.AddSwaggerGen(c =>
 {
     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
@@ -67,7 +70,7 @@ void SeedDatabase()
     using (var scope = app.Services.CreateScope())
     {
         var dbInitializer = scope.ServiceProvider.GetService<DBInitializer>();
-        dbInitializer.Initialize();
+        dbInitializer?.Initialize();
     }
 }
 
