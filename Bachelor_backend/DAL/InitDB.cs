@@ -19,6 +19,7 @@ namespace Bachelor_backend.DAL
             try
             {
                 await _db.Database.EnsureDeletedAsync();
+                await _db.Database.EnsureCreatedAsync();
                 /*
                 await _db.Tags.ExecuteDeleteAsync();
                 await _db.Texts.ExecuteDeleteAsync();
