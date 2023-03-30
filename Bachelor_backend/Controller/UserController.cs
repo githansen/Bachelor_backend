@@ -223,5 +223,10 @@ namespace Bachelor_backend.Controller
         }
         //TODO: Use crypto to encrypt cookie or set cookie as user parameters
 
+        public ActionResult<bool> RemoveSession()
+        {
+            HttpContext.Session.SetString(_loggedIn,"");
+            return Ok(true);
+        }
     }
 }
