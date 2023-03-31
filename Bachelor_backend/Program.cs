@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Reflection;
+using Bachelor_backend.Services;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -32,15 +33,18 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
 builder.Services.AddControllers();
+
+//Adding repositories and services
 builder.Services.AddScoped<IVoiceRepository, VoiceRepository>();
 builder.Services.AddScoped<ITextRepository, TextRepository>();
 builder.Services.AddScoped<ISecurityRepository, SecurityRepository>();
+builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddTransient<IAzureStorage, AzureStorage>();
 
 //Temporary for initializing db on command
 builder.Services.AddScoped <InitDB>();
 
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Henrik")));
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
