@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Xunit.Abstractions;
 
 namespace xUnitBackendTest;
 
@@ -749,7 +750,7 @@ public class AdminTest
         {
             new()
             {
-                UserId = 1,
+                UserId = new Guid(),
                 AgeGroup = "18-29",
                 Dialect = "Østlandsk",
                 Gender = "Kvinne",
@@ -757,7 +758,7 @@ public class AdminTest
             },
             new()
             {
-                UserId = 2,
+                UserId = new Guid(),
                 AgeGroup = "30-39",
                 Dialect = "Trøndersk",
                 Gender = "Mann",

@@ -7,7 +7,7 @@ namespace Bachelor_backend.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
         
         [RegularExpression("^([a-zA-ZæøåÆØÅ]{4,16})$")]
         public string? NativeLanguage { get; set; }
