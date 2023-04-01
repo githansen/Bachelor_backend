@@ -10,8 +10,8 @@ namespace Bachelor_backend.DAL
     {
         [Key]
         public string Username { get; set; }
-        public byte[] Password { get; set; }
-        public byte[] Salt { get; set; }
+        public string Password { get; set; }
+        public string Salt { get; set; }
     }    
 
 

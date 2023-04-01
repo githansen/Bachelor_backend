@@ -62,13 +62,20 @@ namespace Bachelor_backend.Controller
         }
 
         [HttpPost]
-        public async Task<ActionResult> RegisterAdmin(AdminUser user)
+        public async Task<ActionResult> RegisterAdmin([FromBody] AdminUser user)
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
 
             if (sessionString.IsNullOrEmpty())
             {
                 return Unauthorized();
+            }
+
+            var regexPassword = new Regex(@"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$");
+
+            if (regexPassword.IsMatch(user.Password))
+            {
+                return BadRequest("Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character");
             }
             
             if (ModelState.IsValid)
@@ -96,7 +103,7 @@ namespace Bachelor_backend.Controller
         /// <response code="200">OK - creation successful</response>
         /// <response code="400">Error while creating tag</response>
         [HttpPost]
-        public async Task<ActionResult> CreateTag([FromQuery]string text)
+        public async Task<ActionResult> CreateTag([FromBody]string text)
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
             if (sessionString.IsNullOrEmpty())
@@ -250,6 +257,56 @@ namespace Bachelor_backend.Controller
                 return Ok(true);
             }
             return BadRequest(false);
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> EditText([FromBody]Text text)
+        {
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
+
+            bool success = await _textRep.EditText(text);
+            if (success)
+            {
+                return Ok(true);
+            }
+            return BadRequest(false);
+        }
+        
+        [HttpPost]
+        public async Task<ActionResult> EditTag([FromBody] Tag tag) 
+        {
+            if (ModelState.IsValid)
+            {
+            
+                var sessionString = HttpContext.Session.GetString(_loggedIn);
+                if (sessionString.IsNullOrEmpty())
+                {
+                    return Unauthorized();
+                }
+                
+                var success = await _textRep.EditTag(tag);
+                if (success)
+                {
+                    return Ok(true);
+                }
+                
+                
+                _logger.LogInformation("Error in editing tag");
+                return BadRequest(false);
+            }
+
+            _logger.LogInformation("Fault in input");
+            return BadRequest("Fault in input");
+
         }
 
         /// <summary>
@@ -414,43 +471,6 @@ namespace Bachelor_backend.Controller
 
             return StatusCode(StatusCodes.Status500InternalServerError, null);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult> EditText([FromBody]Text text)
-        {
-            var sessionString = HttpContext.Session.GetString(_loggedIn);
-            if (sessionString.IsNullOrEmpty())
-            {
-                return Unauthorized();
-            }
-
-            bool success = await _textRep.EditText(text);
-            if (success)
-            {
-                return Ok(true);
-            }
-            return BadRequest(false);
-        }
-        [HttpPost]
-        public async Task<ActionResult> EditTag([FromBody] Tag tag) 
-        {
-            var sessionString = HttpContext.Session.GetString(_loggedIn);
-            if (sessionString.IsNullOrEmpty())
-            {
-                return Unauthorized();
-            }
-            
-            bool success = await _textRep.EditTag(tag);
-            if (success)
-            {
-                return Ok(true);
-            }
-            
-            return BadRequest(false);
-        }
+        
     }
 }

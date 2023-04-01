@@ -3,14 +3,18 @@ using Bachelor_backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Bachelor_backend.DAL.Repositories;
+using Bachelor_backend.Services;
 
 namespace Bachelor_backend.DBInitializer
 {
     public class DBInitializer : IDBInitializer
     {
         private readonly DatabaseContext _db;
-        public DBInitializer(DatabaseContext db) {
+        private readonly ISecurityService _security;
+        public DBInitializer(DatabaseContext db, ISecurityService security) 
+        {
             _db = db;
+            _security = security;
         }
         public void Initialize()
         {
@@ -26,21 +30,24 @@ namespace Bachelor_backend.DBInitializer
 
             }       
             
-            //Add admin user
-            /*
-            var salt = SecurityRepository.CreateSalt();
-            var hash = SecurityRepository.HashPassword("admin", salt);
-            var admin = new AdminUsers()
+            //Add admin user if none exists
+            if (!_db.Admins.Any())
             {
-                Username = "Admin",
-                Password = hash,
-                Salt = salt
-            };
+                var salt = _security.CreateSalt();
+                var hash = _security.HashPassword("admin", salt);
+                var admin = new AdminUsers()
+                {
+                    Username = "admin",
+                    Password = hash,
+                    Salt = salt
+                };
             
-            _db.Admins.Add(admin);
-            _db.SaveChanges();
-            */
-               if(_db.Texts.Count() > 0) { return; }
+                _db.Admins.Add(admin);
+                _db.SaveChanges();
+            }
+            
+            
+            if(_db.Texts.Any()) { return; }
 
 
 

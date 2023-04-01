@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Reflection;
+using Bachelor_backend.Services;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -32,10 +33,16 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
 builder.Services.AddControllers();
+
+//Adding repositories and services
 builder.Services.AddScoped<IVoiceRepository, VoiceRepository>();
 builder.Services.AddScoped<ITextRepository, TextRepository>();
 builder.Services.AddScoped<ISecurityRepository, SecurityRepository>();
+builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddTransient<IAzureStorage, AzureStorage>();
+
+//Temporary for initializing db on command
+builder.Services.AddScoped <InitDB>();
 
 builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
@@ -52,7 +59,7 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     //options.Cookie.SameSite = SameSiteMode.None;
 });
-builder.Services.AddScoped<DBInitializer, DBInitializer>();
+builder.Services.AddScoped<IDBInitializer, DBInitializer>();
 builder.Services.AddSwaggerGen(c =>
 {
     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
@@ -67,7 +74,7 @@ void SeedDatabase()
     using (var scope = app.Services.CreateScope())
     {
         var dbInitializer = scope.ServiceProvider.GetService<DBInitializer>();
-        dbInitializer.Initialize();
+        dbInitializer?.Initialize();
     }
 }
 
