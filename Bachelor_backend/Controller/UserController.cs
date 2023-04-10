@@ -48,8 +48,9 @@ namespace Bachelor_backend.Controller
             }
 
             //TODO: Check textId number
+            var userId = Guid.Parse(Regex.Match(sessionString, @"\b[A-Fa-f0-9]{8}(?:-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12}\b").Value);
             string uuid =
-                await _voiceRep.SaveFile(recording, textId, int.Parse(Regex.Match(sessionString, @"\d+").Value));
+                await _voiceRep.SaveFile(recording, textId, userId);
 
             if (uuid.IsNullOrEmpty())
             {
@@ -121,8 +122,8 @@ namespace Bachelor_backend.Controller
             {
                 return Unauthorized();
             }
-
-            int userId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
+            
+            var userId = Guid.Parse(Regex.Match(sessionString, @"\b[A-Fa-f0-9]{8}(?:-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12}\b").Value);
             var user = await _textRep.GetUser(userId);
 
             var watch2 = Stopwatch.StartNew();

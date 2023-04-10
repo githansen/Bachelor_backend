@@ -209,7 +209,7 @@ namespace Bachelor_backend.DAL.Repositories
             return user;
         }
 
-        public async Task<User> GetUser(int userId)
+        public async Task<User> GetUser(Guid userId)
         {
             try
             {
@@ -223,18 +223,18 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-        public async Task<bool> DeleteText(int TextId)
+        public async Task<bool> DeleteText(int textId)
         {
 
             try
             {
                 int total = _db.Audiofiles
-                .Where(t => t.Text.TextId == TextId).Count();
+                .Where(t => t.Text.TextId == textId).Count();
                 if (total > 0)
                 {
                     return false;
                 }
-                Text text = await _db.Texts.FindAsync(TextId);
+                Text text = await _db.Texts.FindAsync(textId);
                 _db.Texts.Remove(text);
                 await _db.SaveChangesAsync();
                 return true;
@@ -246,11 +246,11 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-        public async Task<bool> DeleteTag(int TagId)
+        public async Task<bool> DeleteTag(int tagId)
         {
             try
             {
-                int total =  await _db.Tags.FromSql($"SELECT * FROM dbo.Tags WHERE TagId={TagId} AND TagId IN (SELECT TagsTagId FROM dbo.TagsForTexts)").CountAsync();
+                int total =  await _db.Tags.FromSql($"SELECT * FROM dbo.Tags WHERE TagId={tagId} AND TagId IN (SELECT TagsTagId FROM dbo.TagsForTexts)").CountAsync();
 
                 if(total > 0) 
                 {
@@ -260,7 +260,7 @@ namespace Bachelor_backend.DAL.Repositories
                 //TODO: Noe forskjell på disse
                 //var tag = await _db.Tags.FindAsync(TagId);
                 var x = await GetAllTags();
-                Tag tag = x.Where(x => x.TagId == TagId).FirstOrDefault();
+                Tag tag = x.Where(x => x.TagId == tagId).FirstOrDefault();
                 if (tag == null || tag?.Texts?.Count > 0)
                 {
                     return false;
@@ -306,12 +306,12 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-        public async Task<Text> GetOneText(int id)
+        public async Task<Text> GetOneText(int textId)
         {
             try
             {
                 
-                Text text = _db.Texts.Where(t => t.TextId == id).Select(t => new Text
+                Text text = _db.Texts.Where(t => t.TextId == textId).Select(t => new Text
                 {
                     TextId= t.TextId,
                     Tags = t.Tags,
@@ -321,8 +321,9 @@ namespace Bachelor_backend.DAL.Repositories
                 }).FirstOrDefault();
                 return text;
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogInformation(e.Message);
                 return null;
             }
         }
@@ -351,11 +352,6 @@ namespace Bachelor_backend.DAL.Repositories
              */
             try
             {
-                Text test = _db.Texts.Where(t => t.TextId == text.TextId).Select(t => new Text
-                {
-                    Tags = t.Tags,
-                }).FirstOrDefault();
-
                 string sql = GenerateSql(text);
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
@@ -423,16 +419,7 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-
-
-
-
-
-
-
-
-
-      //Help methods
+        //Help methods
         public Text GetRandom(List<Text> list)
         {
             Random r = new Random();

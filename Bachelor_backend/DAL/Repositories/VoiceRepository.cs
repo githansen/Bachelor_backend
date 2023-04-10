@@ -21,7 +21,7 @@ public class VoiceRepository : IVoiceRepository
     }
 
 
-    public async Task<string> SaveFile(IFormFile recording, int textId, int userId)
+    public async Task<string> SaveFile(IFormFile recording, int textId, Guid userId)
     {
         try
         {
