@@ -73,7 +73,7 @@ void SeedDatabase()
 {
     using (var scope = app.Services.CreateScope())
     {
-        var dbInitializer = scope.ServiceProvider.GetService<DBInitializer>();
+        var dbInitializer = scope.ServiceProvider.GetService<IDBInitializer>();
         dbInitializer?.Initialize();
     }
 }
