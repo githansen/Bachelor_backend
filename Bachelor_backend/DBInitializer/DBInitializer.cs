@@ -47,7 +47,7 @@ namespace Bachelor_backend.DBInitializer
             }
             
             
-            if(_db.Texts.ToList().Count > 0) { return; }
+            if(_db.Texts.Count() > 0) { return; }
 
 
 
