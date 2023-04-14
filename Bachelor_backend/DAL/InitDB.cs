@@ -18,9 +18,6 @@ namespace Bachelor_backend.DAL
         {
             try
             {
-                await _db.Database.EnsureDeletedAsync();
-                await _db.Database.EnsureCreatedAsync();
-                /*
                 await _db.Tags.ExecuteDeleteAsync();
                 await _db.Texts.ExecuteDeleteAsync();
                 await _db.Admins.ExecuteDeleteAsync();
@@ -28,7 +25,7 @@ namespace Bachelor_backend.DAL
                 await _db.Audiofiles.ExecuteDeleteAsync();
                 await _db.Users.ExecuteDeleteAsync();
                 await _db.SaveChangesAsync();
-            */
+            
                 _dbInitializer.Initialize();
                 
                 return true;

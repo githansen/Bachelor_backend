@@ -42,6 +42,7 @@ namespace Bachelor_backend.Controller
         public async Task<ActionResult> SaveFile(IFormFile recording, int textId)
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
+            Console.WriteLine(sessionString);
             if (string.IsNullOrEmpty(sessionString))
             {
                 return Unauthorized();
