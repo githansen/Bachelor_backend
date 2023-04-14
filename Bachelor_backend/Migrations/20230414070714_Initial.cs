@@ -12,6 +12,19 @@ namespace Bachelorbackend.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Admins",
+                columns: table => new
+                {
+                    Username = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Salt = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Admins", x => x.Username);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tags",
                 columns: table => new
                 {
@@ -44,8 +57,7 @@ namespace Bachelorbackend.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     NativeLanguage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AgeGroup = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Dialect = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -82,7 +94,7 @@ namespace Bachelorbackend.Migrations
                 {
                     UUID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     TextId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -148,6 +160,9 @@ namespace Bachelorbackend.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Admins");
+
             migrationBuilder.DropTable(
                 name: "Audiofiles");
 
