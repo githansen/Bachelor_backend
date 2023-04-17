@@ -207,10 +207,11 @@ namespace Bachelor_backend.Controller
             }
 
             var list = await _textRep.GetAllTexts();
-            if(list != null)
+            if(!list.IsNullOrEmpty())
             {
                 return Ok(list);
             }
+            _logger.LogInformation("Received empty list");
             return StatusCode(StatusCodes.Status500InternalServerError, list);
         }
         /// <summary>

@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Mime;
 using Bachelor_backend.Controller;
 using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models;
@@ -440,7 +441,121 @@ public class AdminTest
         Assert.Equal("Fault in input", result.Value);
     }
     
-    //TODO: GetAllTexts
+    [Fact]
+    public async Task GetAllTextsOk()
+    {
+        //Arrange
+        var texts = new List<Text>()
+        {
+            new(){
+            Active = true,
+            TextId = 1,
+            TextText = "test",
+            Tags = new List<Tag>()
+            {
+                new()
+                {
+                    TagId = 1,
+                    TagText = "test"
+                }
+            }
+            },
+            new(){
+                Active = true,
+                TextId = 2,
+                TextText = "test2",
+                Tags = new List<Tag>()
+                {
+                    new()
+                    {
+                        TagId = 2,
+                        TagText = "test2"
+                    }
+                }
+            }
+        };
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        mockTextRep.Setup(x => x.GetAllTexts()).ReturnsAsync(texts);
+        
+        //Act
+        var result = await _adminController.GetAllTexts() as OkObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.Equal(texts, result.Value!);
+    }
+    
+    [Fact]
+    public async Task GetAllTextsNotLoggedIn()
+    {
+        //Arrange
+        var texts = new List<Text>()
+        {
+            new(){
+                Active = true,
+                TextId = 1,
+                TextText = "test",
+                Tags = new List<Tag>()
+                {
+                    new()
+                    {
+                        TagId = 1,
+                        TagText = "test"
+                    }
+                }
+            },
+            new(){
+                Active = true,
+                TextId = 2,
+                TextText = "test2",
+                Tags = new List<Tag>()
+                {
+                    new()
+                    {
+                        TagId = 2,
+                        TagText = "test2"
+                    }
+                }
+            }
+        };
+        
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        mockTextRep.Setup(x => x.GetAllTexts()).ReturnsAsync(texts);
+        
+        //Act
+        var result = await _adminController.GetAllTexts() as UnauthorizedResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result!.StatusCode);
+    }
+    
+    [Fact]
+    public async Task GetAllTextsFault()
+    {
+        //Arrange
+        var texts = new List<Text>();
+        texts = null!;
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        mockTextRep.Setup(x => x.GetAllTexts()).ReturnsAsync((List<Text>) null);
+        
+        //Act
+        var result = await _adminController.GetAllTexts() as ObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.InternalServerError, result!.StatusCode);
+    }
+    
 
     [Fact]
     public async Task DeleteTextOk()
