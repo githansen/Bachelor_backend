@@ -104,7 +104,7 @@ public class AdminTest
         var user = new AdminUser()
         {
             Username = "person",
-            Password = "password"
+            Password = "Password1@"
         };
         
         mockSession[_loggedIn] = "admin";
@@ -128,7 +128,7 @@ public class AdminTest
         var user = new AdminUser()
         {
             Username = "person",
-            Password = "password"
+            Password = "Password2@"
         };
         
         mockSession[_loggedIn] = "admin";
@@ -152,7 +152,7 @@ public class AdminTest
         var user = new AdminUser()
         {
             Username = "1234",
-            Password = "1234"
+            Password = "1234Pass234@"
         };
         
         mockSession[_loggedIn] = "admin";
@@ -171,13 +171,35 @@ public class AdminTest
     }
     
     [Fact]
+    public async Task RegisterLoggedInFaultPassword()
+    {
+        //Arrange
+        var user = new AdminUser()
+        {
+            Username = "1234",
+            Password = "1234"
+        };
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        //Act
+        var result = await _adminController.RegisterAdmin(user) as BadRequestObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result!.StatusCode);
+        Assert.Equal("Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character" , result!.Value!);
+    }
+    
+    [Fact]
     public async Task RegisterNotLoggedIn()
     {
         //Arrange
         var user = new AdminUser()
         {
             Username = "person",
-            Password = "password"
+            Password = "Password1@"
         };
         
         mockSession[_loggedIn] = _notLoggedIn;
@@ -417,6 +439,8 @@ public class AdminTest
         Assert.Equal((int) HttpStatusCode.BadRequest, result!.StatusCode);
         Assert.Equal("Fault in input", result.Value);
     }
+    
+    //TODO: GetAllTexts
 
     [Fact]
     public async Task DeleteTextOk()
@@ -879,6 +903,25 @@ public class AdminTest
         //Assert
         Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
         Assert.True((bool) result.Value!);
+    }
+    
+    [Fact]
+    public async Task EditTagFaultInput()
+    {
+        //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        _adminController.ModelState.AddModelError("TagText", "Fault in input");
+        mockTextRep.Setup(x => x.EditTag(It.IsAny<Tag>())).ReturnsAsync(true);
+        
+        //Act
+        var result = await _adminController.EditTag(It.IsAny<Tag>()) as BadRequestObjectResult;
+
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result!.StatusCode);
+        Assert.Equal("Fault in input", result.Value!);
     }
     
     [Fact]

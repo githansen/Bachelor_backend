@@ -18,12 +18,12 @@ namespace Bachelor_backend.DAL
         {
             try
             {
-                await _db.Tags.ExecuteDeleteAsync();
-                await _db.Texts.ExecuteDeleteAsync();
-                await _db.Admins.ExecuteDeleteAsync();
-                await _db.TargetGroups.ExecuteDeleteAsync();
-                await _db.Audiofiles.ExecuteDeleteAsync();
-                await _db.Users.ExecuteDeleteAsync();
+                _db.Audiofiles.RemoveRange(_db.Audiofiles);
+                _db.Tags.RemoveRange(_db.Tags);
+                _db.Texts.RemoveRange(_db.Texts);
+                _db.Admins.RemoveRange(_db.Admins);
+                _db.TargetGroups.RemoveRange(_db.TargetGroups);
+                _db.Users.RemoveRange(_db.Users);
                 await _db.SaveChangesAsync();
             
                 _dbInitializer.Initialize();
