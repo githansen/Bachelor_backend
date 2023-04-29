@@ -2,8 +2,10 @@
 using System.Net;
 using System.Text;
 
-namespace Bachelor_backend
+namespace Bachelor_backend.Swagger
 {
+    // https://medium.com/@niteshsinghal85/securing-swagger-in-production-92d0a045a5 
+    // Password protects the swagger UI
     public class SwaggerBasicAuthMiddleware
     {
         private readonly RequestDelegate next;
@@ -40,7 +42,7 @@ namespace Bachelor_backend
                 await next.Invoke(context).ConfigureAwait(false);
             }
         }
-        
+
     }
     public static class SwaggerAuthorizeExtensions
     {

@@ -9,7 +9,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Reflection;
 using Bachelor_backend.Services;
-using Bachelor_backend;
+using Bachelor_backend.Swagger;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -44,7 +44,7 @@ builder.Services.AddTransient<IAzureStorage, AzureStorage>();
 //Temporary for initializing db on command
 builder.Services.AddScoped <InitDB>();
 
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("JohanDesktop")));
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
