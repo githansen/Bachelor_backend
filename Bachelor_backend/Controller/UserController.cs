@@ -43,14 +43,16 @@ namespace Bachelor_backend.Controller
         public async Task<ActionResult> SaveFile(IFormFile recording, int textId)
         {
             var sessionString = HttpContext.Session.GetString(_loggedIn);
+            Console.WriteLine(sessionString);
             if (string.IsNullOrEmpty(sessionString))
             {
                 return Unauthorized();
             }
 
             //TODO: Check textId number
+            var userId = Guid.Parse(Regex.Match(sessionString, @"\b[A-Fa-f0-9]{8}(?:-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12}\b").Value);
             string uuid =
-                await _voiceRep.SaveFile(recording, textId, int.Parse(Regex.Match(sessionString, @"\d+").Value));
+                await _voiceRep.SaveFile(recording, textId, userId);
 
             if (uuid.IsNullOrEmpty())
             {
@@ -122,8 +124,8 @@ namespace Bachelor_backend.Controller
             {
                 return Unauthorized();
             }
-
-            int userId = int.Parse(Regex.Match(sessionString, @"\d+").Value);
+            
+            var userId = Guid.Parse(Regex.Match(sessionString, @"\b[A-Fa-f0-9]{8}(?:-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12}\b").Value);
             var user = await _textRep.GetUser(userId);
 
             var watch2 = Stopwatch.StartNew();
@@ -224,5 +226,10 @@ namespace Bachelor_backend.Controller
         }
         //TODO: Use crypto to encrypt cookie or set cookie as user parameters
 
+        public ActionResult<bool> RemoveSession()
+        {
+            HttpContext.Session.SetString(_loggedIn,"");
+            return Ok(true);
+        }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System.Security.Cryptography;
 using Bachelor_backend.Models;
+using Bachelor_backend.Services;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.EntityFrameworkCore;
+using Scrypt;
 
 namespace Bachelor_backend.DAL.Repositories
 {
@@ -10,10 +12,13 @@ namespace Bachelor_backend.DAL.Repositories
         private readonly DatabaseContext _db;
         private readonly ILogger<SecurityRepository> _logger;
 
-        public SecurityRepository(DatabaseContext db, ILogger<SecurityRepository> logger)
+        private readonly ISecurityService _security;
+
+        public SecurityRepository(DatabaseContext db, ILogger<SecurityRepository> logger, ISecurityService security)
         {
             _db = db;
             _logger = logger;
+            _security = security;
         }
         
         public async Task<bool> Login(AdminUser user)
@@ -21,14 +26,13 @@ namespace Bachelor_backend.DAL.Repositories
             var admin = await _db.Admins.FirstOrDefaultAsync(a => a.Username == user.Username);
             if (admin == null)
             {
+                _logger.LogInformation("Wrong username");
                 return false;
             }
-            var hash = HashPassword(user.Password, admin.Salt);
-            if (hash.SequenceEqual(admin.Password))
-            {
-                return true;
-            }
-            return false;
+            var isValid = _security.VerifyPassword(user.Password, admin.Salt, admin.Password);
+            
+            //Return true if password is valid
+            return isValid;
         }
 
         public async Task<bool> Register(AdminUser user)
@@ -40,8 +44,8 @@ namespace Bachelor_backend.DAL.Repositories
                 {
                     return false;
                 }
-                var salt = CreateSalt();
-                var hash = HashPassword(user.Password, salt);
+                var salt = _security.CreateSalt();
+                var hash = _security.HashPassword(user.Password, salt);
                 var newAdmin = new AdminUsers()
                 {
                     Username = user.Username,
@@ -58,24 +62,6 @@ namespace Bachelor_backend.DAL.Repositories
                 return false;
             }
             
-        }
-
-        public static byte[] HashPassword(string password, byte[] salt)
-        {
-            return KeyDerivation.Pbkdf2(
-                password: password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA512,
-                iterationCount: 10000,
-                numBytesRequested: 32);
-        }
-        
-        public static byte[] CreateSalt()
-        {
-            var csp = RandomNumberGenerator.Create();
-            var salt = new byte[24];
-            csp.GetBytes(salt);
-            return salt;
         }
     }
 }

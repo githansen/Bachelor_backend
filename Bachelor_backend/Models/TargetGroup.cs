@@ -25,12 +25,11 @@ namespace Bachelor_backend.Models
         {
             var target = (TargetGroup)targetgroup;
 
-            if (target.AgeGroups != null)
+            if (target?.AgeGroups != null)
             {
-                var regexAgeGroup = new Regex("^(\\d){2,2}-(\\d){2,2}|(\\d){2,2}[+]{1,1}$");
+                var regexAgeGroup = new Regex(@"^(\d){2}-(\d){2}|(\d){2}\+$");
                 foreach (var Agegroup in target.AgeGroups)
                 {
-                    Debug.WriteLine(Agegroup);
                     if (!regexAgeGroup.IsMatch(Agegroup))
                     {
                         return false;
@@ -38,7 +37,7 @@ namespace Bachelor_backend.Models
                 }
             }
 
-            if (target.Languages != null)
+            if (target?.Languages != null)
             {
                 var regexLanguage = new Regex("^([a-zA-ZæøåÆØÅ]{4,16})$");
                 foreach (var lang in target.Languages)
@@ -50,11 +49,11 @@ namespace Bachelor_backend.Models
                 }
             }
 
-            if (target.Dialects != null)
+            if (target?.Dialects != null)
             {
 
 
-                var regexDialect = new Regex("\"^([a-zA-ZæøåÆØÅ]{4,16})$\"");
+                var regexDialect = new Regex("^([a-zA-ZæøåÆØÅ]{4,16})$");
                 foreach (var dialect in target.Dialects)
                 {
                     if (!regexDialect.IsMatch(dialect))
@@ -63,7 +62,7 @@ namespace Bachelor_backend.Models
                     }
                 }
             }
-            if(target.Genders != null)
+            if(target?.Genders != null)
             {
                 var regexGenders = new Regex("^(mann|kvinne|annet|Mann|Kvinne|Annet)$");
                 foreach(var gender in target.Genders)

@@ -24,6 +24,15 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
+                //Check if tag exists in db
+                var tagInDb = await _db.Tags.Where(x => x.TagText.Equals(text)).FirstOrDefaultAsync();
+
+                if (tagInDb != null)
+                { 
+                    _logger.LogInformation("Tag already exists");
+                    return false;
+                }
+
                 var NewTag = new Tag
                 {
                     TagText = text,
@@ -155,7 +164,7 @@ namespace Bachelor_backend.DAL.Repositories
             // Finds lists of texts with a target group that fits the user requesting text
             try
             {
-                var liste = await _db.Texts.FromSqlRaw($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetGroups WHERE dbo.Texts.TargetGroupTargetid = dbo.TargetGroups.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%') AND TextId NOT IN (SELECT TextId from dbo.Audiofiles WHERE UserId = {user.UserId})"
+                var liste = await _db.Texts.FromSqlRaw($"SELECT dbo.Texts.* FROM dbo.Texts, dbo.TargetGroups WHERE dbo.Texts.TargetGroupTargetid = dbo.TargetGroups.Targetid AND dbo.Texts.Active = 'True' AND (Genders is NULL OR Genders LIKE '%{user.Gender}%') AND (Languages IS NULL OR Languages LIKE '%{user.NativeLanguage}%') AND (Dialects IS NULL OR Dialects LIKE '%{user.Dialect}%') AND (AgeGroups IS NULL OR AgeGroups LIKE '%{user.AgeGroup}%') AND TextId NOT IN (SELECT TextId from dbo.Audiofiles WHERE UserId = '{user.UserId}')"
                    ).Select(t => new Text()
                    {
                        TextId = t.TextId,
@@ -186,9 +195,8 @@ namespace Bachelor_backend.DAL.Repositories
                 // Returns random from list
                 return GetRandom(liste2);
             }
-            catch(Exception e)
+            catch
             {
-                _logger.LogInformation(e.Message);
                 return null;
             }
             
@@ -202,7 +210,7 @@ namespace Bachelor_backend.DAL.Repositories
             return user;
         }
 
-        public async Task<User> GetUser(int userId)
+        public async Task<User> GetUser(Guid userId)
         {
             try
             {
@@ -216,22 +224,19 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-        public async Task<bool> DeleteText(int TextId)
+        public async Task<bool> DeleteText(int textId)
         {
 
             try
             {
                 int total = _db.Audiofiles
-                .Where(t => t.Text.TextId == TextId).Count();
+                .Where(t => t.Text.TextId == textId).Count();
                 if (total > 0)
                 {
                     return false;
                 }
-                Text text = await _db.Texts.FindAsync(TextId);
-                if (text != null)
-                {
-                    _db.Texts.Remove(text);
-                }
+                Text text = await _db.Texts.FindAsync(textId);
+                _db.Texts.Remove(text);
                 await _db.SaveChangesAsync();
                 return true;
             }
@@ -242,18 +247,22 @@ namespace Bachelor_backend.DAL.Repositories
             }
         }
 
-        public async Task<bool> DeleteTag(int TagId)
+        public async Task<bool> DeleteTag(int tagId)
         {
             try
             {
-                int total =  await _db.Tags.FromSql($"SELECT * FROM dbo.Tags WHERE TagId={TagId} AND TagId IN (SELECT TagsTagId FROM dbo.TagsForTexts)").CountAsync();
+                int total =  await _db.Tags.FromSql($"SELECT * FROM dbo.Tags WHERE TagId={tagId} AND TagId IN (SELECT TagsTagId FROM dbo.TagsForTexts)").CountAsync();
+
                 if(total > 0) 
                 {
                     return false;
                 }
+                
+                //TODO: Noe forskjell på disse
+                //var tag = await _db.Tags.FindAsync(TagId);
                 var x = await GetAllTags();
-                Tag tag = x.Where(i => i.TagId == TagId).FirstOrDefault();
-                if (tag == null || tag.Texts.Count > 0)
+                Tag tag = x.Where(x => x.TagId == tagId).FirstOrDefault();
+                if (tag == null || tag?.Texts?.Count > 0)
                 {
                     return false;
                 }
@@ -266,6 +275,8 @@ namespace Bachelor_backend.DAL.Repositories
             catch (Exception e)
             {
                 _logger.LogInformation(e.Message);
+                Console.WriteLine(e);
+                Console.WriteLine(e.Message);
                 return false;
             }
         }
@@ -274,7 +285,7 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                int total = await _db.Users.CountAsync();
+                int total = await _db.Texts.CountAsync();
                 return total;
             }
             catch
@@ -290,29 +301,28 @@ namespace Bachelor_backend.DAL.Repositories
                 int total = await _db.Users.CountAsync();
                 return total;
             }
-            catch(Exception e)
+            catch
             {
-                _logger.LogInformation(e.Message);
                 return -1;
             }
         }
 
-        public async Task<Text> GetOneText(int id)
+        public async Task<Text> GetOneText(int textId)
         {
             try
             {
                 
-                Text text = await _db.Texts.Where(t => t.TextId == id).Select(t => new Text
+                Text text = _db.Texts.Where(t => t.TextId == textId).Select(t => new Text
                 {
                     TextId= t.TextId,
                     Tags = t.Tags,
                     TextText = t.TextText,
                     Active = t.Active,
                     TargetGroup = t.TargetGroup
-                }).FirstOrDefaultAsync();
+                }).FirstOrDefault();
                 return text;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _logger.LogInformation(e.Message);
                 return null;
@@ -343,11 +353,6 @@ namespace Bachelor_backend.DAL.Repositories
              */
             try
             {
-                Text test = _db.Texts.Where(t => t.TextId == text.TextId).Select(t => new Text
-                {
-                    Tags = t.Tags,
-                }).FirstOrDefault();
-
                 string sql = GenerateSql(text);
 
                 Text textInDB = await _db.Texts.FindAsync(text.TextId);
@@ -358,13 +363,16 @@ namespace Bachelor_backend.DAL.Repositories
                 }
                 else
                 {
-                    textInDB.TargetGroup = new TargetGroup()
+                    if (textInDB != null)
                     {
-                        Genders = text.TargetGroup.Genders,
-                        Languages = text.TargetGroup.Languages,
-                        Dialects = text.TargetGroup.Dialects,
-                        AgeGroups = text.TargetGroup.AgeGroups
-                    };
+                        textInDB.TargetGroup = new TargetGroup()
+                        {
+                            Genders = text?.TargetGroup?.Genders,
+                            Languages = text?.TargetGroup?.Languages,
+                            Dialects = text?.TargetGroup?.Dialects,
+                            AgeGroups = text?.TargetGroup?.AgeGroups
+                        };
+                    }
                 }
 
                 textInDB.TextText = text.TextText;
@@ -372,9 +380,9 @@ namespace Bachelor_backend.DAL.Repositories
                 textInDB.Tags = new List<Tag>();
                 sql = "DELETE FROM dbo.TagsForTexts WHERE TextsTextId="+text.TextId;
                 _db.Database.ExecuteSqlRaw(sql);
-                if (text.Tags != null)
+                if (text?.Tags != null)
                 {
-                    foreach (Tag t in text.Tags)
+                    foreach (var t in text.Tags)
                     {
                         sql = "INSERT INTO dbo.TagsForTexts (TagsTagId, TextsTextId) VALUES (" + t.TagId + ", + " + text.TextId + ")";
                         _db.Database.ExecuteSqlRaw(sql);
@@ -386,6 +394,7 @@ namespace Bachelor_backend.DAL.Repositories
             catch(Exception e)
             {
                 _logger.LogInformation(e.Message);
+                Console.WriteLine(e);
                 return false;
             }
         }
@@ -394,34 +403,24 @@ namespace Bachelor_backend.DAL.Repositories
         {
             try
             {
-                Tag TagFromDb = await _db.Tags.FindAsync(tag.TagId);
-                if(TagFromDb != null) { 
-                TagFromDb.TagText = tag.TagText;
-                await _db.SaveChangesAsync();
-                return true;
+                var tagFromDb = await _db.Tags.FindAsync(tag.TagId);
+                if(tagFromDb != null) 
+                { 
+                    tagFromDb.TagText = tag.TagText;
+                    await _db.SaveChangesAsync();
+                    return true;
                 }
-                else
-                {
-                    return false;
-                }
+                _logger.LogInformation("Failed to edit tag");
+                return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _logger.LogInformation(e.Message);
                 return false;
             }
         }
 
-
-
-
-
-
-
-
-
-
-      //Help methods
+        //Help methods
         public Text GetRandom(List<Text> list)
         {
             Random r = new Random();
@@ -430,10 +429,10 @@ namespace Bachelor_backend.DAL.Repositories
         public string GenerateSql(Text text)
         {
             //Check if TargetGroup already exists --START--
-            var genders = JsonConvert.SerializeObject(text.TargetGroup.Genders);
-            var languages = JsonConvert.SerializeObject(text.TargetGroup.Languages);
-            var dialects = JsonConvert.SerializeObject(text.TargetGroup.Dialects);
-            var agegroups = JsonConvert.SerializeObject(text.TargetGroup.AgeGroups);
+            var genders = JsonConvert.SerializeObject(text.TargetGroup?.Genders);
+            var languages = JsonConvert.SerializeObject(text.TargetGroup?.Languages);
+            var dialects = JsonConvert.SerializeObject(text.TargetGroup?.Dialects);
+            var agegroups = JsonConvert.SerializeObject(text.TargetGroup?.AgeGroups);
 
             string sql = "SELECT * FROM dbo.TargetGroups WHERE";
             if (!genders.ToLower().Equals("null"))

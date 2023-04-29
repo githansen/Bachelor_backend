@@ -12,6 +12,7 @@ namespace xUnitBackendTest
     public class UserTest
     {
         private const string _loggedIn = "UserSession";
+        private const string _guid = "a5b36d71-8c67-4a25-aaf1-18f95aa44d9e";
         private const string _notLoggedIn = "";
         
         private static readonly Mock<IVoiceRepository> mockVoiceRep = new();
@@ -26,9 +27,9 @@ namespace xUnitBackendTest
         public async Task SaveFileOk()
         {
             //Arrange
-            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<int>())).ReturnsAsync("76185658-eb35-4095-8491-08daffb158a5");
+            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<Guid>())).ReturnsAsync("76185658-eb35-4095-8491-08daffb158a5");
 
-            mockSession[_loggedIn] = "1";
+            mockSession[_loggedIn] = _guid;
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
             
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
@@ -46,9 +47,9 @@ namespace xUnitBackendTest
         public async Task SaveFileFault()
         {
             //Arrange
-            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<int>())).ReturnsAsync("");
+            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<Guid>())).ReturnsAsync("");
             
-            mockSession[_loggedIn] = "1";
+            mockSession[_loggedIn] = _guid;
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
             
@@ -66,9 +67,9 @@ namespace xUnitBackendTest
         public async Task SaveFileTooBigFile()
         {
             //Arrange
-            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<int>())).ReturnsAsync("Audiofile is too big");
+            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<Guid>())).ReturnsAsync("Audiofile is too big");
 
-            mockSession[_loggedIn] = "1";
+            mockSession[_loggedIn] = _guid;
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
             
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
@@ -87,9 +88,9 @@ namespace xUnitBackendTest
         public async Task SaveFileWrongFileType()
         {
             //Arrange
-            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<int>())).ReturnsAsync("File extension not allowed");
+            mockVoiceRep.Setup(x => x.SaveFile(It.IsAny<IFormFile>(),It.IsAny<int>(),It.IsAny<Guid>())).ReturnsAsync("File extension not allowed");
 
-            mockSession[_loggedIn] = "1";
+            mockSession[_loggedIn] = _guid;
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
             
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
@@ -191,7 +192,7 @@ namespace xUnitBackendTest
             };
             mockTextRep.Setup(x => x.GetText(It.IsAny<User>())).ReturnsAsync(text);
             
-            mockSession[_loggedIn] = "1";
+            mockSession[_loggedIn] = _guid;
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
             
@@ -228,17 +229,17 @@ namespace xUnitBackendTest
             //Arrange
             var user = new User()
             {
-                UserId = 1,
+                UserId = new Guid(),
                 AgeGroup = "18-29",
                 Dialect = "Østlandsk",
                 Gender = "Kvinne",
                 NativeLanguage = "Norsk"
             };
 
-            mockSession[_loggedIn] = "1";
+            mockSession[_loggedIn] = _guid;
             mockHttpContext.Setup(s => s.Session).Returns(mockSession);
             _userController.ControllerContext.HttpContext = mockHttpContext.Object;
-            mockTextRep.Setup(x => x.GetUser(It.IsAny<int>())).ReturnsAsync(user);
+            mockTextRep.Setup(x => x.GetUser(It.IsAny<Guid>())).ReturnsAsync(user);
             mockTextRep.Setup(x => x.GetText(user)).ReturnsAsync((Text) null);
             
             //Act
@@ -255,7 +256,7 @@ namespace xUnitBackendTest
             //Arrange
             var user = new User()
             {
-                UserId = 1,
+                UserId = new Guid(),
                 NativeLanguage = "Norwegian",
                 AgeGroup = "18-20",
                 Dialect = "Østlandsk"
@@ -281,7 +282,7 @@ namespace xUnitBackendTest
             //Arrange
             var user = new User()
             {
-                UserId = 1,
+                UserId = new Guid(),
                 NativeLanguage = null,
                 AgeGroup = null,
                 Dialect = null
@@ -308,7 +309,7 @@ namespace xUnitBackendTest
             //Arrange
             var user = new User()
             {
-                UserId = 1,
+                UserId = new Guid(),
                 NativeLanguage = "Norwegian",
                 AgeGroup = "18-20",
                 Dialect = "Østlandsk"

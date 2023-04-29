@@ -7,12 +7,12 @@ namespace Bachelor_backend.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
         
         [RegularExpression("^([a-zA-ZæøåÆØÅ]{4,16})$")]
         public string? NativeLanguage { get; set; }
 
-        [RegularExpression(@"^(\\d){2,2}-(\\d){2,2}|(\\d){2,2}[+]{1,1}$")]
+        [RegularExpression(@"^(\d){2}-(\d){2}|(\d){2}\+$")]
         public string? AgeGroup { get; set; }
         
         [RegularExpression(@"^([a-zA-ZæøåÆØÅ]{4,16})$")]
