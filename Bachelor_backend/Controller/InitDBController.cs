@@ -8,11 +8,13 @@ namespace Bachelor_backend.Controller
     {
         private readonly InitDB _initDb;
         
+
         public InitDBController(InitDB initDb)
         {
             _initDb = initDb;
         }
-        
+
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         public async Task<bool> InitDB()
         {
