@@ -139,11 +139,12 @@ public class VoiceRepository : IVoiceRepository
     {
         try
         {
-            int total = _db.Audiofiles.Count();
+            int total = await _db.Audiofiles.CountAsync();
             return total;
         }
-        catch
+        catch(Exception e)
         {
+            _logger.LogInformation(e.Message);
             return -1;
         }
        

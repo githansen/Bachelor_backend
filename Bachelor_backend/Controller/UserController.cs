@@ -34,7 +34,7 @@ namespace Bachelor_backend.Controller
         /// Saves recording to database
         /// </summary>
         /// <param name="recording"></param>
-        /// <returns></returns>
+        /// <param name="textId"></param>
         /// <response code="401">Not authorized</response>"
         /// <response code="200">Successfully saved file</response>
         /// <response code="500">Error while saving file</response>
@@ -79,13 +79,10 @@ namespace Bachelor_backend.Controller
         /// Deletes recording
         /// </summary>
         /// <param name="uuid"></param>
-        /// <remarks>
-        /// Argument needs to be a uuid. 
-        /// Example: 123e4567-e89b-12d3-a456-426614174000
-        /// </remarks>
         /// <returns>String describing whether or not deletion was successful</returns>
         /// <response code="200">Deletion succeeded </response>
         /// <response code="400">Deletion unsuccessful - likely non existent uuid</response>
+        /// <response code="404"> File not found, wrong UUID</response>
 
         [HttpDelete]
         public async Task<ActionResult> DeleteFile([FromBody] string uuid)
@@ -108,13 +105,11 @@ namespace Bachelor_backend.Controller
         }
 
         /// <summary>
-        /// GET text
+        /// Retrieve 1 text for user
         /// </summary>
-        /// <remarks>
-        /// No parameters needed, uses Session string to find text
-        /// </remarks>
         /// <response code="401">Not Authorized</response>
         /// <response code="200">OK, returns text</response>
+        /// <response code="500"> Server error</response>
         [HttpPost]
         public async Task<ActionResult> GetText()
         {
@@ -141,21 +136,11 @@ namespace Bachelor_backend.Controller
             }
         }
 
-        ///<summary>Post user data</summary> 
+        ///<summary>Create user </summary> 
         ///<param Name="user"></param>
-        ///<remarks>
-        ///Needs user data as parameter
-        ///Dont include UserId - generated on creation
-        /// Example:
-        /// user = 
-        /// {
-        /// "nativeLanguage": "Norsk",
-        /// "dialect": "Østlandsk",
-        /// "ageGroup":"18-28"
-        /// }
-        /// </remarks>
         /// <response code="200"> Userinfo saved to database, returns true </response>
         /// <response code="500">Error on server, returns false</response>
+        /// <response code="400"> Bad request</response>
         [HttpPost]
         public async Task<ActionResult> RegisterUserInfo([FromBody] User user)
         {
@@ -224,6 +209,7 @@ namespace Bachelor_backend.Controller
             return response;
         }
         //TODO: Use crypto to encrypt cookie or set cookie as user parameters
+        [ApiExplorerSettings(IgnoreApi = true)]
 
         public ActionResult<bool> RemoveSession()
         {

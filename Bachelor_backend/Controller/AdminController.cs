@@ -33,8 +33,11 @@ namespace Bachelor_backend.Controller
         /// <summary>
         /// Login as admin
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <response code="200"> Successful login</response>
+        /// <response code="401"> Wrong pass/username</response>
+        /// <response code="400"> Bad request</response>
+
+
         [HttpPost]
         public async Task<ActionResult> LogIn([FromBody] AdminUser user)
         {
@@ -54,12 +57,23 @@ namespace Bachelor_backend.Controller
 
         }
         
+        /// <summary>
+        /// Logout as admin
+        /// </summary>
+        /// <response code="200"> Successful logout</response>
         [HttpGet]
         public async Task<ActionResult> LogOut()
         {
             HttpContext.Session.SetString(_loggedIn, _notLoggedIn);
             return Ok(true);
         }
+
+        /// <summary>
+        /// Register admin
+        /// </summary>
+        /// <param name="user"></param>
+        /// <response code="200">Successful registration</response>
+        /// <response code="401"> Not logged in</response>
 
         [HttpPost]
         public async Task<ActionResult> RegisterAdmin([FromBody] AdminUser user)
@@ -96,12 +110,11 @@ namespace Bachelor_backend.Controller
         /// <summary>
         /// Post tag
         /// </summary>
-        /// <remarks>
-        /// Needs a string with the tag-text. Example: "Vold"
-        /// </remarks>
         /// <param name="text"></param>
         /// <response code="200">OK - creation successful</response>
         /// <response code="400">Error while creating tag</response>
+        /// <response code="401"> Not logged in</response>
+
         [HttpPost]
         public async Task<ActionResult> CreateTag([FromBody]string text)
         {
@@ -119,13 +132,14 @@ namespace Bachelor_backend.Controller
             _logger.LogInformation("Fault in creating tag");
             return BadRequest(false);
         }
-        
+
         /// <summary>
         /// Get all tags
         /// </summary>
         /// <returns></returns>
         /// <response code="200">Returns list of tags</response>
         /// <response code="400">Returns empty list</response>"
+        /// <response code="401"> Not logged in</response>
         [HttpGet]
         public async Task<ActionResult> GetTags()
         {
@@ -139,35 +153,14 @@ namespace Bachelor_backend.Controller
             return Ok(list);
         }
         /// <summary>
-        /// Post text
+        /// Create text
         /// </summary>
-        /// <remarks>
-        /// Needs text-object as argument
-        /// Example: 
-        /// text = 
-        /// {
-        /// "textText": "Jeg er uskyldig .... ..... . dette er teksten som skal leses opp......",
-        /// "tags":
-        ///     [
-        ///         {
-        ///             "tagText": "vold"
-        ///         },
-        ///         {
-        ///             "tagText": "narkotika"
-        ///         }
-        ///     ],
-        /// "targetUser": 
-        ///     {
-        ///         "nativeLanguage": "Norsk",
-        ///         "ageGroup": "18-28",
-        ///         "dialect": "østlandsk"
-        ///     }
-        /// }
-        /// </remarks>
         /// <param name="text"></param>
         /// <returns></returns>
         /// <response code="200">Successfully saved text, returns true</response>
         /// <response code="500">Failed, returns false</response>
+        /// <response code="401"> Not logged in</response>
+        /// <response code="400"> Bad request</response>
         [HttpPost]
         public async Task<ActionResult> CreateText([FromBody] Text text)
         {
@@ -190,13 +183,14 @@ namespace Bachelor_backend.Controller
             _logger.LogInformation("Fault in input");
             return BadRequest("Fault in input");
         }
-        
+
         /// <summary>
         /// Get all texts
         /// </summary>
         /// <returns></returns>
         /// <response code="200">OK - returns list of all texts</response>
         /// <response code="500">Returns empty list</response>
+        /// <response code="401"> Not logged in</response>
         [HttpGet]
         public async Task<ActionResult> GetAllTexts()
         {
@@ -219,6 +213,7 @@ namespace Bachelor_backend.Controller
         /// <param name="TextId"></param>
         /// <response code="200">OK - returns true, deletion successful</response>
         /// <response code="400">Bad request, returns false. Likely from sending non existent TextId</response>
+        /// <response code="401"> Not logged in</response>
         [HttpDelete]
         public async Task<ActionResult> DeleteText(int TextId)
         {
@@ -235,13 +230,14 @@ namespace Bachelor_backend.Controller
             }
             return BadRequest(false);
             }
-        
+
         /// <summary>
         /// Delete tag
         /// </summary>
         /// <param name="TagId"></param>
         /// <response code="200">OK - returns true, deletion successful</response>
         /// <response code="400">Bad request, returns false. Likely from sending non existent TextId</response>
+        /// <response code="401"> Not logged in</response>
         [HttpDelete]
         public async Task<ActionResult> DeleteTag(int TagId)
         {
@@ -258,12 +254,14 @@ namespace Bachelor_backend.Controller
             }
             return BadRequest(false);
         }
-        
+
         /// <summary>
-        /// 
+        /// Edit text-object
         /// </summary>
         /// <param name="text"></param>
-        /// <returns></returns>
+        /// <response code="200">OK; successful edit</response>
+        /// <response code="400"> Bad request</response>
+        /// <response code="401">Not logged inn</response>
         [HttpPost]
         public async Task<ActionResult> EditText([FromBody]Text text)
         {
@@ -280,7 +278,14 @@ namespace Bachelor_backend.Controller
             }
             return BadRequest(false);
         }
-        
+
+        /// <summary>
+        /// Edit a tag-object
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <response code="200">Successful edit</response>
+        /// <response code="401">Not logged inn</response>
+        /// <response code="400"> Bad request</response>
         [HttpPost]
         public async Task<ActionResult> EditTag([FromBody] Tag tag) 
         {
@@ -310,9 +315,10 @@ namespace Bachelor_backend.Controller
         }
 
         /// <summary>
-        /// 
+        /// Fetch number of texts in database
         /// </summary>
-        /// <returns></returns>
+        /// <response code="401">Not logged inn</response>
+        /// <response code="200">Success</response>
 
         [HttpGet]
         public async Task<ActionResult> GetNumberOfTexts()
@@ -332,9 +338,11 @@ namespace Bachelor_backend.Controller
             return StatusCode(StatusCodes.Status500InternalServerError, -1);
             }
         /// <summary>
-        /// 
+        /// Get total number of recordings
         /// </summary>
-        /// <returns></returns>
+        /// <response code="401"> Not logged in</response>
+        /// <response code="500"> error on server</response>
+        /// <response code="200"> Success</response>
 
         [HttpGet]
         public async Task<ActionResult> GetNumberOfRecordings()
@@ -354,9 +362,11 @@ namespace Bachelor_backend.Controller
             return StatusCode(StatusCodes.Status500InternalServerError, -1);
         }
         /// <summary>
-        /// 
+        /// Get total number of users
         /// </summary>
-        /// <returns></returns>
+        /// <response code="401"> Not logged in</response>
+        /// <response code="200"> Success</response>
+        /// <response code="500"> Server error</response>
 
         [HttpGet]
         public async Task<ActionResult> GetNumberOfUsers()
@@ -374,10 +384,12 @@ namespace Bachelor_backend.Controller
             return StatusCode(StatusCodes.Status500InternalServerError, -1);
         }
         /// <summary>
-        /// 
+        /// Retrieves 1 text by textId
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
+        /// <response code="401"> Not logged in</response>
+        /// <response code="200"> Success</response>
+        /// <response code="500"> Server error</response>
 
         [HttpGet]
         public async Task<ActionResult> GetOneText(int id) 
@@ -397,25 +409,22 @@ namespace Bachelor_backend.Controller
 
         }
 
+
+
         /// <summary>
-        /// 
+        /// Gets list of all recordings 
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        [HttpGet]
-        public async Task<ActionResult> GetNumberOfDeletedRecordings()
-        {
-            throw new NotImplementedException();
-        }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
+        /// <response code="401"> Not logged in</response>
+        /// <response code="200"> Success </response>
+        /// <response code="500"> Server error</response>
         [HttpGet]
         public async Task<ActionResult> GetAllRecordings()
         {
-            throw new NotImplementedException();
+            var sessionString = HttpContext.Session.GetString(_loggedIn);
+            if (sessionString.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
             List<Audiofile> list = await _voicerep.GetAllRecordings();
             if(list != null)
             {
@@ -427,11 +436,12 @@ namespace Bachelor_backend.Controller
             }
         }
         /// <summary>
-        /// 
+        /// Get 1 audiofile
         /// </summary>
         /// <param name="uuid"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <response code="401"> Not logged in</response>
+        /// <response code="200"> Success</response>
+        /// <response code="400"> Bad request</response>
         [HttpGet]
         public async Task<ActionResult> GetOneRecording(string uuid) 
         {
@@ -450,10 +460,11 @@ namespace Bachelor_backend.Controller
         }
 
         /// <summary>
-        /// 
+        /// Get list of all users
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <response code="401"> Not logged in</response>
+        /// <response code="200"> Success</response>
+        /// <response code="500"> Server error</response>
         [HttpGet]
         public async Task<ActionResult> GetAllUsers()
         {

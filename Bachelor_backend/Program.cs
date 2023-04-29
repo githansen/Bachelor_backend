@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Reflection;
 using Bachelor_backend.Services;
+using Bachelor_backend.Swagger;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -33,7 +34,6 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
 builder.Services.AddControllers();
-
 //Adding repositories and services
 builder.Services.AddScoped<IVoiceRepository, VoiceRepository>();
 builder.Services.AddScoped<ITextRepository, TextRepository>();
@@ -48,7 +48,6 @@ builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(b
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
-
 // Configuring sessions
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -60,6 +59,7 @@ builder.Services.AddSession(options =>
     //options.Cookie.SameSite = SameSiteMode.None;
 });
 builder.Services.AddScoped<IDBInitializer, DBInitializer>();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
@@ -78,7 +78,6 @@ void SeedDatabase()
     }
 }
 
-
 app.UseSession();
 app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);
@@ -87,6 +86,8 @@ app.MapControllerRoute(
     pattern: "{controller}/{action=Index}/{id?}");
 SeedDatabase();
 
+app.UseAuthorization();
+app.UseSwaggerAuthorized();
 app.UseSwagger(options =>
 {
     options.SerializeAsV2 = true;
