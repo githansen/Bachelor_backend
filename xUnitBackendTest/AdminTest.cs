@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Mime;
 using Bachelor_backend.Controller;
 using Bachelor_backend.DAL.Repositories;
 using Bachelor_backend.Models;
@@ -104,7 +105,7 @@ public class AdminTest
         var user = new AdminUser()
         {
             Username = "person",
-            Password = "password"
+            Password = "Password1@"
         };
         
         mockSession[_loggedIn] = "admin";
@@ -128,7 +129,7 @@ public class AdminTest
         var user = new AdminUser()
         {
             Username = "person",
-            Password = "password"
+            Password = "Password2@"
         };
         
         mockSession[_loggedIn] = "admin";
@@ -152,7 +153,7 @@ public class AdminTest
         var user = new AdminUser()
         {
             Username = "1234",
-            Password = "1234"
+            Password = "1234Pass234@"
         };
         
         mockSession[_loggedIn] = "admin";
@@ -171,13 +172,35 @@ public class AdminTest
     }
     
     [Fact]
+    public async Task RegisterLoggedInFaultPassword()
+    {
+        //Arrange
+        var user = new AdminUser()
+        {
+            Username = "1234",
+            Password = "1234"
+        };
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        //Act
+        var result = await _adminController.RegisterAdmin(user) as BadRequestObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result!.StatusCode);
+        Assert.Equal("Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character" , result!.Value!);
+    }
+    
+    [Fact]
     public async Task RegisterNotLoggedIn()
     {
         //Arrange
         var user = new AdminUser()
         {
             Username = "person",
-            Password = "password"
+            Password = "Password1@"
         };
         
         mockSession[_loggedIn] = _notLoggedIn;
@@ -417,6 +440,122 @@ public class AdminTest
         Assert.Equal((int) HttpStatusCode.BadRequest, result!.StatusCode);
         Assert.Equal("Fault in input", result.Value);
     }
+    
+    [Fact]
+    public async Task GetAllTextsOk()
+    {
+        //Arrange
+        var texts = new List<Text>()
+        {
+            new(){
+            Active = true,
+            TextId = 1,
+            TextText = "test",
+            Tags = new List<Tag>()
+            {
+                new()
+                {
+                    TagId = 1,
+                    TagText = "test"
+                }
+            }
+            },
+            new(){
+                Active = true,
+                TextId = 2,
+                TextText = "test2",
+                Tags = new List<Tag>()
+                {
+                    new()
+                    {
+                        TagId = 2,
+                        TagText = "test2"
+                    }
+                }
+            }
+        };
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        mockTextRep.Setup(x => x.GetAllTexts()).ReturnsAsync(texts);
+        
+        //Act
+        var result = await _adminController.GetAllTexts() as OkObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.Equal(texts, result.Value!);
+    }
+    
+    [Fact]
+    public async Task GetAllTextsNotLoggedIn()
+    {
+        //Arrange
+        var texts = new List<Text>()
+        {
+            new(){
+                Active = true,
+                TextId = 1,
+                TextText = "test",
+                Tags = new List<Tag>()
+                {
+                    new()
+                    {
+                        TagId = 1,
+                        TagText = "test"
+                    }
+                }
+            },
+            new(){
+                Active = true,
+                TextId = 2,
+                TextText = "test2",
+                Tags = new List<Tag>()
+                {
+                    new()
+                    {
+                        TagId = 2,
+                        TagText = "test2"
+                    }
+                }
+            }
+        };
+        
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        mockTextRep.Setup(x => x.GetAllTexts()).ReturnsAsync(texts);
+        
+        //Act
+        var result = await _adminController.GetAllTexts() as UnauthorizedResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.Unauthorized, result!.StatusCode);
+    }
+    
+    [Fact]
+    public async Task GetAllTextsFault()
+    {
+        //Arrange
+        var texts = new List<Text>();
+        texts = null!;
+        
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        mockTextRep.Setup(x => x.GetAllTexts()).ReturnsAsync((List<Text>) null);
+        
+        //Act
+        var result = await _adminController.GetAllTexts() as ObjectResult;
+        
+        //Assert
+        Assert.Equal((int) HttpStatusCode.InternalServerError, result!.StatusCode);
+    }
+    
 
     [Fact]
     public async Task DeleteTextOk()
@@ -882,6 +1021,25 @@ public class AdminTest
     }
     
     [Fact]
+    public async Task EditTagFaultInput()
+    {
+        //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+        
+        _adminController.ModelState.AddModelError("TagText", "Fault in input");
+        mockTextRep.Setup(x => x.EditTag(It.IsAny<Tag>())).ReturnsAsync(true);
+        
+        //Act
+        var result = await _adminController.EditTag(It.IsAny<Tag>()) as BadRequestObjectResult;
+
+        //Assert
+        Assert.Equal((int) HttpStatusCode.BadRequest, result!.StatusCode);
+        Assert.Equal("Fault in input", result.Value!);
+    }
+    
+    [Fact]
     public async Task EditTagNotLoggedIn()
     {
         //Arrange
@@ -912,5 +1070,60 @@ public class AdminTest
         //Assert
         Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
         Assert.Equal(false, result.Value);
+    }
+    
+    [Fact]
+    public async Task GetNumberOfRecordingsOk()
+    {
+        //Arrange
+        var numberOfRecordings = 10;
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+
+        mockVoiceRep.Setup(x => x.GetNumberOfRecordings()).ReturnsAsync(numberOfRecordings);
+        
+        //Act
+        var result = await _adminController.GetNumberOfRecordings() as OkObjectResult;
+
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.Equal(numberOfRecordings, result.Value);
+    }
+
+    [Fact]
+    public async Task GetNumberOfRecordingsFault()
+    {
+        //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+
+        mockVoiceRep.Setup(x => x.GetNumberOfRecordings()).ReturnsAsync(-1);
+
+        //Act
+        var result = await _adminController.GetNumberOfRecordings() as ObjectResult;
+
+        //Assert
+        Assert.Equal((int)HttpStatusCode.InternalServerError, result!.StatusCode);
+        Assert.Equal(-1, result.Value);
+    }
+    
+    [Fact]
+    public async Task GetNumberOfRecordingsNotLoggedIn()
+    {
+        //Arrange
+        var numberOfRecordings = 10;
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+
+        mockVoiceRep.Setup(x => x.GetNumberOfRecordings()).ReturnsAsync(numberOfRecordings);
+
+        //Act
+        var result = await _adminController.GetNumberOfRecordings() as UnauthorizedResult;
+
+        //Assert
+        Assert.Equal((int)HttpStatusCode.Unauthorized, result!.StatusCode);
     }
 }
