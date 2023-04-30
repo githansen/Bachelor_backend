@@ -1071,4 +1071,59 @@ public class AdminTest
         Assert.Equal((int) HttpStatusCode.BadRequest, result.StatusCode);
         Assert.Equal(false, result.Value);
     }
+    
+    [Fact]
+    public async Task GetNumberOfRecordingsOk()
+    {
+        //Arrange
+        var numberOfRecordings = 10;
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+
+        mockVoiceRep.Setup(x => x.GetNumberOfRecordings()).ReturnsAsync(numberOfRecordings);
+        
+        //Act
+        var result = await _adminController.GetNumberOfRecordings() as OkObjectResult;
+
+        //Assert
+        Assert.Equal((int) HttpStatusCode.OK, result!.StatusCode);
+        Assert.Equal(numberOfRecordings, result.Value);
+    }
+
+    [Fact]
+    public async Task GetNumberOfRecordingsFault()
+    {
+        //Arrange
+        mockSession[_loggedIn] = "admin";
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+
+        mockVoiceRep.Setup(x => x.GetNumberOfRecordings()).ReturnsAsync(-1);
+
+        //Act
+        var result = await _adminController.GetNumberOfRecordings() as ObjectResult;
+
+        //Assert
+        Assert.Equal((int)HttpStatusCode.InternalServerError, result!.StatusCode);
+        Assert.Equal(-1, result.Value);
+    }
+    
+    [Fact]
+    public async Task GetNumberOfRecordingsNotLoggedIn()
+    {
+        //Arrange
+        var numberOfRecordings = 10;
+        mockSession[_loggedIn] = _notLoggedIn;
+        mockHttpContext.Setup(s => s.Session).Returns(mockSession);
+        _adminController.ControllerContext.HttpContext = mockHttpContext.Object;
+
+        mockVoiceRep.Setup(x => x.GetNumberOfRecordings()).ReturnsAsync(numberOfRecordings);
+
+        //Act
+        var result = await _adminController.GetNumberOfRecordings() as UnauthorizedResult;
+
+        //Assert
+        Assert.Equal((int)HttpStatusCode.Unauthorized, result!.StatusCode);
+    }
 }
